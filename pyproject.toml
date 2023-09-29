@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "glebtube"
+version = "0.0.1"
+description = "Videohosting YT copy (non commercial)"
+authors = ["JukNavozn1k <deffender1337@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^4.2.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
