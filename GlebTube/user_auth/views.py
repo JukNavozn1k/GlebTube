@@ -31,11 +31,6 @@ class Reg(views.View):
         return render(request, 'auth.html',context=context)
 
     def post(self,request):
-        '''
-        form = forms.AuthForm(request.POST)
-        if authenticate(request,username=form['username'].value(),password=form['password'].value()) is None:
-            return HttpResponse('Good') '''
-
         if User.objects.filter(username=request.POST['username']).first():
             return HttpResponse('User already exists!')
         else:
