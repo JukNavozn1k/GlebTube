@@ -39,8 +39,8 @@ class Reg(views.View):
                user = form.save() 
                user.set_password(user.password)
                user.save()
-               #login(request,user)
-               redirect('/')
+               login(request,user)
+               return redirect('/')
             else: render(request, 'auth.html',context={'form':forms.AuthForm()})
 
 class Logout(views.View):
