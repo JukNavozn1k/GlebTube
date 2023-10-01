@@ -1,4 +1,4 @@
-from django.shortcuts import render,HttpResponse
+from django.shortcuts import render,redirect
 
 from django import views
 
@@ -15,29 +15,37 @@ Auth form
 '''
 class Login(views.View):
     def get(self,request):
-        form = forms.AuthForm()
-        context = {'form' : form, 'title' :'Авторизация'}
-        return render(request, 'auth.html',context=context)
+        return render(request, 'auth.html',context={'form':forms.AuthForm()})
     def post(self,request):
         form = forms.AuthForm(request.POST)
-        if authenticate(request,username=form['username'].value(),password=form['password'].value()) is None:
-            return HttpResponse('Bad')
-        return HttpResponse('Good')
+        user = authenticate(request,username=form['username'].value(),password=form['password'].value())
+        if user  is None:
+            return render(request, 'auth.html',context={'form':forms.AuthForm()})
+        else: 
+            # login user...
+            login(request,user)
+            return redirect('/')
 
 class Reg(views.View):
     def get(self,request):
-        form = forms.AuthForm()
-        context = {'form' : form, 'title':'Регистрация'}
-        return render(request, 'auth.html',context=context)
+        return render(request, 'auth.html',context={'form':forms.AuthForm()})
 
     def post(self,request):
         if User.objects.filter(username=request.POST['username']).first():
-            return HttpResponse('User already exists!')
+            return render(request, 'auth.html',context={'form':forms.AuthForm()})
         else:
             form = forms.AuthForm(request.POST)
             if form.is_valid():
                user = form.save() 
                user.set_password(user.password)
                user.save()
-            return HttpResponse('User created!')
+               #login(request,user)
+               redirect('/')
+            else: render(request, 'auth.html',context={'form':forms.AuthForm()})
+
+class Logout(views.View):
+    def get(self,request):
+        logout(request)
+        return redirect('/')
+  
 

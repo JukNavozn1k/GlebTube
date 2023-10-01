@@ -59,7 +59,7 @@ ROOT_URLCONF = 'GlebTube.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['GlebTube/user_auth/templates','GlebTube/video_manager/templates','../templates/'],
+        'DIRS': ['GlebTube/user_auth/templates','GlebTube/video_manager/templates','../templates/','GlebTube/core/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
