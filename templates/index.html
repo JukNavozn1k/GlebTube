@@ -83,8 +83,12 @@ body {
 
 <div class="topnav">
   <a href="/">Главная</a>
+  {% if not request.user %}
   <a href="/login">Войти</a>
   <a href="/reg">Зарегестрироваться</a>
+  {% else %}
+  <a href="/logout">Выйти</a>
+{% endif %}
   <div class="search-container">
     <form action="/action_page.php">
       <input type="text" placeholder="Поиск..." name="search">
@@ -94,9 +98,10 @@ body {
 </div>
 
 <div style="padding-left:16px">
-  <h2>Responsive Search Bar</h2>
+  <h2>Welcome back, {{ request.user }}</h2>
   <p>Navigation bar with a search box and a submit button inside of it.</p>
   <p>Resize the browser window to see the responsive effect.</p>
+  
 </div>
     <div class ="content"> 
       {% block content %} {% endblock %}
