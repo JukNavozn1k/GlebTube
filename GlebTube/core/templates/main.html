@@ -2,6 +2,26 @@
 
 {% block content %}
 {% load static %}
+ <link rel="stylesheet" href="{% static '/css/bootstrap.css' %}">
 
-<script src="{% static 'test.js' %}"></script>
+<table>
+    <tr>
+        {% for video in videos %}
+        <td>
+            <div class="card" style="width: 18rem;">
+                <img class="card-img-top" src="{{video.img.url}}" alt="Card image cap">
+                <div class="card-body">
+                  <h5 class="card-title">{{video.caption}}</h5>
+                  <p class="card-text">{{ video.description}}</p>
+                  <a href="{{video.video.url}}" class="btn btn-primary">Смотреть</a>
+                </div>
+              </div>        
+        </td>
+        {% endfor %}
+    </tr>
+
+
+</table>
+
+
 {% endblock %}
