@@ -4,13 +4,17 @@
 {% block content %}
 {% if not user.is_authenticated%}
 <div class ="mx-auto col-10 col-md-8 col-lg-6 ">
-<h1>Вход/Регистрация</h1>
+
+
 <div class="form-group">
+{% block form %}
+<h1>Вход/Регистрация</h1>
 <form method="POST">
   {% csrf_token %}
   {{ form.as_p }}
 <input type="submit" value="Продолжить" class="btn btn-outline-primary float-right"/>
 </form>
+{% endblock %}
 </div>
 </div>
 

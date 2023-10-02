@@ -16,13 +16,13 @@ Auth form
 class Login(views.View):
     def get(self,request):
         if request.user.is_authenticated: return redirect('/')
-        return render(request, 'auth.html',context={'form':forms.AuthForm()})
+        return render(request, 'login.html',context={'form':forms.AuthForm()})
     def post(self,request):
         if request.user.is_authenticated: return redirect('/')
         form = forms.AuthForm(request.POST)
         user = authenticate(request,username=form['username'].value(),password=form['password'].value())
         if user  is None:
-            return render(request, 'auth.html',context={'form':forms.AuthForm()})
+            return render(request, 'login.html',context={'form':forms.AuthForm()})
         else: 
             # login user...
             login(request,user)
@@ -31,12 +31,12 @@ class Login(views.View):
 class Reg(views.View):
     def get(self,request):
         if request.user.is_authenticated: return redirect('/')
-        return render(request, 'auth.html',context={'form':forms.AuthForm()})
+        return render(request, 'reg.html',context={'form':forms.AuthForm()})
 
     def post(self,request):
         if request.user.is_authenticated: return redirect('/')
         if User.objects.filter(username=request.POST['username']).first():
-            return render(request, 'auth.html',context={'form':forms.AuthForm()})
+            return render(request, 'reg.html',context={'form':forms.AuthForm()})
         else:
             form = forms.AuthForm(request.POST)
             if form.is_valid():
@@ -45,7 +45,7 @@ class Reg(views.View):
                user.save()
                login(request,user)
                return redirect('/')
-            else: render(request, 'auth.html',context={'form':forms.AuthForm()})
+            else: render(request, 'reg.html',context={'form':forms.AuthForm()})
 
 class Logout(views.View):
     def get(self,request):
