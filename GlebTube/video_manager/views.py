@@ -17,16 +17,18 @@ class Upload(View):
 
         form = forms.UploadForm(request.POST,request.FILES)
         form.author = User.objects.get(username=request.user)
-        print(form.author)
         if form.is_valid():
-            form.save()
+            video  = form.save()
+            video.author = request.user
+            video.save()
+            
             return redirect('/')
         else: return render(request,'upload.html',context={'form':forms.UploadForm()})
 
 
 class Watch(View):
     def get(self,request,video_id):
-        video = models.Video.objects.get(video_id=int(video_id))
+        video = models.Video.objects.all().filter(video_id=video_id).first()
 
         context = {'video':video}
         return render(request,'watch.html',context=context)
