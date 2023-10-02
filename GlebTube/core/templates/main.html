@@ -1,24 +1,14 @@
 {% extends 'index.html' %}
 
 {% block content %}
-<table>
-    <tr>
-        {% for video in videos %}
-        <td>
-            <div class="card" style="width: 18rem;">
-                <img class="card-img-top" src="{{video.img.url}}" alt="Card image cap">
-                <div class="card-body">
-                  <h5 class="card-title">{{video.caption}}</h5>
-                  <p class="card-text">{{ video.description}}</p>
-                  <a href="{{video.video.url}}" class="btn btn-primary">Смотреть</a>
-                </div>
-              </div>        
-        </td>
-        {% endfor %}
-    </tr>
 
+{% for video in videos %}
+<h2>{{ video.caption }}</h1>
+<h3>{{video.description}}</h3>
+<video controls> 
+<source src="{{video.video.url}}" type="video/mp4">
+</video>
 
-</table>
-
+{% endfor %}
 
 {% endblock %}
