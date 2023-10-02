@@ -10,23 +10,34 @@
 
 
 
-  
-<div class="topnav">
-  <a href="/">Главная</a>
-  {% if not user.is_authenticated%}
-  <a href="/login">Войти</a>
-  <a href="/reg">Зарегестрироваться</a>
-  {% else %}
-  <a href="/upload">Загрузить видео</a>
-  <a href="/logout">Выйти</a>
-{% endif %}
-  <div class="search-container">
-    <form action="/action_page.php">
-      <input type="text" placeholder="Поиск..." name="search">
-      <button type="submit"><i class="fa fa-search"></i></button>
-    </form>
-  </div>
-</div>
+  <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+    <div class="col-md-3 mb-2 mb-md-0">
+      <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
+        <img class="bi" src="{% static 'logo.png' %}" width="32" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use>
+      </a>
+    </div>
+
+    <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+      <li><a href="/" class="nav-link px-2 link-secondary">Главная</a></li>
+      {% if request.user.is_authenticated %}
+      <li><a href="/upload" class="nav-link px-2">Мои видео</a></li>
+      <li><a href="/upload" class="nav-link px-2">Загрузить видео</a></li>
+      <li><a href="/upload" class="nav-link px-2">Подписки</a></li>
+      
+      {% endif %}
+     
+    </ul>
+
+    <div class="col-md-3 text-end">
+      {% if not request.user.is_authenticated %}
+      <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='/login';">Вход</button>
+      <button type="button" class="btn btn-primary" onclick="location.href='/reg';">Регистрация</button>
+      {% else %}
+      <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='#';">Профиль</button>
+      <button type="button" class="btn btn-danger" onclick="location.href='/logout';">Выход</button>
+      {% endif %}
+    </div>
+  </header>
 
     <div class ="content"> 
       {% block content %} {% endblock %}
