@@ -17,7 +17,8 @@ class AuthForm(forms.ModelForm):
             'username' : 'Имя пользователя',
             'password' : 'Пароль',
             'first_name' : 'Имя',
-            'last_name' : 'Фамилия'
+            'last_name' : 'Фамилия',
+            'email' : 'Электронная почта'
           
         }
         help_texts = {
