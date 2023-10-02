@@ -1,0 +1,12 @@
+{% extends 'index.html' %}
+
+{%block content %}
+<div class="embed-responsive embed-responsive-16by9">
+    <h1>Video url: {{video_url}}</h1>
+<video controls width="500px">
+    <source src = "{{video_url}}" type="video/mp4">
+</video>
+
+  </div>
+
+{% endblock %}
