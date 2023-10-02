@@ -1,0 +1,12 @@
+{% extends 'index.html' %}
+
+{%block content %}
+
+    <h1>{{video.caption}}</h1>
+<video controls width="800px" height="400px">
+    <source src = "{{video.video.url}}" type="video/mp4">
+</video>
+<h2>Описание: </h2>
+<p>{{video.description}}</p>
+<p>{{video.date_uploaded}}</p>
+{% endblock %}
