@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 
 from django.views import View
 
@@ -9,3 +9,10 @@ def home(request):
     context = {'videos': videos}
     print(context)
     return render(request,'main.html',context=context)
+def my_videos(request):
+   if request.user.is_authenticated:
+        videos = models.Video.objects.all().filter(author=request.user)
+        context = {'videos': videos}
+        print(context)
+        return render(request,'main.html',context=context)
+   else: return redirect('/')
