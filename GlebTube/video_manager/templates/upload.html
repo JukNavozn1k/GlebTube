@@ -3,11 +3,17 @@
 
 {% block content %}
 
-<h1>Video Uploader</h1>
+
+<div class ="mx-auto col-10 col-md-8 col-lg-6">
+<div class="form-group">
+    <h1>Новое видео</h1>
 <form enctype="multipart/form-data" method="POST" action="">
+
 {% csrf_token %}
 {{ form.as_p }}
-<input type="submit" value="Upload"/>
+<input type="submit" value="Загрузить" class="btn btn-outline-primary float-right"/>
 </form>
+</div>
+</div>
 
 {% endblock %}
