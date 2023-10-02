@@ -5,7 +5,7 @@ from . import models
 class UploadForm(forms.ModelForm):
     class Meta:
         model =  models.Video
-        exclude = ['date_uploaded']
+        exclude = ['date_uploaded','author']
         widgets = {
             
             'caption' : forms.TextInput(attrs={'class' : 'form-control','placeholder':'Моё первое видео!'}),

@@ -4,5 +4,5 @@ from . import views
 
 urlpatterns = [
   path('upload/',views.Upload.as_view()),
-  path('watch/<path:video_url>',views.Watch.as_view())
+  path('watch/<path:video_id>',views.Watch.as_view())
 ] 
