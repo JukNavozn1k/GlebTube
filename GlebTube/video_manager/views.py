@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,HttpResponse
 from django.views import View
 
 from . import forms
@@ -20,3 +20,9 @@ class Upload(View):
             form.save()
             return redirect('/')
         else: return render(request,'upload.html',context={'form':forms.UploadForm()})
+
+
+class Watch(View):
+    def get(self,request,video_url):
+        context = {'video_url':video_url}
+        return render(request,'watch.html',context=context)
