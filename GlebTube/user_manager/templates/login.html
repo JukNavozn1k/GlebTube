@@ -1,0 +1,14 @@
+{% extends 'base_auth.html' %}
+
+{% block title %}Вход - GlebTube {% endblock %}
+
+{% block form %}
+
+<h1>Вход</h1>
+<form method="POST">
+  {% csrf_token %}
+  <p>{{form.username}}</p>
+  <p>{{form.password}}</p>
+<input type="submit" value="Продолжить" class="btn btn-outline-primary float-right"/>
+</form>
+{% endblock %}
