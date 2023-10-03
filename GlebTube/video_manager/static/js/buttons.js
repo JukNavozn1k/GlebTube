@@ -26,7 +26,7 @@ document.querySelectorAll(".post").forEach(post => {
 			rating.classList.add("post-rating-selected");
 
 			const likeOrDislike = likeRating === rating ? "like" : "dislike";
-			const response = await fetch(`/posts/${postId}/${likeOrDislike}`);
+			const response = await fetch(`/video/${postId}/${likeOrDislike}`);
 			const body = await response.json();
 		});
 	});
