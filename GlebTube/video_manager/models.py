@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 
 class Video(models.Model):
-    video_id = models.BigAutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     caption = models.CharField(max_length=32,null = False)
     description = models.TextField(max_length=1024)
     img = models.ImageField(upload_to='images_uploaded',null=True)
