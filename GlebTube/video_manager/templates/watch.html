@@ -16,16 +16,40 @@
   <video class="post-video"  alt="Post Video" controls width="600px" height="400px">
     <source src = "{{video.video.url}}" type="video/mp4">
   </video>
+  {% if grade == 0 %}
   <div class="post-ratings-container">
     <div class="post-rating">
       <span class="post-rating-button material-icons">thumb_up</span>
-      <span class="post-rating-count">0</span>
+      <span class="post-rating-count">{{likes}}</span>
     </div>
     <div class="post-rating">
       <span class="post-rating-button material-icons">thumb_down</span>
-      <span class="post-rating-count">0</span>
+      <span class="post-rating-count">{{dislikes}}</span>
     </div>
   </div>
+  {% elif grade == 1 %}
+  <div class="post-ratings-container">
+    <div class="post-rating post-rating-selected">
+      <span class="post-rating-button material-icons">thumb_up</span>
+      <span class="post-rating-count">{{likes}}</span>
+    </div>
+    <div class="post-rating">
+      <span class="post-rating-button material-icons">thumb_down</span>
+      <span class="post-rating-count">{{dislikes}}</span>
+    </div>
+  </div>
+  {% elif grade == -1 %}
+  <div class="post-ratings-container">
+    <div class="post-rating">
+      <span class="post-rating-button material-icons">thumb_up</span>
+      <span class="post-rating-count">{{likes}}</span>
+    </div>
+    <div class="post-rating post-rating-selected">
+      <span class="post-rating-button material-icons">thumb_down</span>
+      <span class="post-rating-count">{{dislikes}}</span>
+    </div>
+  </div>
+  {% endif %}
 
 </div>
 
