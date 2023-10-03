@@ -37,5 +37,8 @@ class Watch(View):
 
 
 def video(request,video_id,action):
-    print(video_id,action)
-    return HttpResponse('Test')
+    if request.user.is_authenticated:
+        print(video_id,action)
+        return HttpResponse('Good')
+    else: return HttpResponse('User not logged!')
+    
