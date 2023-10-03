@@ -9,8 +9,11 @@ class Video(models.Model):
     id = models.BigAutoField(primary_key=True)
     caption = models.CharField(max_length=32,null = False)
     description = models.TextField(max_length=1024)
+
     img = models.ImageField(upload_to='images_uploaded',null=True)
     video = models.FileField(upload_to='videos_uploaded',null=True,
     validators=[FileExtensionValidator(allowed_extensions=['MOV','avi','mp4','webm','mkv'])])
+    
+    views = models.PositiveBigIntegerField(default=0)
     date_uploaded = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(User,null=True,on_delete=models.CASCADE)

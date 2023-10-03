@@ -29,6 +29,7 @@ class Upload(View):
 class Watch(View):
     def get(self,request,video_id):
         video = models.Video.objects.all().filter(id=video_id).first()
-
+        video.views += 1
+        video.save()
         context = {'video':video}
         return render(request,'watch.html',context=context)
