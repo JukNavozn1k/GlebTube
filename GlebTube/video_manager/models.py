@@ -28,7 +28,7 @@ class RateVideo(models.Model):
         
     video = models.ForeignKey(Video,on_delete=models.CASCADE)
     author = models.ForeignKey(User,on_delete=models.CASCADE)
-    grade = models.IntegerField(default=0)
+    grade = models.IntegerField(default=0,choices=[(-1, 'Dislike'), (0, 'None'), (1, 'Like')])
     
     class Meta:
         unique_together = ['video', 'author']
