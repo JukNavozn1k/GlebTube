@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect,HttpResponse
 from django.views import View
 from django.contrib.auth.models import User
 
+from django.db.models import Q
 
 from . import models
 from . import forms
@@ -31,14 +32,38 @@ class Watch(View):
         video = models.Video.objects.all().filter(id=video_id).first()
         video.views += 1
         video.save()
-        context = {'video':video}
+
+        rates = models.RateVideo.objects.all().filter(video=video)
+        likes = rates.filter(grade=1).count()
+        dislikes = rates.filter(grade=-1).count()
+
+        if request.user.is_authenticated: rate = models.RateVideo.objects.filter(Q(video=video) & Q(author=request.user)).first()
+        else: rate = None
+        grade = 0
+        if not rate is None:
+            grade = rate.grade
+        context = {'video':video,'likes':likes,'dislikes':dislikes,'grade':grade}
         return render(request,'watch.html',context=context)
     
 
 
 def video(request,video_id,action):
     if request.user.is_authenticated:
-        print(video_id,action)
-        return HttpResponse('Good')
-    else: return HttpResponse('User not logged!')
+        video = models.Video.objects.all().filter(id=video_id).first()
+        author = request.user
+
+        rate = models.RateVideo.objects.filter(Q(video=video) & Q(author=author)).first()
+        if rate is None:
+            rate = models.RateVideo()
+            rate.video = video
+            rate.author = author
+
+        if action == 'like':
+            rate.grade = 1
+        elif action == 'dislike':
+            rate.grade = -1
+        rate.save()
+
+        return HttpResponse('200')
+    return HttpResponse('User not logged!')
     
