@@ -33,3 +33,9 @@ class Watch(View):
         video.save()
         context = {'video':video}
         return render(request,'watch.html',context=context)
+    
+
+
+def video(request,video_id,action):
+    print(video_id,action)
+    return HttpResponse('Test')
