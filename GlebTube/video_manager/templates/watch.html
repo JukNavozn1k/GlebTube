@@ -3,13 +3,22 @@
 {% block title %} {{video.caption}} - GlebTube  {% endblock %}
 
 {%block content %}
-
+    {% load static %}
+    <link rel="stylesheet" a href="{% static '/css/rate_buttons.css' %}"> 
+    
+    <script src="https://use.fontawesome.com/fe459689b4.js"></script>
     <h1>{{video.caption}}</h1>
 <video controls width="800px" height="400px">
     <source src = "{{video.video.url}}" type="video/mp4">
 </video>
+<br>
+<button class="btn" id="green"><i class="fa fa-thumbs-up fa-lg" aria-hidden="true">Нравится</i></button>
+  <button class="btn" id="red"><i class="fa fa-thumbs-down fa-lg" aria-hidden="true">Не нравится</i></button>
 <h2>Описание: </h2>
 <p>{{video.description}}</p>
 <p>Дата выхода: {{video.date_uploaded}} Количество просмотров: {{video.views}}</p>
 <p>Автор: {{video.author}} </p>
+
+
+<script src="{% static '/js/buttons.js' %}"></script>
 {% endblock %}
