@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.10.4"
 django = "^4.2.5"
 pillow = "^10.0.1"
 
