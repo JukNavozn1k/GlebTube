@@ -1,13 +1,98 @@
 {% extends 'index.html' %}
 
-{%block content %}
+{% block title %} {{video.caption}} - GlebTube  {% endblock %}
 
-    <h1>{{video.caption}}</h1>
-<video controls width="800px" height="400px">
-    <source src = "{{video.video.url}}" type="video/mp4">
+{%block content %}
+    {% load static %}
+
+
+<!-- COMMENT(s) -->
+<div class="container mt-5">
+  <link rel="stylesheet" a href="{% static '/css/rate_buttons.css' %}"> 
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<div class="post" data-post-id="{{video.id}}">
+<video class="post-video"  alt="Post Video" controls width="640px" height="360px">
+  <source src = "{{video.video.url}}" type="video/mp4">
 </video>
+<h1>{{video.caption}}</h1>
+{% if grade == 0 %}
+<div class="post-ratings-container">
+  <div class="post-rating">
+    <span class="post-rating-button material-icons">thumb_up</span>
+    <span class="post-rating-count">{{likes}}</span>
+  </div>
+  <div class="post-rating">
+    <span class="post-rating-button material-icons">thumb_down</span>
+    <span class="post-rating-count">{{dislikes}}</span>
+  </div>
+</div>
+{% elif grade == 1 %}
+<div class="post-ratings-container">
+  <div class="post-rating post-rating-selected">
+    <span class="post-rating-button material-icons">thumb_up</span>
+    <span class="post-rating-count">{{likes}}</span>
+  </div>
+  <div class="post-rating">
+    <span class="post-rating-button material-icons">thumb_down</span>
+    <span class="post-rating-count">{{dislikes}}</span>
+  </div>
+</div>
+{% elif grade == -1 %}
+<div class="post-ratings-container">
+  <div class="post-rating">
+    <span class="post-rating-button material-icons">thumb_up</span>
+    <span class="post-rating-count">{{likes}}</span>
+  </div>
+  <div class="post-rating post-rating-selected">
+    <span class="post-rating-button material-icons">thumb_down</span>
+    <span class="post-rating-count">{{dislikes}}</span>
+  </div>
+</div>
+{% endif %}
+
 <h2>Описание: </h2>
 <p>{{video.description}}</p>
-<p>{{video.date_uploaded}}</p>
+<p>Дата выхода: {{video.date_uploaded}} Количество просмотров: {{video.views}}</p>
 <p>Автор: {{video.author}} </p>
+</div>
+  <h1>Комментарии</h1>
+  
+  <div class="bg-white p-2">
+    <div class="d-flex flex-row align-items-start"><img class="rounded-circle" src="{% static 'logo.png' %}" width="40"><textarea class="form-control ml-1 shadow-none textarea" placeholder="Введите комментарий"></textarea></div>
+    <div class="mt-2 text-right"><button class="btn btn-primary btn-sm shadow-none" type="button">Отправить</button></div>
+</div>
+  <div class="d-flex justify-content-center row">
+      <div class="col"> <!--<div class="col-md-8"> -->
+          <div class="d-flex flex-column comment-section">
+              <div class="bg-white p-2">
+                  <div class="d-flex flex-row user-info"><img class="rounded-circle" src="{% static 'logo.png' %}" width="40">
+                      <div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">Marry Andrews</span><span class="date text-black-50">Shared publicly - Jan 2020</span></div>
+                  </div>
+                  <div class="mt-2">
+                      <p class="comment-text">Я люблю житомир</p>
+                  </div>
+              </div>
+              <div class="bg-white">
+                  <div class="d-flex flex-row fs-12">
+                      <div class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>
+                      <div class="like p-2 cursor"><i class="fa fa-commenting-o"></i><span class="ml-1">Comment</span></div>
+                      <div class="like p-2 cursor"><i class="fa fa-share"></i><span class="ml-1">Share</span></div>
+                  </div>
+              </div>
+              <!--
+              <div class="bg-white p-2">
+                  <div class="d-flex flex-row align-items-start"><img class="rounded-circle" src="{% static 'logo.png' %}" width="40"><textarea class="form-control ml-1 shadow-none textarea" placeholder="Введите комментарий"></textarea></div>
+                  <div class="mt-2 text-right"><button class="btn btn-primary btn-sm shadow-none" type="button">Отправить</button><button class="btn btn-outline-primary btn-sm ml-1 shadow-none" type="button">Свернуть</button></div>
+              </div> -->
+              
+          </div>
+      </div>
+  </div>
+</div>
+
+
+
+
+<script src="{% static '/js/buttons.js' %}"></script>
 {% endblock %}
