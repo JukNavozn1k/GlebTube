@@ -6,9 +6,10 @@ document.querySelectorAll(".post").forEach(post => {
 	ratings.forEach(rating => {
 		const button = rating.querySelector(".post-rating-button");
 		const count = rating.querySelector(".post-rating-count");
-
+		
 		button.addEventListener("click", async () => {
 			if (rating.classList.contains("post-rating-selected")) {
+				
 				return;
 			}
 

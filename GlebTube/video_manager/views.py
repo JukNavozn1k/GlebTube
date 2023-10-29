@@ -56,16 +56,18 @@ def video(request,video_id,action):
         video = models.Video.objects.all().filter(id=video_id).first()
         author = request.user
 
-        rate = models.RateVideo.objects.filter(Q(video=video) & Q(author=author)).first()
+        rate = models.RateVideo.objects.filter(Q(content=video) & Q(author=author)).first()
         if rate is None:
             rate = models.RateVideo()
-            rate.video = video
+            rate.content = video
             rate.author = author
 
         if action == 'like':
             rate.grade = 1
         elif action == 'dislike':
             rate.grade = -1
+        elif action == 'unrate':
+            rate.grade = 0       
         rate.save()
 
         return HttpResponse('200')
