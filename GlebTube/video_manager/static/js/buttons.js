@@ -14,7 +14,6 @@ document.querySelectorAll(".post").forEach(post => {
 				unrate = true;
 			}
 			
-
 			ratings.forEach(rating => {
 				if (rating.classList.contains("post-rating-selected")) {
 					const count = rating.querySelector(".post-rating-count");
@@ -27,10 +26,10 @@ document.querySelectorAll(".post").forEach(post => {
 			{
 				count.textContent = Number(count.textContent) + 1;
 				rating.classList.add("post-rating-selected");
-				var likeOrDislike = likeRating === rating ? "like" : "dislike";	
+				var action = likeRating === rating ? "like" : "dislike";	
 			}
-			else {likeOrDislike = "unrate"}
-			const response = await fetch(`/video/${postId}/${likeOrDislike}`);
+			else {action = "unrate"}
+			const response = await fetch(`/video/${postId}/${action}`);
 			const body = await response.json();
 		});
 	});
