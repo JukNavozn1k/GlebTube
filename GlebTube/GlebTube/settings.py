@@ -40,9 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'user_manager',
     'video_manager',
-    'core',
-    'polymorphic',
-    
+    'core', 
 ]
 
 MIDDLEWARE = [
