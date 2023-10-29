@@ -1,11 +1,12 @@
 from django.db import models
 
 from django.core.validators import FileExtensionValidator
-from django.core.exceptions import ValidationError
-
 from django.utils import timezone
 
 from django.contrib.auth.models import User
+
+# from polymorphic.models import PolymorphicModel
+
 
 class Video(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -20,15 +21,21 @@ class Video(models.Model):
     date_uploaded = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(User,null=True,on_delete=models.CASCADE)
 
-class RateVideo(models.Model):
-    # NOT WORKING (NOW)
-    def validate_three_values(self,value):
-        if value not in [-1, 0, 1]:
-            raise ValidationError("Invalid value. Please choose -1, 0, or 1.")
-        
-    video = models.ForeignKey(Video,on_delete=models.CASCADE)
+
+
+
+class Rate(models.Model):
+    content = models.Field()
     author = models.ForeignKey(User,on_delete=models.CASCADE)
     grade = models.IntegerField(default=0,choices=[(-1, 'Dislike'), (0, 'None'), (1, 'Like')])
     
     class Meta:
-        unique_together = ['video', 'author']
+        unique_together = ['content', 'author']
+        abstract = True
+
+class RateVideo(Rate):
+    content = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Video")
+    pass
+    
+   
+
