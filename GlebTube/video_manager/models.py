@@ -21,6 +21,9 @@ class Video(models.Model):
     date_uploaded = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(User,null=True,on_delete=models.CASCADE)
 
+
+
+
 class Rate(models.Model):
     content = models.Field()
     author = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -31,7 +34,7 @@ class Rate(models.Model):
         abstract = True
 
 class RateVideo(Rate):
-    content = models.ForeignKey(Video,on_delete=models.CASCADE)
+    content = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Video")
     pass
     
    
