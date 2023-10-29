@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'user_manager',
     'video_manager',
     'core',
+    'polymorphic',
     
 ]
 
