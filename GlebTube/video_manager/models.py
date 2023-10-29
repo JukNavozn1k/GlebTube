@@ -23,7 +23,7 @@ class Video(models.Model):
 
 
 
-
+# Rating models
 class Rate(models.Model):
     content = models.Field()
     author = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -36,6 +36,22 @@ class Rate(models.Model):
 class RateVideo(Rate):
     content = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Video")
     pass
-    
+# rate comment (ToDo)
    
 
+# Comment models
+class Comment(models.Model):
+    instance = models.Field()
+    author = models.ForeignKey(User,on_delete=models.CASCADE)
+    class Meta:
+        # unique_together = ['instance', 'author'] user can send many comments to one video/comment
+        abstract = True
+class Comment(models.Model):
+    instance = models.Field()
+    author = models.ForeignKey(User,on_delete=models.CASCADE)
+    content = models.TextField(null=False)
+    class Meta:
+        # unique_together = ['instance', 'author'] user can send many comments to one video/comment
+        abstract = True
+class CommentVideo(Comment):
+    instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Video")
