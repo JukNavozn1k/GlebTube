@@ -21,11 +21,6 @@ class Video(models.Model):
     author = models.ForeignKey(User,null=True,on_delete=models.CASCADE)
 
 class RateVideo(models.Model):
-    # NOT WORKING (NOW)
-    def validate_three_values(self,value):
-        if value not in [-1, 0, 1]:
-            raise ValidationError("Invalid value. Please choose -1, 0, or 1.")
-        
     video = models.ForeignKey(Video,on_delete=models.CASCADE)
     author = models.ForeignKey(User,on_delete=models.CASCADE)
     grade = models.IntegerField(default=0,choices=[(-1, 'Dislike'), (0, 'None'), (1, 'Like')])
