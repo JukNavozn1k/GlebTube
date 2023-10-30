@@ -51,7 +51,7 @@ class Watch(View):
     
 
 
-def video(request,video_id,action):
+def rate_video(request,video_id,action):
     if request.user.is_authenticated:
         video = models.Video.objects.all().filter(id=video_id).first()
         author = request.user
