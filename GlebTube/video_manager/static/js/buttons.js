@@ -68,7 +68,7 @@ document.querySelectorAll(".post").forEach(post => {
 document.getElementById('sendButton').addEventListener('click', function () {
     const comment = document.getElementById('comment').value;
    
-    fetch(`/comment_video/${parseVideoIdFromUrl()}`, {
+    fetch(`${window.location.pathname}/comment`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -78,8 +78,9 @@ document.getElementById('sendButton').addEventListener('click', function () {
     })
     .then(response => response.text())
             .then(html => {
-                // Update the content of the current page with the received HTML
-                document.body.innerHTML = html;
+             
+              
+				window.location.reload();
             })
             .catch(error => {
                 console.error('Error:', error);
