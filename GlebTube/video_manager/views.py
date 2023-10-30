@@ -72,4 +72,14 @@ def rate_video(request,video_id,action):
 
         return HttpResponse('200')
     return HttpResponse('User not logged!')
+
+def comment_video(request,video_id):
+    if request.user.is_authenticated:
+        video = models.Video.objects.all().filter(id=video_id).first()
+        author = request.user
+        print(request.body[1])
+      
+
+        return HttpResponse('200')
+    return HttpResponse('User not logged!')
     

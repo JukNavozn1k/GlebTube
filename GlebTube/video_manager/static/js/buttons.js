@@ -68,7 +68,7 @@ document.querySelectorAll(".post").forEach(post => {
 document.getElementById('sendButton').addEventListener('click', function () {
     const comment = document.getElementById('comment').value;
    
-    fetch(window.location.pathname, {
+    fetch(`/comment_video/${parseVideoIdFromUrl()}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
