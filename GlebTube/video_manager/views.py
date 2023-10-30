@@ -7,6 +7,8 @@ from django.db.models import Q
 from . import models
 from . import forms
 
+import json 
+
 class Upload(View):
     def get(self,request):
         if not request.user.is_authenticated:
@@ -28,6 +30,22 @@ class Upload(View):
 
 
 class Watch(View):
+    def load_page(self,request,video_id):
+        video = models.Video.objects.all().filter(id=video_id).first()
+        rates = models.RateVideo.objects.all().filter(content=video)
+        likes = rates.filter(grade=1).count()
+        dislikes = rates.filter(grade=-1).count()
+            
+        if request.user.is_authenticated: rate = models.RateVideo.objects.filter(Q(content=video) & Q(author=request.user)).first()
+        else: rate = None
+        grade = 0
+        if not rate is None:
+            grade = rate.grade
+
+        comments = models.CommentVideo.objects.all().filter(instance=video)
+        
+        return  {'video':video,'likes':likes,'dislikes':dislikes,'grade':grade,'comments':comments} 
+
     def get(self,request,video_id):
         video = models.Video.objects.all().filter(id=video_id).first()
         video.views += 1
@@ -47,6 +65,18 @@ class Watch(View):
         comments = models.CommentVideo.objects.all().filter(instance=video)
        
         context = {'video':video,'likes':likes,'dislikes':dislikes,'grade':grade,'comments':comments}
+        return render(request,'watch.html',context=context)
+    
+    # processing all actions with video
+    def post(self,request,video_id,action):
+        
+        video = models.Video.objects.all().filter(id=video_id).first()
+
+        comment = json.loads(request.body)['comment']
+        new_comment = models.CommentVideo(author=request.user,instance=video,content=comment)
+        new_comment.save()
+        context = self.load_page(request,video_id)
+        
         return render(request,'watch.html',context=context)
     
 
