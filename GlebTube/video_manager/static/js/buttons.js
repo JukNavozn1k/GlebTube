@@ -1,3 +1,24 @@
+function parseVideoIdFromUrl() {
+    const url = window.location.pathname; // Get the current URL
+    const parts = url.split('/'); // Split the URL by '/'
+    
+    // Assuming 'video_id' is the second part in the URL (index 2, considering 0-based indexing)
+    const videoId = parseInt(parts[2], 10);
+
+    if (!isNaN(videoId)) {
+        // videoId contains the parsed integer value
+        return videoId;
+    } else {
+        // Handle the case where 'video_id' is not a valid integer
+        return null;
+    }
+}
+
+
+ // Get the CSRF token using the {% csrf_token %} template tag
+const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+
+// Rate video Buttons
 document.querySelectorAll(".post").forEach(post => {
 	
 	const postId = post.dataset.postId;
@@ -29,8 +50,38 @@ document.querySelectorAll(".post").forEach(post => {
 				var action = likeRating === rating ? "like" : "dislike";	
 			}
 			else {action = "unrate"}
-			const response = await fetch(`/video/${postId}/${action}`);
+			const response = await fetch(`/video/${postId}/${action}`,{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRFToken': csrfToken, // Include the CSRF token in the headers
+				},
+				body: JSON.stringify({ comment: comment }),
+			});
 			const body = await response.json();
 		});
 	});
+});
+
+
+// Add comment
+document.getElementById('sendButton').addEventListener('click', function () {
+    const comment = document.getElementById('comment').value;
+   
+    fetch(window.location.pathname, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken, // Include the CSRF token in the headers
+        },
+        body: JSON.stringify({ comment: comment }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Handle the response from the server as needed
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 });
