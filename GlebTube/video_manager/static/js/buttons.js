@@ -54,7 +54,7 @@ document.querySelectorAll(".post").forEach(post => {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'X-CSRFToken': csrfToken, // Include the CSRF token in the headers
+					'X-CSRFToken': csrfToken, 
 				},
 				body: JSON.stringify({ comment: comment }),
 			});
@@ -78,8 +78,6 @@ document.getElementById('sendButton').addEventListener('click', function () {
     })
     .then(response => response.text())
             .then(html => {
-             
-              
 				window.location.reload();
             })
             .catch(error => {

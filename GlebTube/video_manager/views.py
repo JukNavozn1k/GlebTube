@@ -32,9 +32,7 @@ class Upload(View):
 
 class Watch(View):
 
-    
-
-    def load_page(self,request,video_id):
+    def get(self,request,video_id):
         video = models.Video.objects.all().filter(id=video_id).first()
         rates = models.RateVideo.objects.all().filter(content=video)
         likes = rates.filter(grade=1).count()
@@ -47,13 +45,9 @@ class Watch(View):
             grade = rate.grade
 
         comments = models.CommentVideo.objects.all().filter(instance=video)
-        
-        return  {'video':video,'likes':likes,'dislikes':dislikes,'grade':grade,'comments':comments} 
-    
-    def get(self,request,video_id):
-        context = self.load_page(request,video_id)
+        context = {'video':video,'likes':likes,'dislikes':dislikes,'grade':grade,'comments':comments} 
         return render(request,'watch.html',context=context)
-    
+
     # processing all actions with video
     def post(self,request,video_id,action):
         
@@ -76,8 +70,6 @@ class Watch(View):
                     rate.author = author
                 rate.grade = rate_actions[action]
                 rate.save()
-                      
-        
-        context = self.load_page(request,video_id)
-        return render(request,'watch.html',context=context)
+
+        return HttpResponse("Good!")
     
