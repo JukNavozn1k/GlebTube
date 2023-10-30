@@ -7,7 +7,6 @@ from django.contrib.auth.models import User
 
 # from polymorphic.models import PolymorphicModel
 
-
 class Video(models.Model):
     id = models.BigAutoField(primary_key=True)
     caption = models.CharField(max_length=32,null = False)
@@ -20,8 +19,6 @@ class Video(models.Model):
     views = models.PositiveBigIntegerField(default=0)
     date_uploaded = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(User,null=True,on_delete=models.CASCADE)
-
-
 
 # Rating models
 class Rate(models.Model):
@@ -36,16 +33,11 @@ class Rate(models.Model):
 class RateVideo(Rate):
     content = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Video")
     pass
-# rate comment (ToDo)
+
+
    
 
 # Comment models
-class Comment(models.Model):
-    instance = models.Field()
-    author = models.ForeignKey(User,on_delete=models.CASCADE)
-    class Meta:
-        # unique_together = ['instance', 'author'] user can send many comments to one video/comment
-        abstract = True
 class Comment(models.Model):
     instance = models.Field()
     author = models.ForeignKey(User,on_delete=models.CASCADE)
