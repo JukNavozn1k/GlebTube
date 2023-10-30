@@ -76,12 +76,12 @@ document.getElementById('sendButton').addEventListener('click', function () {
         },
         body: JSON.stringify({ comment: comment }),
     })
-    .then(response => response.json())
-    .then(data => {
-        // Handle the response from the server as needed
-        console.log(data);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
+    .then(response => response.text())
+            .then(html => {
+                // Update the content of the current page with the received HTML
+                document.body.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
 });
