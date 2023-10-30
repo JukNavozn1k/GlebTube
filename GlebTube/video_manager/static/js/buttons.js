@@ -55,7 +55,7 @@ document.querySelectorAll(".post").forEach(post => {
 });
 
 
-// Add comment window.location.reload();
+// Add comment 
 document.getElementById('sendButton').addEventListener('click', function () {
     const comment = document.getElementById('comment').value;
    
@@ -69,8 +69,8 @@ document.getElementById('sendButton').addEventListener('click', function () {
     })
     .then((res) => {
 		if (res.status === 200) {
-			alert("Processing...");
-				
+			window.location.reload();
+			// ToDo async comment adding without reloading
 		  
 		} else if (res.status === 401) {
 		  alert("Unauthorized: You need to log in");
