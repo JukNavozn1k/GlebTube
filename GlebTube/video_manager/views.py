@@ -34,6 +34,10 @@ class Watch(View):
 
     def get(self,request,video_id):
         video = models.Video.objects.all().filter(id=video_id).first()
+        
+        video.views += 1
+        video.save()
+
         rates = models.RateVideo.objects.all().filter(content=video)
         likes = rates.filter(grade=1).count()
         dislikes = rates.filter(grade=-1).count()
