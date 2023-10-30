@@ -1,4 +1,5 @@
 from django.shortcuts import render,redirect,HttpResponse
+
 from django.views import View
 from django.contrib.auth.models import User
 
@@ -30,6 +31,7 @@ class Upload(View):
 
 
 class Watch(View):
+
     def load_page(self,request,video_id):
         video = models.Video.objects.all().filter(id=video_id).first()
         rates = models.RateVideo.objects.all().filter(content=video)
@@ -45,38 +47,21 @@ class Watch(View):
         comments = models.CommentVideo.objects.all().filter(instance=video)
         
         return  {'video':video,'likes':likes,'dislikes':dislikes,'grade':grade,'comments':comments} 
-
+    
     def get(self,request,video_id):
-        video = models.Video.objects.all().filter(id=video_id).first()
-        video.views += 1
-        video.save()
-
-        rates = models.RateVideo.objects.all().filter(content=video)
-        likes = rates.filter(grade=1).count()
-        dislikes = rates.filter(grade=-1).count()
-
-        if request.user.is_authenticated: rate = models.RateVideo.objects.filter(Q(content=video) & Q(author=request.user)).first()
-        else: rate = None
-        grade = 0
-        if not rate is None:
-            grade = rate.grade
-
-
-        comments = models.CommentVideo.objects.all().filter(instance=video)
-       
-        context = {'video':video,'likes':likes,'dislikes':dislikes,'grade':grade,'comments':comments}
+        context = self.load_page(request,video_id)
         return render(request,'watch.html',context=context)
     
     # processing all actions with video
     def post(self,request,video_id,action):
-        
-        video = models.Video.objects.all().filter(id=video_id).first()
+        if request.user.is_authenticated:
+          if action == "comment":
+                video = models.Video.objects.all().filter(id=video_id).first()
+                comment = json.loads(request.body)['comment']
+                new_comment = models.CommentVideo(author=request.user,instance=video,content=comment)
+                new_comment.save()
 
-        comment = json.loads(request.body)['comment']
-        new_comment = models.CommentVideo(author=request.user,instance=video,content=comment)
-        new_comment.save()
         context = self.load_page(request,video_id)
-        
         return render(request,'watch.html',context=context)
     
 
@@ -102,14 +87,3 @@ def rate_video(request,video_id,action):
 
         return HttpResponse('200')
     return HttpResponse('User not logged!')
-
-def comment_video(request,video_id):
-    if request.user.is_authenticated:
-        video = models.Video.objects.all().filter(id=video_id).first()
-        author = request.user
-        print(request.body[1])
-      
-
-        return HttpResponse('200')
-    return HttpResponse('User not logged!')
-    
