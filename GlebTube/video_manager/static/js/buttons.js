@@ -50,7 +50,7 @@ document.querySelectorAll(".post").forEach(post => {
 				var action = likeRating === rating ? "like" : "dislike";	
 			}
 			else {action = "unrate"}
-			const response = await fetch(`/rate_video/${postId}/${action}`,{
+			const response = await fetch(`${window.location.pathname}/${action}`,{  
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

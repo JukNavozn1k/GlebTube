@@ -32,6 +32,8 @@ class Upload(View):
 
 class Watch(View):
 
+    
+
     def load_page(self,request,video_id):
         video = models.Video.objects.all().filter(id=video_id).first()
         rates = models.RateVideo.objects.all().filter(content=video)
@@ -54,36 +56,28 @@ class Watch(View):
     
     # processing all actions with video
     def post(self,request,video_id,action):
+        
         if request.user.is_authenticated:
-          if action == "comment":
-                video = models.Video.objects.all().filter(id=video_id).first()
-                comment = json.loads(request.body)['comment']
-                new_comment = models.CommentVideo(author=request.user,instance=video,content=comment)
-                new_comment.save()
+          video = models.Video.objects.all().filter(id=video_id).first()
+          author = request.user
 
+          rate_actions = {'dislike':-1,'unrate' : 0,'like':1} 
+
+          if action == "comment":
+                comment = json.loads(request.body)['comment']
+                new_comment = models.CommentVideo(author=author,instance=video,content=comment)
+                new_comment.save()
+            
+          elif action in rate_actions:
+                rate = models.RateVideo.objects.filter(Q(content=video) & Q(author=author)).first()
+                if rate is None:
+                    rate = models.RateVideo()
+                    rate.content = video
+                    rate.author = author
+                rate.grade = rate_actions[action]
+                rate.save()
+                      
+        
         context = self.load_page(request,video_id)
         return render(request,'watch.html',context=context)
     
-
-
-def rate_video(request,video_id,action):
-    if request.user.is_authenticated:
-        video = models.Video.objects.all().filter(id=video_id).first()
-        author = request.user
-
-        rate = models.RateVideo.objects.filter(Q(content=video) & Q(author=author)).first()
-        if rate is None:
-            rate = models.RateVideo()
-            rate.content = video
-            rate.author = author
-
-        if action == 'like':
-            rate.grade = 1
-        elif action == 'dislike':
-            rate.grade = -1
-        elif action == 'unrate':
-            rate.grade = 0       
-        rate.save()
-
-        return HttpResponse('200')
-    return HttpResponse('User not logged!')
