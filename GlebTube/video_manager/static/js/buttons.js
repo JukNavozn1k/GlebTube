@@ -19,7 +19,6 @@ document.querySelectorAll(".post").forEach(post => {
 			}			
 			if (!unrate) 
 			{
-				
 				var action = likeRating === rating ? "like" : "dislike";	
 			}
 			else {action = "unrate"}
@@ -56,7 +55,7 @@ document.querySelectorAll(".post").forEach(post => {
 });
 
 
-// Add comment
+// Add comment window.location.reload();
 document.getElementById('sendButton').addEventListener('click', function () {
     const comment = document.getElementById('comment').value;
    
@@ -68,11 +67,13 @@ document.getElementById('sendButton').addEventListener('click', function () {
         },
         body: JSON.stringify({ comment: comment }),
     })
-    .then(response => response.text())
-            .then(html => {
-				window.location.reload();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+    .then((res) => {
+		if (res.status === 200) {
+			alert("Processing...");
+				
+		  
+		} else if (res.status === 401) {
+		  alert("Unauthorized: You need to log in");
+		}
+	  });
 });
