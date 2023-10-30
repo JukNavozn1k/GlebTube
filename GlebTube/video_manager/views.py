@@ -50,11 +50,9 @@ class Watch(View):
 
     # processing all actions with video
     def post(self,request,video_id,action):
-        
         if request.user.is_authenticated:
           video = models.Video.objects.all().filter(id=video_id).first()
           author = request.user
-
           rate_actions = {'dislike':-1,'unrate' : 0,'like':1} 
 
           if action == "comment":
@@ -71,5 +69,7 @@ class Watch(View):
                 rate.grade = rate_actions[action]
                 rate.save()
 
-        return HttpResponse("Good!")
+          return HttpResponse("Good!",status=200)
+        else: return HttpResponse("Unauthorized: You need to log in", status=401)
+        
     
