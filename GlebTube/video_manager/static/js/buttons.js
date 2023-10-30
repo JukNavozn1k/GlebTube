@@ -33,20 +33,10 @@ document.querySelectorAll(".post").forEach(post => {
 			var unrate = false;
 			if (rating.classList.contains("post-rating-selected")) {
 				unrate = true;
-			}
-			
-			ratings.forEach(rating => {
-				if (rating.classList.contains("post-rating-selected")) {
-					const count = rating.querySelector(".post-rating-count");
-
-					count.textContent = Math.max(0, Number(count.textContent) - 1);
-					rating.classList.remove("post-rating-selected");
-				}
-			});
+			}			
 			if (!unrate) 
 			{
-				count.textContent = Number(count.textContent) + 1;
-				rating.classList.add("post-rating-selected");
+				
 				var action = likeRating === rating ? "like" : "dislike";	
 			}
 			else {action = "unrate"}
@@ -57,8 +47,27 @@ document.querySelectorAll(".post").forEach(post => {
 					'X-CSRFToken': csrfToken, 
 				},
 				body: JSON.stringify({ comment: comment }),
-			});
-			const body = await response.json();
+			})
+			.then((res) => {
+				if (res.status === 200) {
+					ratings.forEach(rating => {
+						if (rating.classList.contains("post-rating-selected")) {
+							const count = rating.querySelector(".post-rating-count");
+
+							count.textContent = Math.max(0, Number(count.textContent) - 1);
+							rating.classList.remove("post-rating-selected");
+						}
+					});
+					if (!unrate){
+					count.textContent = Number(count.textContent) + 1;
+					rating.classList.add("post-rating-selected"); }
+				  
+				} else if (res.status === 401) {
+				  alert("Unauthorized: You need to log in");
+				}
+			  });
+
+		//	const body = await response.json();
 		});
 	});
 });
