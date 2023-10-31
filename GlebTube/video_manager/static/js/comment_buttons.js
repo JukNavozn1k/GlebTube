@@ -1,7 +1,7 @@
  // Get the CSRF token using the {% csrf_token %} template tag
 const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
 const commentsCountElement = document.getElementById("comments_count");
-var parentElement = document.querySelector('.comment_list');
+const parentElement = document.querySelector('.comment_list');
 
 
 function inc_count()
@@ -16,7 +16,7 @@ function inc_count()
     commentsCountElement.textContent = text.replace(currentCount, newCount);
   }
 }
-function add_comment()
+function add_comment(author,date_uploaded,comment)
 {
   
   // Create a new div element to contain the provided code
@@ -27,11 +27,11 @@ function add_comment()
             <div class="d-flex flex-column comment-section">
                 <div class="bg-white p-2">
                     <div class="d-flex flex-row user-info"><img class="rounded-circle" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" width="40">
-                        <div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">#</span>
-                          <span class="date text-black-50">#</span></div>
+                        <div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">${author}</span>
+                          <span class="date text-black-50">${date_uploaded}</span></div>
                     </div>
                     <div class="mt-2">
-                        <p class="comment-text">#</p>
+                        <p class="comment-text">${comment}</p>
                     </div>
                 </div>
             </div>
@@ -66,7 +66,7 @@ document.getElementById('sendButton').addEventListener('click', function () {
           // alert(`${data['param']}`);
           console.log(data);
           inc_count();
-          add_comment();
+          add_comment(data['author'],data['date_uploaded'],data['comment']);
          
         });
       } else if (res.status === 401) {
