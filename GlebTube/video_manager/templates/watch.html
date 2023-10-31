@@ -15,7 +15,7 @@
 <video class="post-video"  alt="Post Video" controls width="640px" height="360px">
   <source src = "{{video.video.url}}" type="video/mp4">
 </video>
-<h1>{{video.caption}}</h1>
+<h3>{{video.caption}}</h3>
 {% if grade == 0 %}
 <div class="post-ratings-container">
   <div class="post-rating">
@@ -74,19 +74,22 @@
           <div class="d-flex flex-column comment-section">
               <div class="bg-white p-2">
                   <div class="d-flex flex-row user-info"><img class="rounded-circle" src="{% static 'logo.png' %}" width="40">
-                      <div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">{{comment.author}}</span><span class="date text-black-50">Shared publicly - Jan 2020 (not working)</span></div>
+                      <div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">{{comment.author}}</span>
+                        <span class="date text-black-50">{{comment.date_uploaded}}</span></div>
                   </div>
                   <div class="mt-2">
                       <p class="comment-text">{{comment.content}}</p>
                   </div>
               </div>
+              <!--
               <div class="bg-white">
                   <div class="d-flex flex-row fs-12">
                       <div class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>
                       <div class="like p-2 cursor"><i class="fa fa-commenting-o"></i><span class="ml-1">Comment</span></div>
                       <div class="like p-2 cursor"><i class="fa fa-share"></i><span class="ml-1">Share</span></div>
                   </div>
-              </div>
+              </div> -->
+              
               <!--
               <div class="bg-white p-2">
                   <div class="d-flex flex-row align-items-start"><img class="rounded-circle" src="{% static 'logo.png' %}" width="40"><textarea class="form-control ml-1 shadow-none textarea" placeholder="Введите комментарий"></textarea></div>
@@ -96,6 +99,7 @@
           </div>
       </div>
   </div>
+  
   {% endfor %} 
 </div>
 
