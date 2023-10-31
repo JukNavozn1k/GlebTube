@@ -1,4 +1,5 @@
 from django.shortcuts import render,redirect,HttpResponse
+from django.http import JsonResponse
 
 from django.views import View
 from django.contrib.auth.models import User
@@ -7,6 +8,7 @@ from django.db.models import Q
 
 from . import models
 from . import forms
+
 
 import json 
 
@@ -62,7 +64,8 @@ class Watch(View):
           if action == "comment":
                 comment = json.loads(request.body)['comment']
                 new_comment = models.CommentVideo(author=author,instance=video,content=comment)
-                new_comment.save()
+                # new_comment.save()
+                return JsonResponse({'param':'test2'}, status=200)
             
           elif action in rate_actions:
                 rate = models.RateVideo.objects.filter(Q(content=video) & Q(author=author)).first()
@@ -72,8 +75,8 @@ class Watch(View):
                     rate.author = author
                 rate.grade = rate_actions[action]
                 rate.save()
-
-          return HttpResponse("Good!",status=200)
-        else: return HttpResponse("Unauthorized: You need to log in", status=401)
+                return HttpResponse("Good!",status=200)
+          
+        return HttpResponse("Unauthorized: You need to log in", status=401)
         
     
