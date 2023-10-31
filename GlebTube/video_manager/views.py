@@ -64,10 +64,8 @@ class Watch(View):
           if action == "comment":
                 comment = json.loads(request.body)['comment']
                 new_comment = models.CommentVideo(author=author,instance=video,content=comment)
-                
                 new_comment.save()
-                
-                response = {'comment':comment,'author':str(request.user),'date_uploaded':str(timezone.now())}
+                response = {'comment':comment,'author':str(request.user)}
                 return JsonResponse(response, status=200)
             
           elif action in rate_actions:
