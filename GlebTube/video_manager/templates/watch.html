@@ -7,15 +7,25 @@
 {% csrf_token %}
 
 <!-- COMMENT(s) -->
+
+
 <div class="container mt-5">
   <link rel="stylesheet" a href="{% static '/css/rate_buttons.css' %}"> 
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
+  <div class="card mb-3 border-0">
+    <video class="post-video"  alt="Post Video" controls width="640px" height="360px">
+      <source src = "{{video.video.url}}" type="video/mp4">
+    </video>
+    <div class="card-body">
+      <h5 class="card-title">{{video.caption}}</h5>
+      <h6 class="card-subtitle mb-2 text-muted">Описание</h6>
+      <p class="card-text">{{video.description}}</p>
+      <p class="card-text"><small class="text-muted">Дата выхода: {{video.date_uploaded}} Количество просмотров: {{video.views}}</small></p>
+      <p class="card-text"><small class="text-muted">Автор: {{video.author}}</small></p>
+    </div>
+  </div>
 <div class="post" data-post-id="{{video.id}}">
-<video class="post-video"  alt="Post Video" controls width="640px" height="360px">
-  <source src = "{{video.video.url}}" type="video/mp4">
-</video>
-<h3>{{video.caption}}</h3>
+
 {% if grade == 0 %}
 <div class="post-ratings-container">
   <div class="post-rating">
@@ -51,29 +61,28 @@
 </div>
 {% endif %}
 
-<h2>Описание: </h2>
-<p>{{video.description}}</p>
-<p>Дата выхода: {{video.date_uploaded}} Количество просмотров: {{video.views}}</p>
-<p>Автор: {{video.author}} </p>
-</div>
-  <h1>Комментарии ({{comments|length}})</h1>
+</div class="comment_form">
+  <h3 id="comments_count">Комментарии ({{comments|length}})</h3>
   
   <div class="bg-white p-2">
     
     <div class="d-flex flex-row align-items-start">
-        <img class="rounded-circle" src="{% static 'logo.png' %}" width="40">
+        <img class="rounded-circle" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" width="40">
         <textarea class="form-control ml-1 shadow-none textarea" id="comment" placeholder="Введите комментарий"></textarea>
     </div>
     <div class="mt-2 text-right">
+        <button type="button" id="clearButton" class="btn btn-outline-primary btn-sm shadow-none">Очистить</button>
         <button class="btn btn-primary btn-sm shadow-none" id="sendButton" type="button">Отправить</button>
     </div>
 </div>
+
+<div class="comment_list">
 {% for comment in comments %}  
   <div class="d-flex justify-content-center row">
       <div class="col"> <!--<div class="col-md-8"> -->
           <div class="d-flex flex-column comment-section">
               <div class="bg-white p-2">
-                  <div class="d-flex flex-row user-info"><img class="rounded-circle" src="{% static 'logo.png' %}" width="40">
+                  <div class="d-flex flex-row user-info"><img class="rounded-circle" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" width="40">
                       <div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">{{comment.author}}</span>
                         <span class="date text-black-50">{{comment.date_uploaded}}</span></div>
                   </div>
@@ -99,12 +108,12 @@
           </div>
       </div>
   </div>
-  
   {% endfor %} 
 </div>
 
 
 
 
-<script src="{% static '/js/buttons.js' %}"></script>
+<script src="{% static '/js/comment_buttons.js' %}"></script>
+<script src="{% static '/js/rate_buttons.js' %}"></script>
 {% endblock %}
