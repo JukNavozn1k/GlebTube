@@ -1,14 +1,16 @@
 from django.shortcuts import render,redirect,HttpResponse
+from django.http import JsonResponse
 
 from django.views import View
 from django.contrib.auth.models import User
 
 from django.db.models import Q
 
-from . import models
-from . import forms
+from . import models,forms
+from django.utils import timezone
 
 import json 
+
 
 class Upload(View):
     def get(self,request):
@@ -63,6 +65,8 @@ class Watch(View):
                 comment = json.loads(request.body)['comment']
                 new_comment = models.CommentVideo(author=author,instance=video,content=comment)
                 new_comment.save()
+                response = {'comment':comment,'author':str(request.user)}
+                return JsonResponse(response, status=200)
             
           elif action in rate_actions:
                 rate = models.RateVideo.objects.filter(Q(content=video) & Q(author=author)).first()
@@ -72,8 +76,8 @@ class Watch(View):
                     rate.author = author
                 rate.grade = rate_actions[action]
                 rate.save()
-
-          return HttpResponse("Good!",status=200)
-        else: return HttpResponse("Unauthorized: You need to log in", status=401)
+                return HttpResponse("Good!",status=200)
+          
+        return HttpResponse("Unauthorized: You need to log in", status=401)
         
     
