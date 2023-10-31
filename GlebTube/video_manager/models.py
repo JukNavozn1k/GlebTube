@@ -42,6 +42,7 @@ class Comment(models.Model):
     instance = models.Field()
     author = models.ForeignKey(User,on_delete=models.CASCADE)
     content = models.TextField(null=False)
+    date_uploaded = models.DateTimeField(default=timezone.now)
     class Meta:
         # unique_together = ['instance', 'author'] user can send many comments to one video/comment
         abstract = True
