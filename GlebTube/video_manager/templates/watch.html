@@ -6,15 +6,24 @@
 {% load static %}
 {% csrf_token %}
 
-<!-- COMMENT(s) -->
+<!--Styles-->
+<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+<link rel="stylesheet" a href="{% static '/css/rate_buttons.css' %}"> 
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+
 
 
 <div class="container mt-5">
-  <link rel="stylesheet" a href="{% static '/css/rate_buttons.css' %}"> 
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  
   <div class="card mb-3 border-0">
-    <video class="post-video"  alt="Post Video" controls width="640px" height="360px">
-      <source src = "{{video.video.url}}" type="video/mp4">
+    <video id="player" playsinline controls data-poster="{{video.img.url}}">
+      <source src="{{video.video.url}}" type="video/mp4" />
+      <source src="{{video.video.url}}" type="video/webm" />
+    
+      <!-- Captions are optional 
+      <track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default /> -->
     </video>
     <div class="card-body">
       <h5 class="card-title text-uppercase font-weight-bold">{{video.caption}}</h5>
@@ -61,6 +70,7 @@
 </div>
 {% endif %}
 
+<!-- COMMENT(s) -->
 </div class="comment_form">
   <h3 id="comments_count">Комментарии ({{comments|length}})</h3>
   
@@ -112,8 +122,11 @@
 </div>
 
 
-
-
+<!--Scripts-->
+<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+<script src="{% static '/js/player.js' %}"></script>
 <script src="{% static '/js/comment_buttons.js' %}"></script>
 <script src="{% static '/js/rate_buttons.js' %}"></script>
+
+
 {% endblock %}
