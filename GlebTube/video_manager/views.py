@@ -6,11 +6,11 @@ from django.contrib.auth.models import User
 
 from django.db.models import Q
 
-from . import models
-from . import forms
-
+from . import models,forms
+from django.utils import timezone
 
 import json 
+
 
 class Upload(View):
     def get(self,request):
@@ -64,8 +64,11 @@ class Watch(View):
           if action == "comment":
                 comment = json.loads(request.body)['comment']
                 new_comment = models.CommentVideo(author=author,instance=video,content=comment)
-                # new_comment.save()
-                return JsonResponse({'param':'test2'}, status=200)
+                
+                new_comment.save()
+                
+                response = {'comment':comment,'author':str(request.user),'date_uploaded':str(timezone.now())}
+                return JsonResponse(response, status=200)
             
           elif action in rate_actions:
                 rate = models.RateVideo.objects.filter(Q(content=video) & Q(author=author)).first()
