@@ -66,7 +66,7 @@ document.getElementById('sendButton').addEventListener('click', function () {
           // alert(`${data['param']}`);
           console.log(data);
           inc_count();
-          add_comment(data['author'],data['date_uploaded'],data['comment']);
+          add_comment(data['author'],'Только что',data['comment']);
          
         });
       } else if (res.status === 401) {
