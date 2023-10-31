@@ -7,15 +7,25 @@
 {% csrf_token %}
 
 <!-- COMMENT(s) -->
+
+
 <div class="container mt-5">
   <link rel="stylesheet" a href="{% static '/css/rate_buttons.css' %}"> 
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
+  <div class="card mb-3 border-0">
+    <video class="post-video"  alt="Post Video" controls width="640px" height="360px">
+      <source src = "{{video.video.url}}" type="video/mp4">
+    </video>
+    <div class="card-body">
+      <h5 class="card-title">{{video.caption}}</h5>
+      <h6 class="card-subtitle mb-2 text-muted">Описание</h6>
+      <p class="card-text">{{video.description}}</p>
+      <p class="card-text"><small class="text-muted">Дата выхода: {{video.date_uploaded}} Количество просмотров: {{video.views}}</small></p>
+      <p class="card-text"><small class="text-muted">Автор: {{video.author}}</small></p>
+    </div>
+  </div>
 <div class="post" data-post-id="{{video.id}}">
-<video class="post-video"  alt="Post Video" controls width="640px" height="360px">
-  <source src = "{{video.video.url}}" type="video/mp4">
-</video>
-<h3>{{video.caption}}</h3>
+
 {% if grade == 0 %}
 <div class="post-ratings-container">
   <div class="post-rating">
@@ -51,12 +61,8 @@
 </div>
 {% endif %}
 
-<h2>Описание: </h2>
-<p>{{video.description}}</p>
-<p>Дата выхода: {{video.date_uploaded}} Количество просмотров: {{video.views}}</p>
-<p>Автор: {{video.author}} </p>
 </div>
-  <h1>Комментарии ({{comments|length}})</h1>
+  <h3>Комментарии ({{comments|length}})</h3>
   
   <div class="bg-white p-2">
     
