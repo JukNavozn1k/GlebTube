@@ -31,7 +31,7 @@ function add_comment(author,date_uploaded,comment)
                           <span class="date text-black-50">${date_uploaded}</span></div>
                     </div>
                     <div class="mt-2">
-                        <p class="comment-text">${comment}</p>
+                        <p class="comment-text" style="word-wrap: break-word;">${comment}</p>
                     </div>
                 </div>
             </div>
