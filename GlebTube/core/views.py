@@ -14,3 +14,6 @@ def my_videos(request):
         context = {'videos': videos}
         return render(request,'main.html',context=context)
    else: return redirect('/')
+
+def handler404(request, *args, **argv):
+  return render(request,'404.html')
