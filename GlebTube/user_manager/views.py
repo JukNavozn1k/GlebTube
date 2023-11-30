@@ -22,7 +22,7 @@ class Login(views.View):
         form = forms.AuthForm(request.POST)
         user = authenticate(request,username=form['username'].value(),password=form['password'].value())
         if user  is None:
-            return render(request, 'login.html',context={'form':forms.AuthForm()})
+            return render(request, 'login.html',context={'form':forms.AuthForm(),'alert':{'description':'Неверная комбинация логина и пароля.'}})
         else: 
             # login user...
             login(request,user)
@@ -36,7 +36,7 @@ class Reg(views.View):
     def post(self,request):
         if request.user.is_authenticated: return redirect('/')
         if User.objects.filter(username=request.POST['username']).first():
-            return render(request, 'reg.html',context={'form':forms.AuthForm()})
+            return render(request, 'reg.html',context={'form':forms.AuthForm(),'alert':{'description':'Пользователь уже существует.'}})
         else:
             form = forms.AuthForm(request.POST)
             if form.is_valid():
@@ -45,7 +45,7 @@ class Reg(views.View):
                user.save()
                login(request,user)
                return redirect('/')
-            else: render(request, 'reg.html',context={'form':forms.AuthForm()})
+            else: return render(request, 'reg.html',context={'form':forms.AuthForm(),'alert':{'description':'Неверно заполнена форма.'}})
 
 class Logout(views.View):
     def get(self,request):
