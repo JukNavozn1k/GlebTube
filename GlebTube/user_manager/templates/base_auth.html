@@ -7,13 +7,10 @@
 
 
 <div class="form-group">
+<div class="alert alert-danger">
+    <strong>Ошибка: </strong> Описание ошибки...
+</div>
 {% block form %}
-<h1>Вход/Регистрация</h1>
-<form method="POST">
-  {% csrf_token %}
-  {{ form.as_p }}
-<input type="submit" value="Продолжить" class="btn btn-outline-primary float-right"/>
-</form>
 {% endblock %}
 </div>
 </div>

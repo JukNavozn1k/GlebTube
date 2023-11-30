@@ -3,11 +3,12 @@
 {% block title %}Регистрация - GlebTube {% endblock %}
 
 {% block form %}
+{% load static %}
 
 <h1>Регистрация</h1>
 <form method="POST">
   {% csrf_token %}
-  {% load static %}
+  
   {% for f in form %}
   <p> <label>{{f.label}}</label>{{f}} {{ f.help_text }}
   {% if f == form.password %} 
