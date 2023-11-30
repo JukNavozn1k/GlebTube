@@ -3,12 +3,23 @@
 {% block title %}Вход - GlebTube {% endblock %}
 
 {% block form %}
+{% load static %}
 
 <h1>Вход</h1>
 <form method="POST">
+  
   {% csrf_token %}
-  <p>{{form.username}}</p>
-  <p>{{form.password}}</p>
+  <p><label>Имя пользователя: </label> {{form.username}}</p>
+  <p><label>Пароль: </label> {{form.password}}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+      <label class="form-check-label" for="flexCheckDefault">
+        Показать пароль
+      </label>
+    </div>
+  </p>
 <input type="submit" value="Продолжить" class="btn btn-outline-primary float-right"/>
+
 </form>
+<script src="{% static 'js/password_checkbox.js' %}"></script>
 {% endblock %}

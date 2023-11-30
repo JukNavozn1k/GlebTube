@@ -4,16 +4,13 @@
 {% block content %}
 {% if not user.is_authenticated%}
 <div class ="mx-auto col-10 col-md-8 col-lg-6 ">
-
-
+{% if alert %} 
 <div class="form-group">
+<div class="alert alert-danger">
+    <strong>Ошибка: </strong> {{alert.description}}
+</div>
+{% endif %}
 {% block form %}
-<h1>Вход/Регистрация</h1>
-<form method="POST">
-  {% csrf_token %}
-  {{ form.as_p }}
-<input type="submit" value="Продолжить" class="btn btn-outline-primary float-right"/>
-</form>
 {% endblock %}
 </div>
 </div>
