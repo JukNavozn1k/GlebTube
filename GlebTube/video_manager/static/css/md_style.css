@@ -1,0 +1,13 @@
+
+.md_content
+{
+    word-wrap: break-word;  
+    max-width:75vw;
+    height:auto;
+  
+}
+
+.md_content img 
+{
+    width:100%;
+}

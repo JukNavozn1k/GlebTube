@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'markdownx',
     'user_manager',
     'video_manager',
     'core', 
@@ -132,3 +133,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+MARKDOWNX_UPLOAD_MAX_SIZE = 10*10*10
+
+MARKDOWNX_IMAGE_MAX_SIZE = {
+    'size': (10, 10),
+    'quality': 100
+}
