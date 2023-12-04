@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_bleach',
     'markdownx',
     'user_manager',
     'video_manager',
@@ -133,9 +134,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MARKDOWNX_UPLOAD_MAX_SIZE = 10*10*10
+BLEACH_DEFAULT_WIDGET = 'wysiwyg.widgets.WysiwygWidget'
 
-MARKDOWNX_IMAGE_MAX_SIZE = {
-    'size': (10, 10),
-    'quality': 100
+BLEACH_ALLOWED_TAGS = [
+    'a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol',
+    'strong', 'ul', 'h1', 'h2', 'h3', 'p', 'img',  # Allow 'img' tag for images
+]
+
+BLEACH_ALLOWED_ATTRIBUTES = {
+    'a': ['href', 'title'],
+    'abbr': ['title'],
+    'acronym': ['title'],
+    'img': ['src', 'alt'],  # Allow 'src' and 'alt' attributes for images
 }
