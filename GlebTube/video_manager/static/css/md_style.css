@@ -1,0 +1,19 @@
+
+.md_content
+{
+    word-wrap: break-word;  
+    max-width:75vw;
+    height:auto;
+  
+}
+
+.md_content img 
+{
+    width:100%;
+}
+
+.md_content{
+    /* Add your desired indentation or shift here */
+    /* For example: */
+    margin-left: 30px; /* Adjust this value as needed */
+  }

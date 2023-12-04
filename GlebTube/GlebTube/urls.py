@@ -28,6 +28,7 @@ urlpatterns = [
     path('',include('user_manager.urls')),
     path('',include('video_manager.urls')),
     path('',include('core.urls')),
+    path('markdownx/', include('markdownx.urls')),
     
 ] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 

@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_bleach',
+    'markdownx',
     'user_manager',
     'video_manager',
     'core', 
@@ -132,3 +134,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+BLEACH_DEFAULT_WIDGET = 'wysiwyg.widgets.WysiwygWidget'
+
+BLEACH_ALLOWED_TAGS = [
+    'a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol',
+    'strong', 'ul', 'h1', 'h2', 'h3', 'p', 'img',  # Allow 'img' tag for images
+]
+
+BLEACH_ALLOWED_ATTRIBUTES = {
+    'a': ['href', 'title'],
+    'abbr': ['title'],
+    'acronym': ['title'],
+    'img': ['src', 'alt'],  # Allow 'src' and 'alt' attributes for images
+}
