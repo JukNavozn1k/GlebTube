@@ -27,9 +27,8 @@ class Upload(View):
             video  = form.save()
             video.author = request.user
             video.save()
-            
             return redirect('/')
-        else: return render(request,'upload.html',context={'form':forms.UploadForm()})
+        else: return render(request,'upload.html',context={'form':forms.UploadForm(),'alert':{'description':f'{form.errors}'}})
 
 
 class Watch(View):
