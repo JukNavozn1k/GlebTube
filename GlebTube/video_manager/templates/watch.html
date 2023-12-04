@@ -5,6 +5,7 @@
 {%block content %}
 
 {% load formatted_markdown %}
+{% load bleach_tags %}
 
 {% load static %}
 {% csrf_token %}
@@ -102,24 +103,11 @@
                   </div>
                   <div class="mt-2">
                       <div class="md_content">
-                      <p class="comment-text">{{comment.content|formatted_markdown }}</p>
+                      <p class="comment-text">{{comment.content|formatted_markdown|bleach}}</p>
                     </div>
                   </div>
               </div>
-              <!--
-              <div class="bg-white">
-                  <div class="d-flex flex-row fs-12">
-                      <div class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>
-                      <div class="like p-2 cursor"><i class="fa fa-commenting-o"></i><span class="ml-1">Comment</span></div>
-                      <div class="like p-2 cursor"><i class="fa fa-share"></i><span class="ml-1">Share</span></div>
-                  </div>
-              </div> -->
-              
-              <!--
-              <div class="bg-white p-2">
-                  <div class="d-flex flex-row align-items-start"><img class="rounded-circle" src="{% static 'logo.png' %}" width="40"><textarea class="form-control ml-1 shadow-none textarea" placeholder="Введите комментарий"></textarea></div>
-                  <div class="mt-2 text-right"><button class="btn btn-primary btn-sm shadow-none" type="button">Отправить</button><button class="btn btn-outline-primary btn-sm ml-1 shadow-none" type="button">Свернуть</button></div>
-              </div> -->
+             
               
           </div>
       </div>
