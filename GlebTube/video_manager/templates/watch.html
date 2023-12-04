@@ -3,12 +3,16 @@
 {% block title %} {{video.caption}} - GlebTube  {% endblock %}
 
 {%block content %}
+
+{% load formatted_markdown %}
+
 {% load static %}
 {% csrf_token %}
 
 <!--Styles-->
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 <link rel="stylesheet" a href="{% static '/css/rate_buttons.css' %}"> 
+<link rel="stylesheet" a href="{% static '/css/md_style.css' %}"> 
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 
@@ -97,7 +101,9 @@
                         <span class="date text-black-50">{{comment.date_uploaded}}</span></div>
                   </div>
                   <div class="mt-2">
-                      <p class="comment-text" style="word-wrap: break-word;">{{comment.content}}</p>
+                      <div class="md_content">
+                      <p class="comment-text">{{comment.content|formatted_markdown }}</p>
+                    </div>
                   </div>
               </div>
               <!--
