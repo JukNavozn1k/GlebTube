@@ -5,17 +5,23 @@ from django.views import View
 from django.contrib.auth.models import User
 
 from django.db.models import Q
-
 from . import models,forms
-from django.utils import timezone
 
 import json 
 
-
 import bleach
-
 from django.utils.safestring import mark_safe
 from markdownx.utils import markdownify
+
+class History(View):
+      def get(self,request):
+          if request.user.is_authenticated:
+            history = models.History.objects.all().filter(viewer=request.user)
+            videos = [h.video for h in history][::-1]
+            context = {'videos':videos}
+            return render(request,'main.html',context=context)
+          else: return redirect('/')
+
 
 class Upload(View):
     def get(self,request):
