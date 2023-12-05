@@ -12,6 +12,11 @@ from django.utils import timezone
 import json 
 
 
+import bleach
+
+from django.utils.safestring import mark_safe
+from markdownx.utils import markdownify
+
 class Upload(View):
     def get(self,request):
         if not request.user.is_authenticated:
@@ -63,8 +68,9 @@ class Watch(View):
           if action == "comment":
                 comment = json.loads(request.body)['comment']
                 new_comment = models.CommentVideo(author=author,instance=video,content=comment)
+                cleaned_comment = bleach.clean(comment,tags=bleach.ALLOWED_TAGS, attributes=bleach.ALLOWED_ATTRIBUTES)
                 new_comment.save()
-                response = {'comment':comment,'author':str(request.user)}
+                response = {'comment': mark_safe(markdownify(cleaned_comment)),'author':str(request.user)}
                 return JsonResponse(response, status=200)
             
           elif action in rate_actions:
