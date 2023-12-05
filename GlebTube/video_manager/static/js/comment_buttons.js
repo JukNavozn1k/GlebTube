@@ -83,9 +83,7 @@ document.getElementById('sendButton').addEventListener('click', function () {
       if (res.status === 200) {
         // Parse JSON response from the server
         return res.json().then((data) => {
-          // You can now work with the JSON data in the 'data' variable
-          // alert(`${data['param']}`);
-          console.log(data);
+      
           inc_count();
           add_comment(data['author'],'Только что',data['comment']);
          
