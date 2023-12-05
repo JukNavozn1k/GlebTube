@@ -54,7 +54,7 @@ class Watch(View):
         if not rate is None:
             grade = rate.grade
 
-        comments = models.CommentVideo.objects.all().filter(instance=video)
+        comments = models.CommentVideo.objects.all().filter(instance=video).order_by('-id')
         context = {'video':video,'likes':likes,'dislikes':dislikes,'grade':grade,'comments':comments} 
         return render(request,'watch.html',context=context)
 
