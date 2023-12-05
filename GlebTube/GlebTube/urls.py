@@ -22,14 +22,16 @@ from django.conf.urls.static import static
 
 from django.conf.urls import (handler400, handler403, handler404, handler500)
 
+from . import views
 
 urlpatterns = [
+    path('',views.home),
+    path('/',views.home),
     path('admin/', admin.site.urls),
     path('',include('user_manager.urls')),
     path('',include('video_manager.urls')),
-    path('',include('core.urls')),
     path('markdownx/', include('markdownx.urls')),
     
 ] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 
-handler404 = 'core.views.handler404'
+handler404 = 'GlebTube.views.handler404'
