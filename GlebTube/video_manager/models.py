@@ -25,7 +25,7 @@ class History(models.Model):
       viewer = models.ForeignKey(User,null=True,on_delete=models.CASCADE)
       video = models.ForeignKey(Video,null=True,on_delete=models.CASCADE)
       class Meta:
-        verbose_name = 'История просмотров'
+        verbose_name = 'Просмотр'
         verbose_name_plural = 'История просмотров'
        
 
