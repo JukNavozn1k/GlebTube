@@ -48,7 +48,9 @@ class Watch(View):
         likes = rates.filter(grade=1).count()
         dislikes = rates.filter(grade=-1).count()
             
-        if request.user.is_authenticated: rate = models.RateVideo.objects.filter(Q(content=video) & Q(author=request.user)).first()
+        if request.user.is_authenticated: 
+            rate = models.RateVideo.objects.filter(Q(content=video) & Q(author=request.user)).first()
+            models.History(viewer=request.user,video=video).save()
         else: rate = None
         grade = 0
         if not rate is None:
