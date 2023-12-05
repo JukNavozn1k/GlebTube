@@ -6,3 +6,4 @@ from . import models
 admin.site.register(models.Video)
 admin.site.register(models.RateVideo)
 admin.site.register(models.CommentVideo)
+admin.site.register(models.History)

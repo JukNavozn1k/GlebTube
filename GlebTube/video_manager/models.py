@@ -20,6 +20,13 @@ class Video(models.Model):
     date_uploaded = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(User,null=True,on_delete=models.CASCADE)
 
+
+class History(models.Model):
+      viewer = models.ForeignKey(User,null=True,on_delete=models.CASCADE)
+      video = models.ForeignKey(Video,null=True,on_delete=models.CASCADE)
+
+
+
 # Rating models
 class Rate(models.Model):
     content = models.Field()
