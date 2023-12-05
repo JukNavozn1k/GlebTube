@@ -20,12 +20,9 @@
     <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
       <li><a href="/" class="nav-link px-2 link-secondary">Главная</a></li>
      
-      <li><a href="/my_videos" class="nav-link px-2">Мои видео ({{request.user}})</a></li>
+      <li><a href="/my_videos" class="nav-link px-2">Мои видео</a></li>
+      <li><a href="/history" class="nav-link px-2">История просмотров</a></li>
       <li><a href="/upload" class="nav-link px-2">Загрузить видео</a></li>
-      <li><a href="#" onclick="alert('В разработке...');" class="nav-link px-2">Подписки</a></li>
-      
-    
-     
     </ul>
 
     <div class="col-md-3 text-end">
@@ -33,7 +30,7 @@
       <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='/login';">Вход</button>
       <button type="button" class="btn btn-primary" onclick="location.href='/reg';">Регистрация</button>
       {% else %}
-      <button type="button" class="btn btn-outline-primary me-2" onclick="alert('В разработке...');">Профиль</button>
+      <button type="button" class="btn btn-outline-primary me-2" onclick="alert('В разработке...');">Профиль ({{request.user}})</button>
       <button type="button" class="btn btn-danger" onclick="location.href='/logout';">Выход</button>
       {% endif %}
     </div>

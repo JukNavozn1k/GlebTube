@@ -5,17 +5,29 @@ from django.views import View
 from django.contrib.auth.models import User
 
 from django.db.models import Q
-
 from . import models,forms
-from django.utils import timezone
 
 import json 
 
-
 import bleach
-
 from django.utils.safestring import mark_safe
 from markdownx.utils import markdownify
+
+class History(View):
+      # return's all watched wideo in -watched order
+      def get(self,request):
+          if request.user.is_authenticated:
+            history = models.History.objects.all().filter(viewer=request.user)
+            videos = [h.video for h in history][::-1]
+            context = {'videos':videos}
+            return render(request,'main.html',context=context)
+          else: return redirect('/')
+      def delete(self,request):
+          if request.user.is_authenticated:
+            history = models.History.objects.all().filter(viewer=request.user).delete() 
+            return render(request,'main.html')
+          else: return redirect('/')
+
 
 class Upload(View):
     def get(self,request):
@@ -48,7 +60,9 @@ class Watch(View):
         likes = rates.filter(grade=1).count()
         dislikes = rates.filter(grade=-1).count()
             
-        if request.user.is_authenticated: rate = models.RateVideo.objects.filter(Q(content=video) & Q(author=request.user)).first()
+        if request.user.is_authenticated: 
+            rate = models.RateVideo.objects.filter(Q(content=video) & Q(author=request.user)).first()
+            models.History(viewer=request.user,video=video).save()
         else: rate = None
         grade = 0
         if not rate is None:
@@ -86,3 +100,9 @@ class Watch(View):
         return HttpResponse("Unauthorized: You need to log in", status=401)
         
     
+def my_videos(request):
+   if request.user.is_authenticated:
+        videos = models.Video.objects.all().filter(author=request.user)
+        context = {'videos': videos,'author_buttons':True}
+        return render(request,'main.html',context=context)
+   else: return redirect('/')
