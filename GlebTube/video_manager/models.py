@@ -24,8 +24,10 @@ class Video(models.Model):
 class History(models.Model):
       viewer = models.ForeignKey(User,null=True,on_delete=models.CASCADE)
       video = models.ForeignKey(Video,null=True,on_delete=models.CASCADE)
-
-
+      class Meta:
+        verbose_name = 'История просмотров'
+        verbose_name_plural = 'История просмотров'
+       
 
 # Rating models
 class Rate(models.Model):
