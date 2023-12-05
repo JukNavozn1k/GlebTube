@@ -69,7 +69,7 @@ class Watch(View):
                 comment = json.loads(request.body)['comment']
                 new_comment = models.CommentVideo(author=author,instance=video,content=comment)
                 cleaned_comment = bleach.clean(comment,tags=bleach.ALLOWED_TAGS, attributes=bleach.ALLOWED_ATTRIBUTES)
-                # new_comment.save()
+                new_comment.save()
                 response = {'comment': mark_safe(markdownify(cleaned_comment)),'author':str(request.user)}
                 return JsonResponse(response, status=200)
             
