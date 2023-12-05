@@ -100,3 +100,9 @@ class Watch(View):
         return HttpResponse("Unauthorized: You need to log in", status=401)
         
     
+def my_videos(request):
+   if request.user.is_authenticated:
+        videos = models.Video.objects.all().filter(author=request.user)
+        context = {'videos': videos,'author_buttons':True}
+        return render(request,'main.html',context=context)
+   else: return redirect('/')
