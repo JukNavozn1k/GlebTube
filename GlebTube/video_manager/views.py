@@ -24,7 +24,7 @@ class History(View):
           else: return redirect('/')
       def delete(self,request):
           if request.user.is_authenticated:
-            history = models.History.objects.all().filter(viewer=request.user).delete() 
+            models.History.objects.all().filter(viewer=request.user).delete() 
             return render(request,'main.html')
           else: return redirect('/')
 
