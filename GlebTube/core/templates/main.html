@@ -20,7 +20,7 @@
                   </div>
                 </div>
                 
-                {% if request.user == video.author %}
+                {% if request.user == video.author and author_buttons %}
                 <div class = "mt-1">
                 <button type="button" class="btn btn-sm btn-success" onclick="event.stopPropagation();">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
