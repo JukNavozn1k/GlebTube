@@ -1,7 +1,6 @@
 function handleDeleteButtonClick(event) {
     // Extracting video ID from the clicked button
     const videoId = event.target.value;
-
     // Extracting CSRF token value
     const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
     
@@ -20,10 +19,13 @@ function handleDeleteButtonClick(event) {
         if (response.ok) {
             // Successful deletion
             console.log(`Video with ID ${videoId} deleted successfully.`);
+            console.log(response);
+            location.reload();
             // You can perform further actions if needed
         } else {
             // Handle errors or non-successful status codes
             console.error('Failed to delete the video.');
+            alert("Ошибка: в доступе отказано");
         }
     })
     .catch(error => {

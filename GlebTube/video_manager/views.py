@@ -128,3 +128,11 @@ def my_videos(request):
         context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
         return render(request,'main.html',context=context)
    else: return redirect('/')
+
+
+def delete_video(request,video_id):
+   if request.user.is_authenticated :
+        video = models.Video.objects.filter(id=video_id, author=request.user).first()
+        video.delete()
+        return HttpResponse("OK",status=200)
+   else: return HttpResponse("NOT OK",status=403)
