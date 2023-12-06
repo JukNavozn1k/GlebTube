@@ -29,7 +29,7 @@ class History(View):
           else: return redirect('/')
 
 
-class Upload(View):
+class UploadVideo(View):
     def get(self,request):
         if not request.user.is_authenticated:
             return redirect('/login')
@@ -46,6 +46,28 @@ class Upload(View):
             video.save()
             return redirect('/')
         else: return render(request,'upload.html',context={'form':forms.UploadForm(),'alert':{'description':f'{form.errors}','title':'Новое видео'}})
+
+
+'''
+class EditVideo(View):
+    def get(self,request,video_id):
+       return HttpResponse(f"Video id: {video_id}")
+    def delete(self,request):
+        if not request.user.is_authenticated:
+            return redirect('/login')
+        else: return redirect('/login')
+
+        form = forms.UploadForm(request.POST,request.FILES)
+        form.author = User.objects.get(username=request.user)
+        if form.is_valid():
+            video  = form.save()
+            video.author = request.user
+            video.save()
+            return redirect('/')
+        else: return render(request,'upload.html',context={'form':forms.UploadForm(),'alert':{'description':f'{form.errors}','title':'Новое видео'}})
+'''
+
+
 
 
 class Watch(View):

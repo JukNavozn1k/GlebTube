@@ -1,0 +1,21 @@
+{% extends 'index.html' %}
+
+
+{% block content %}
+
+
+<div class ="mx-auto col-10 col-md-8 col-lg-6">
+{% if alert %} 
+    <div class="form-group">
+    <div class="alert alert-danger">
+        <strong>Ошибка: </strong> {{alert.description}}
+    </div>
+{% endif %}
+<div class="form-group">
+<h1>{% block override_header %}Новое видео {% endblock %}</h1>
+
+{% block override_form %}
+{% endblock %}
+</div>
+</div>
+{% endblock %}
