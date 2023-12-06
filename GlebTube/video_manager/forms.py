@@ -2,7 +2,7 @@ from django import forms
 
 from . import models
 
-class UploadForm(forms.ModelForm):
+class VideoForm(forms.ModelForm):
     class Meta:
         model =  models.Video
         exclude = ['date_uploaded','author','views']
