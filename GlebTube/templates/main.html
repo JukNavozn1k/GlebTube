@@ -2,7 +2,7 @@
 
 {% block content %}
 {% load static %}
-
+{% csrf_token %}
 
 <div class="album py-5 bg-body-tertiary">
     <div class="container">
@@ -41,7 +41,6 @@
   </div>
 
 {% if author_buttons %}
-  {% csrf_token %}
   <script src="{% static '/js/delete_video.js' %}"></script>
 {% endif %}
 
