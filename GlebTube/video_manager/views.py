@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 
 from django.db.models import Q
 from . import models,forms
+from user_manager.models import History as hist
 
 import json 
 
@@ -17,14 +18,14 @@ class History(View):
       # return's all watched wideo in -watched order
       def get(self,request):
           if request.user.is_authenticated:
-            history = models.History.objects.all().filter(viewer=request.user)
+            history = hist.objects.all().filter(viewer=request.user)
             videos = [h.video for h in history][::-1]
             context = {'videos':videos,'title':'История'}
             return render(request,'main.html',context=context)
           else: return redirect('/')
       def delete(self,request):
           if request.user.is_authenticated:
-            models.History.objects.all().filter(viewer=request.user).delete() 
+            hist.objects.all().filter(viewer=request.user).delete() 
             return render(request,'main.html')
           else: return redirect('/')
 
@@ -84,7 +85,7 @@ class Watch(View):
             
         if request.user.is_authenticated: 
             rate = models.RateVideo.objects.filter(Q(content=video) & Q(author=request.user)).first()
-            models.History(viewer=request.user,video=video).save()
+            hist(viewer=request.user,video=video).save()
         else: rate = None
         grade = 0
         if not rate is None:

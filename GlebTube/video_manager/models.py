@@ -21,13 +21,6 @@ class Video(models.Model):
     author = models.ForeignKey(User,null=True,on_delete=models.CASCADE)
 
 
-class History(models.Model):
-      viewer = models.ForeignKey(User,null=True,on_delete=models.CASCADE)
-      video = models.ForeignKey(Video,null=True,on_delete=models.CASCADE)
-      class Meta:
-        verbose_name = 'Просмотр'
-        verbose_name_plural = 'История просмотров'
-       
 
 # Rating models
 class Rate(models.Model):
