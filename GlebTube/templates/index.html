@@ -3,7 +3,12 @@
 <head>
   {% load static %}
   <link rel="icon" type="image/x-icon" href="{% static 'logo.png' %}">
-  <title>{% block title %}GlebTube{% endblock %}</title>
+  <title>{% block title %}
+    {% if title %}
+    {{title}} - 
+    {% endif %}
+     GlebTube
+    {% endblock %}</title>
 <link rel="stylesheet" href="{% static '/css/bootstrap.css' %}">
 </head>
 <body>
