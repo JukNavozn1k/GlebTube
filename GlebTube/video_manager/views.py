@@ -19,12 +19,12 @@ class History(View):
           if request.user.is_authenticated:
             history = models.History.objects.all().filter(viewer=request.user)
             videos = [h.video for h in history][::-1]
-            context = {'videos':videos}
+            context = {'videos':videos,'title':'История'}
             return render(request,'main.html',context=context)
           else: return redirect('/')
       def delete(self,request):
           if request.user.is_authenticated:
-            history = models.History.objects.all().filter(viewer=request.user).delete() 
+            models.History.objects.all().filter(viewer=request.user).delete() 
             return render(request,'main.html')
           else: return redirect('/')
 
@@ -33,7 +33,7 @@ class Upload(View):
     def get(self,request):
         if not request.user.is_authenticated:
             return redirect('/login')
-        return render(request,'upload.html',context={'form':forms.UploadForm()})
+        return render(request,'upload.html',context={'form':forms.UploadForm(),'title':'Новое видео'})
     def post(self,request):
         if not request.user.is_authenticated:
             return redirect('/login')
@@ -45,7 +45,7 @@ class Upload(View):
             video.author = request.user
             video.save()
             return redirect('/')
-        else: return render(request,'upload.html',context={'form':forms.UploadForm(),'alert':{'description':f'{form.errors}'}})
+        else: return render(request,'upload.html',context={'form':forms.UploadForm(),'alert':{'description':f'{form.errors}','title':'Новое видео'}})
 
 
 class Watch(View):
@@ -103,6 +103,6 @@ class Watch(View):
 def my_videos(request):
    if request.user.is_authenticated:
         videos = models.Video.objects.all().filter(author=request.user)
-        context = {'videos': videos,'author_buttons':True}
+        context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
         return render(request,'main.html',context=context)
    else: return redirect('/')

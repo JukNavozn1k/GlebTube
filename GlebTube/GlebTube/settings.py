@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'markdownx',
     'user_manager',
     'video_manager',
-    'core', 
 ]
 
 MIDDLEWARE = [
@@ -60,7 +59,7 @@ ROOT_URLCONF = 'GlebTube.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['GlebTube/user_manager/templates','GlebTube/video_manager/templates','templates/','GlebTube/core/templates'],
+        'DIRS': ['GlebTube/user_manager/templates','GlebTube/video_manager/templates','templates/'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
