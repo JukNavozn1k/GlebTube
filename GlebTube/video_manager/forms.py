@@ -21,8 +21,8 @@ class UploadForm(forms.ModelForm):
 
         }
 
-
+'''
 class EditForm(UploadForm):
     class Meta:
         exclude = ['date_uploaded','author','views','video','img']
-      
+'''
