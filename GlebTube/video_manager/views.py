@@ -47,6 +47,8 @@ class UploadVideo(View):
             return redirect('/')
         else: return render(request,'upload.html',context={'form':forms.UploadForm(),'alert':{'description':f'{form.errors}','title':'Новое видео'}})
 
+
+'''
 class EditVideo(View):
     def get(self,request,video_id):
        return HttpResponse(f"Video id: {video_id}")
@@ -63,7 +65,7 @@ class EditVideo(View):
             video.save()
             return redirect('/')
         else: return render(request,'upload.html',context={'form':forms.UploadForm(),'alert':{'description':f'{form.errors}','title':'Новое видео'}})
-
+'''
 
 
 
