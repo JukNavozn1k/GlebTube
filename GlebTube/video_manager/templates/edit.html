@@ -4,7 +4,6 @@
 
 {% block override_form %}
 <form enctype="multipart/form-data" method="POST" action="">
-
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Обновить" class="btn btn-primary float-right"/>
