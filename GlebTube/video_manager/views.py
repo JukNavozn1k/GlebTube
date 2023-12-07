@@ -34,19 +34,19 @@ class UploadVideo(View):
     def get(self,request):
         if not request.user.is_authenticated:
             return redirect('/login')
-        return render(request,'upload.html',context={'form':forms.VideoForm(),'title':'Новое видео'})
+        return render(request,'upload.html',context={'form':forms.UploadForm(),'title':'Новое видео'})
     def post(self,request):
         if not request.user.is_authenticated:
             return redirect('/login')
 
-        form = forms.VideoForm(request.POST,request.FILES)
+        form = forms.UploadForm(request.POST,request.FILES)
         form.author = User.objects.get(username=request.user)
         if form.is_valid():
             video  = form.save()
             video.author = request.user
             video.save()
             return redirect('/')
-        else: return render(request,'upload.html',context={'form':forms.VideoForm(),'alert':{'description':f'{form.errors}','title':'Новое видео'}})
+        else: return render(request,'upload.html',context={'form':forms.UploadForm(),'alert':{'description':f'{form.errors}','title':'Новое видео'}})
 
 
 
@@ -54,7 +54,7 @@ class EditVideo(View):
     def get(self,request,video_id):
        video = models.Video.objects.all().filter(id=video_id).first()
        if request.user == video.author:
-           form = forms.VideoForm(instance=video)
+           form = forms.EditForm(instance=video)
            return render(request,'edit.html',context={'form':form})
        else: return redirect('/')
    
