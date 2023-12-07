@@ -19,7 +19,7 @@
               <div class="card-body">
                 {% if request.user == video.author and author_buttons %}
                 <div class = "mt-1 float-right">
-                <button type="button" class="btn btn-sm btn-success" onclick="event.stopPropagation();">
+                <button type="button" class="btn btn-sm btn-success" onclick="event.stopPropagation();location.href='/edit/video/{{video.id}}';">
                   Изменить
                   </button>
                 <button type="button" value="{{video.id}}" class="btn btn-sm btn-danger delete-button" onclick="event.stopPropagation();">
