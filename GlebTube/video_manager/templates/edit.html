@@ -1,3 +1,11 @@
 {% extends 'video_manager.html' %}
 
 {% block override_header %}Редактировать видео{% endblock %}
+
+{% block override_form %}
+<form enctype="multipart/form-data" method="POST" action="">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Обновить" class="btn btn-primary float-right"/>
+    </form>
+{% endblock %}
