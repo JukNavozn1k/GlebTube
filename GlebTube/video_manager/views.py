@@ -64,7 +64,7 @@ class EditVideo(View):
            if form.is_valid():
                form.save()
                return redirect('/')
-           else: return render(request,'edit.html',context={'form':form})
+           else: return render(request,'edit.html',context={'form':forms.EditForm(instance=video),'alert':{'description':f'{form.errors}','title':'Редактировать видео'}})
        else: return redirect('/')
    
    
