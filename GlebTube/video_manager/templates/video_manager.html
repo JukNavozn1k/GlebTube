@@ -5,12 +5,18 @@
 
 
 <div class ="mx-auto col-10 col-md-8 col-lg-6">
-{% if alert %} 
+{% if error_alert %} 
     <div class="form-group">
     <div class="alert alert-danger">
-        <strong>Ошибка: </strong> {{alert.description}}
+        <strong>Ошибка: </strong> {{error_alert.description}}
+    </div>
+{% elif success_alert %}
+<div class="form-group">
+    <div class="alert alert-success">
+        <strong>Успех: </strong> {{success_alert.description}}
     </div>
 {% endif %}
+
 <div class="form-group">
 <h1>{% block override_header %}Новое видео {% endblock %}</h1>
 
