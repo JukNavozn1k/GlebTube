@@ -25,7 +25,7 @@ class UploadForm(forms.ModelForm):
 class EditForm(forms.ModelForm):
     class Meta:
         model =  models.Video
-        exclude = ['date_uploaded','author','views','img','video']
+        exclude = ['date_uploaded','author','views','video']
         widgets = {
             
             'caption' : forms.TextInput(attrs={'class' : 'form-control','placeholder':'Моё первое видео!'}),
