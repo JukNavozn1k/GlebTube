@@ -1,9 +1,33 @@
-# GlebTube 
+
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/othneildrew/Best-README-Template">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" alt="Logo" width="80" height="80">
+  </a>
+
+  <h3 align="center">GlebTube</h3>
+
+  <p align="center">
+    A non-commercial YouTube clone
+    <br/>
+    <a href="https://github.com/JukNavozn1k/GlebTube/releases"><strong>Get release!</strong></a>
+    <br />
+    <br />
+    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">View Demo</a>
+    ·
+    <a href="https://github.com/JukNavozn1k/GlebTube/issues">Report Bug</a>
+    ·
+  </p>
+</div>
+
+
 
 ## About project
 
 ### Description
-A simple videohosting for web dev. Not for commercial use
+This project is created for educational purposes and possibly in the case of blocking YouTube as a domestic analog. 
+The project is written in Django with the use of custom plugins to add various functionality. 
 
 ### Roadmap
 
@@ -20,14 +44,14 @@ A simple videohosting for web dev. Not for commercial use
 
 
 This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+To get a local copy up and running follow these steps.
 
 
 
 
 ### Installation
 
-_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
+_To execute the following commands, you need to install python and pip_
 
 1. Clone the repo
    ```sh
