@@ -57,6 +57,16 @@ class EditVideo(View):
            form = forms.EditForm(instance=video)
            return render(request,'edit.html',context={'form':form})
        else: return redirect('/')
+    def post(self,request,video_id):
+       video = models.Video.objects.all().filter(id=video_id).first()
+       if request.user == video.author:
+           form = forms.EditForm(request.POST,request.FILES,instance=video)
+           if form.is_valid():
+               form.save()
+               return redirect('/')
+           else: return render(request,'edit.html',context={'form':form})
+       else: return redirect('/')
+   
    
 
 
