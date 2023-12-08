@@ -45,7 +45,7 @@ class Reg(views.View):
                user.save()
                login(request,user)
                return redirect('/')
-            else: return render(request, 'reg.html',context={'form':forms.AuthForm(),'alert':{'description':'Неверно заполнена форма.'}})
+            else: return render(request, 'reg.html',context={'form':forms.AuthForm(),'alert':{'description':f'{form.errors}'}})
 
 class Logout(views.View):
     def get(self,request):
