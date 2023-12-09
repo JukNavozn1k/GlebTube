@@ -11,7 +11,7 @@
       </h3>
       <div class="row">   <!--row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mt-4--> 
         {% for video in videos %}
-        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 p-3">
+        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 p-3 video_{{video.id}}">
             
             <div class="card shadow-sm border-0" onclick="location.href='/watch/{{video.id}}'" style="cursor: pointer;" title="{{video.caption}}">
               
@@ -22,7 +22,9 @@
                 <button type="button" class="btn btn-sm btn-success" onclick="event.stopPropagation();location.href='/edit/video/{{video.id}}';">
                   Изменить
                   </button>
-                <button type="button" value="{{video.id}}" class="btn btn-sm btn-danger delete-button" onclick="event.stopPropagation();">
+                <button type="button" hx-delete="/delete/video/{{video.id}}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                 hx-target=".video_{{video.id}}" hx-swap="outerHTML"
+                 class="btn btn-sm btn-danger delete-button" onclick="event.stopPropagation();">
                   Удалить
                 </button>
               </div>
@@ -41,10 +43,6 @@
       </div>
     </div>
   </div>
-
-{% if author_buttons %}
-  <script src="{% static '/js/delete_video.js' %}"></script>
-{% endif %}
 
 
 {% endblock %}
