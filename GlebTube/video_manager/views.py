@@ -139,5 +139,5 @@ def delete_video(request,video_id):
         video = models.Video.objects.filter(id=video_id, author=request.user).first()
         if video is None: return HttpResponse("NOT OK",status=403)
         else: video.delete()
-        return HttpResponse("OK",status=200)
-   else: return HttpResponse("NOT OK",status=403)
+        return HttpResponse("",status=200)
+   else: return HttpResponse("",status=403)
