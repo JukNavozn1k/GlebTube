@@ -110,11 +110,7 @@
                       <p class="comment-text">{{comment.content|formatted_markdown|bleach}}</p>
                     </div>
                   </div>
-                  {% if request.user == comment.author %} 
-                  <button hx-confirm="Вы уверены, что хотите удалить этот комментарий" hx-delete="/delete/comment/{{video.id}}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
-                  hx-target=".comment_{{comment.id}}" hx-swap="outerHTML"
-                  class="float-right btn btn-danger btn-sm shadow-none" type="button">Удалить</button>
-                  {% endif %}
+                 
               </div>
              
               
