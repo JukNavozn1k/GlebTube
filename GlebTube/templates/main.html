@@ -22,7 +22,7 @@
                 <button type="button" class="btn btn-sm btn-success" onclick="event.stopPropagation();location.href='/edit/video/{{video.id}}';">
                   Изменить
                   </button>
-                <button type="button" hx-delete="/delete/video/{{video.id}}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                <button type="button"hx-confirm="Вы уверены, что хотите удалить это видео?" hx-delete="/delete/video/{{video.id}}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
                  hx-target=".video_{{video.id}}" hx-swap="outerHTML"
                  class="btn btn-sm btn-danger delete-button" onclick="event.stopPropagation();">
                   Удалить
