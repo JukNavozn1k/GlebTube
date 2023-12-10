@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,HttpResponse
 
 from django import views
 
@@ -6,6 +6,7 @@ from . import forms
 
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.models import User
+
 
 
 '''
@@ -55,8 +56,13 @@ class Logout(views.View):
 
 class Profile(views.View):
     def get(self,request,user):
-        user = User.objects.get(username=user)
-        isOwner = False
-        if request.user == user: isOwner = True
-        context = {'user': user,'isOwner':isOwner}
-        return render(request,'profile.html',context=context)
+        try:
+            user = User.objects.get(username=user)
+            
+            isOwner = False
+            if request.user == user: isOwner = True
+            context = {'user': user,'isOwner':isOwner}
+            return render(request,'profile.html',context=context)
+        except User.DoesNotExist: 
+            return HttpResponse("Не найден",status=401)
+      
