@@ -1,9 +1,9 @@
 
-
 const commentsCountElement = document.getElementById("comments_count");
 
-// Add comment 
-document.getElementById('sendButton').addEventListener('click', function () {
+
+function inc_count()
+{
   const text = commentsCountElement.textContent;
   const match = /(\d+)/.exec(text);
 
@@ -13,9 +13,19 @@ document.getElementById('sendButton').addEventListener('click', function () {
     // Update the text content with the incremented count
     commentsCountElement.textContent = text.replace(currentCount, newCount);
   }
-});
-
+}
 // Clear comment
 document.getElementById('clearButton').addEventListener('click', function () {
     comment = document.getElementById('comment').value = "";
+});
+
+document.body.addEventListener('htmx:afterRequest', function (evt) {
+ 
+  if (evt.detail.failed) {
+    alert("Ошибка: Необходима авторизация.");
+  }
+  else
+  {
+    inc_count();
+  }
 });

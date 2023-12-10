@@ -87,7 +87,9 @@
     <div class="mt-2 text-right">
         <button type="button" id="clearButton" class="btn btn-outline-primary btn-sm shadow-none">Очистить</button>
         <button hx-post="/watch/{{video.id}}/comment" hx-vars="comment:document.getElementById('comment').value" 
-         hx-target=".comment_list" hx-swap="afterbegin"
+         hx-target=".comment_list"
+         hx-swap="afterbegin"
+         
          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
          class="btn btn-primary btn-sm shadow-none" id="sendButton" type="button">Отправить</button>
     </div>
@@ -120,6 +122,7 @@
 </div>
 
 <!--Scripts-->
+
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 <script src="{% static '/js/player.js' %}"></script>
 <script src="{% static '/js/comment_video.js' %}"></script>

@@ -43,7 +43,7 @@ document.querySelectorAll(".post").forEach(post => {
 					rating.classList.add("post-rating-selected"); }
 				  
 				} else if (res.status === 401) {
-				  alert("Ошибка: необходима авторизация.");
+				  alert("Ошибка: Необходима авторизация.");
 				}
 			  });
 
