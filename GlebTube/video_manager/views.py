@@ -1,5 +1,4 @@
 from django.shortcuts import render,redirect,HttpResponse
-from django.http import JsonResponse
 
 from django.views import View
 from django.contrib.auth.models import User
@@ -8,7 +7,6 @@ from django.db.models import Q
 from . import models,forms
 from user_manager.models import History as hist
 
-import json 
 
 import bleach
 from django.utils.safestring import mark_safe
@@ -22,12 +20,12 @@ class History(View):
             videos = [h.video for h in history][::-1]
             context = {'videos':videos,'title':'История'}
             return render(request,'main.html',context=context)
-          else: return redirect('/')
+          else: return redirect('/login')
       def delete(self,request):
           if request.user.is_authenticated:
             hist.objects.all().filter(viewer=request.user).delete() 
             return render(request,'main.html')
-          else: return redirect('/')
+          else: return redirect('/login')
 
 
 class UploadVideo(View):
@@ -154,7 +152,7 @@ def my_videos(request):
         videos = models.Video.objects.all().filter(author=request.user)
         context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
         return render(request,'main.html',context=context)
-   else: return redirect('/')
+   else: return redirect('/login')
 
 
 def delete_video(request,video_id):
