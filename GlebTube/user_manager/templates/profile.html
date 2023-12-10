@@ -14,10 +14,15 @@
             Здесь будет замечательное описание, когда-нибудь...
           </div>
           <span class="profile_buttons">
-            <a href="#" class="btn btn-success btn-sm">
+              {% if isOwner %}
+              <a href="#" class="btn btn-success btn-sm">
+                Редактировать
+              </a>
+              {% else %}
+              <a href="#" class="btn btn-success btn-sm">
                 Подписаться
               </a>
-             
+              {% endif %}
           </span>
           <!--
           <div class="d-flex justify-content-center align-items-center py-4">
