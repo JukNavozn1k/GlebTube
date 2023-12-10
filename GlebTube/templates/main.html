@@ -19,7 +19,7 @@
               <div class="card-body">
                 {% if request.user == video.author and author_buttons %}
                 <div class = "mt-1 float-right">
-                <button type="button" class="btn btn-sm btn-success" onclick="event.stopPropagation();location.href='/edit/video/{{video.id}}';">
+                <button type="button" class="btn btn-sm btn-warning" onclick="event.stopPropagation();location.href='/edit/video/{{video.id}}';">
                   Изменить
                   </button>
                 <button type="button"hx-confirm="Вы уверены, что хотите удалить это видео?" hx-delete="/delete/video/{{video.id}}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
