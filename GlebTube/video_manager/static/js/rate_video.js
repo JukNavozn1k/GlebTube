@@ -1,6 +1,4 @@
- // Get the CSRF token using the {% csrf_token %} template tag
-// const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
-
+const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
 // Rate video Buttons
 document.querySelectorAll(".post").forEach(post => {
 	
@@ -45,7 +43,7 @@ document.querySelectorAll(".post").forEach(post => {
 					rating.classList.add("post-rating-selected"); }
 				  
 				} else if (res.status === 401) {
-				  alert("Unauthorized: You need to log in");
+				  alert("Ошибка: Необходима авторизация.");
 				}
 			  });
 
