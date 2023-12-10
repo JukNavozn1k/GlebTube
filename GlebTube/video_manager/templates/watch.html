@@ -34,7 +34,7 @@
       <div class="md_content">
       <p class="card-text">{{video.description|formatted_markdown|bleach}}</p>
     </div>
-      <p class="card-text"><small class="text-muted">Дата выхода: {{video.date_uploaded}} Количество просмотров: {{video.views}}</small></p>
+      <p class="card-text"><small class="text-muted">Дата выхода: {{video.date_uploaded|date:"m.d.Y H:i"}} Количество просмотров: {{video.views}}</small></p>
       <p class="card-text"><small class="text-muted">Автор: {{video.author}}</small></p>
     </div>
   </div>
@@ -80,22 +80,22 @@
   <h3 id="comments_count">Комментарии ({{comments|length}})</h3>
   
   <div class="bg-white p-2">
-    
     <div class="d-flex flex-row align-items-start">
         <img class="rounded-circle" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" width="40">
         <textarea class="form-control ml-1 shadow-none textarea" id="comment" placeholder="Введите комментарий"></textarea>
     </div>
     <div class="mt-2 text-right">
         <button type="button" id="clearButton" class="btn btn-outline-primary btn-sm shadow-none">Очистить</button>
-        <button class="btn btn-primary btn-sm shadow-none" id="sendButton" type="button">Отправить</button>
+        <button hx-post="/watch/{{video.id}}/comment" hx-vars="comment:document.getElementById('comment').value" 
+         hx-target=".comment_list"
+         hx-swap="afterbegin"
+         
+         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+         class="btn btn-primary btn-sm shadow-none" id="sendButton" type="button">Отправить</button>
     </div>
 </div>
 
 <div class="comment_list">
-
-
-
-
 {% for comment in comments %}  
   <div class="d-flex justify-content-center row">
       <div class="col"> <!--<div class="col-md-8"> -->
@@ -103,13 +103,14 @@
               <div class="bg-white p-2">
                   <div class="d-flex flex-row user-info"><img class="rounded-circle" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" width="40">
                       <div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">{{comment.author}}</span>
-                        <span class="date text-black-50">{{comment.date_uploaded}}</span></div>
+                        <span class="date text-black-50">Дата выхода: {{comment.date_uploaded|date:"m.d.Y H:i"}}</span></div>
                   </div>
                   <div class="mt-2">
                       <div class="md_content">
                       <p class="comment-text">{{comment.content|formatted_markdown|bleach}}</p>
                     </div>
                   </div>
+                 
               </div>
              
               
@@ -121,6 +122,7 @@
 </div>
 
 <!--Scripts-->
+
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 <script src="{% static '/js/player.js' %}"></script>
 <script src="{% static '/js/comment_video.js' %}"></script>
