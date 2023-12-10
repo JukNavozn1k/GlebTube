@@ -55,4 +55,4 @@ class Logout(views.View):
 
 class Profile(views.View):
     def get(self,request):
-        return render(request,'channel.html')
+        return render(request,'profile.html')
