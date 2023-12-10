@@ -135,9 +135,7 @@ class Watch(View):
                 cleaned_comment = bleach.clean(comment,tags=bleach.ALLOWED_TAGS, attributes=bleach.ALLOWED_ATTRIBUTES)
                 new_comment.save()
                 return HttpResponse(self.comment_generator(new_comment.date_uploaded,new_comment.author,mark_safe(markdownify(cleaned_comment))))
-                
-               
-            
+
           elif action in rate_actions:
                 rate = models.RateVideo.objects.filter(Q(content=video) & Q(author=author)).first()
                 if rate is None:
@@ -148,7 +146,7 @@ class Watch(View):
                 rate.save()
                 return HttpResponse("Good!",status=200)
           
-        return HttpResponse("Unauthorized: You need to log in", status=401)
+        return HttpResponse("Ошибка: Необходима авторизация", status=401)
         
     
 def my_videos(request):
