@@ -1,11 +1,13 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,HttpResponse
 
 from django import views
 
 from . import forms
+from . import models
 
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.models import User
+
 
 
 '''
@@ -53,3 +55,20 @@ class Logout(views.View):
         return redirect('/')
   
 
+class Profile(views.View):
+    def get(self,request,user):
+        try:
+            user = User.objects.get(username=user)
+            
+            isOwner = False
+            if request.user == user: isOwner = True
+            context = {'user': user,'isOwner':isOwner}
+            return render(request,'profile.html',context=context)
+        except User.DoesNotExist: 
+            return render(request,'404.html')
+
+def delete_history(request):
+    if request.user.is_authenticated :
+        models.History.objects.all().filter(viewer=request.user).delete()
+        return HttpResponse("",status=200)
+    else: return HttpResponse("",status=403)
