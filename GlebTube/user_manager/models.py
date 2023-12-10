@@ -10,3 +10,8 @@ class History(models.Model):
       class Meta:
         verbose_name = 'Просмотр'
         verbose_name_plural = 'История просмотров'
+  
+class UserAdditional(models.Model):
+      user = models.ForeignKey(User,unique=True,on_delete=models.CASCADE)
+      profile_description = models.TextField(max_length=1024)
+      avatar = models.ImageField(upload_to='images_uploaded',null=True)
