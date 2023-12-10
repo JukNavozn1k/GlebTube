@@ -54,5 +54,7 @@ class Logout(views.View):
   
 
 class Profile(views.View):
-    def get(self,request):
-        return render(request,'profile.html')
+    def get(self,request,user):
+        user = User.objects.get(username=user)
+        context = {'user': user}
+        return render(request,'profile.html',context=context)
