@@ -1,6 +1,6 @@
 
 const commentsCountElement = document.getElementById("comments_count");
-
+const  commentListDiv = document.querySelector('.comment_list');
 
 function inc_count()
 {
@@ -22,7 +22,24 @@ document.getElementById('clearButton').addEventListener('click', function () {
 document.body.addEventListener('htmx:afterRequest', function (evt) {
  
   if (evt.detail.xhr.status === 401) {
-    alert("Ошибка: Необходима авторизация.");
+    if (!document.getElementById('error_lbl')) {
+      var newDiv = document.createElement('div');
+      newDiv.innerHTML = `
+      <div class="form-group">
+      <div class="alert alert-danger">
+          <strong>Ошибка: </strong> Необходима авторизация.
+      </div>
+      
+      `; 
+      newDiv.id = 'error_lbl';
+      commentListDiv.insertBefore(newDiv, commentListDiv.firstChild);
+    }
+
+
+
+
+
+
   }
   else
   {
