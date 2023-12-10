@@ -73,6 +73,20 @@ bleach = {version = ">=5,<6", extras = ["css"]}
 Django = ">=3.2"
 
 [[package]]
+name = "django-jazzmin"
+version = "2.6.0"
+description = "Drop-in theme for django admin, that utilises AdminLTE 3 & Bootstrap 4 to make yo' admin look jazzy"
+optional = false
+python-versions = ">=3.6.2"
+files = [
+    {file = "django_jazzmin-2.6.0-py3-none-any.whl", hash = "sha256:fb554c2d564649c65243b13385121fdbdda58521f49544f9d7cb9c414a4908d4"},
+    {file = "django_jazzmin-2.6.0.tar.gz", hash = "sha256:5bb07055cf19183030724f976904fd8b6337559727959340a43832fab0531812"},
+]
+
+[package.dependencies]
+django = ">=2.2"
+
+[[package]]
 name = "django-markdownx"
 version = "4.0.5"
 description = "A comprehensive Markdown editor built for Django."
@@ -251,4 +265,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10.4"
-content-hash = "091289ea963a4ed5120593aa50e9489b07b95e29d18457e68f8f9fb0bda66f0a"
+content-hash = "cdabbc4eedf7672fdf5e8ead059dfaba7aac40370c419aa9d8e7d653a6f7fcbf"
