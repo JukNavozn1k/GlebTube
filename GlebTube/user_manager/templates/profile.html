@@ -1,0 +1,88 @@
+{% extends 'index.html' %}
+
+
+{% block content %}
+{% csrf_token %}
+<div class="bg-white">
+    <div class="container">
+      <div class="text-center py-5">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" width="120" alt class="ui-w-100 rounded-circle">
+  
+        <div class="col-md-8 col-lg-6 col-xl-5 p-0 mx-auto">
+          <h4 class="font-weight-bold my-4">{{user.username}}</h4>
+  
+          <div class="text-muted mb-4">
+            Здесь будет замечательное описание, когда-нибудь...
+          </div>
+          <span class="profile_buttons">
+              {% if isOwner %}
+              <button type="button" class="btn btn-warning btn-sm">
+                Редактировать профиль
+              </button>
+              <button type="button" 
+              hx-confirm="Вы уверены, что хотите очистить историю?" 
+              hx-delete="/delete/history" 
+              hx-swap="none"
+              hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                
+              class="btn btn-danger btn-sm">
+                Очистить историю
+              </button>
+              {% else %}
+              <button type="button" class="btn btn-success btn-sm">
+                Подписаться
+              </button>
+              {% endif %}
+          </span>
+         
+          <div class="d-flex justify-content-center align-items-center py-4">
+            <div>
+              <div class="d-inline-block text-dark">
+                
+                <span class="text-muted">Всего лайков: </span>
+                <strong>234</strong>
+              </div>
+              
+              <div class="d-inline-block text-dark ml-3">
+                <span class="text-muted">Всего подписчиков: </span>
+                <strong>111</strong>
+              </div>
+            </div>
+            <div>
+              
+              <a href="#" class="btn btn-default icon-btn md-btn-flat btn-sm ml-1">
+                <i class="ion ion-md-mail"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="text-center">
+          <a href="#" class="btn icon-btn borderless btn-outline-twitter btn-lg btn-round">
+            <span class="ion ion-logo-twitter"></span>
+          </a>
+          <a href="#" class="btn icon-btn borderless btn-outline-facebook btn-lg btn-round">
+            <span class="ion ion-logo-facebook"></span>
+          </a>
+          <a href="#" class="btn icon-btn borderless btn-outline-instagram btn-lg btn-round">
+            <span class="ion ion-logo-instagram"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <hr class="m-0">
+  
+    <ul class="nav nav  justify-content-center">
+      <li class="nav-item">
+        <a class="nav-link py-4 active" href="#">Видео пользователя</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link py-4" href="#">Понравилось пользователю</a>
+      </li>    
+    </ul>
+  
+  </div>
+
+
+{% endblock %}
