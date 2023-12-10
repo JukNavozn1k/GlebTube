@@ -9,7 +9,7 @@ class UploadForm(forms.ModelForm):
         widgets = {
             
             'caption' : forms.TextInput(attrs={'class' : 'form-control','placeholder':'Моё первое видео!'}),
-            'video' : forms.FileInput(attrs={'class' : 'form-control form-control-sm'}),
+            'video' : forms.FileInput(attrs={'class' : 'form-control form-control-sm',"accept" : ".mov, .avi, .mp4, .webm, .mkv"}),
             'img' : forms.FileInput(attrs={'class' : 'form-control form-control-sm'}),
             'description' : forms.Textarea(attrs={'class' : 'form-control','rows' : '3','placeholder':'Как я провёл лето...'})
         }
@@ -29,7 +29,7 @@ class EditForm(forms.ModelForm):
         widgets = {
             
             'caption' : forms.TextInput(attrs={'class' : 'form-control','placeholder':'Моё первое видео!'}),
-            'video' : forms.FileInput(attrs={'class' : 'form-control form-control-sm'}),
+            'video' : forms.FileInput(attrs={'class' : 'form-control form-control-sm',"accept" : ".mov, .avi, .mp4, .webm, .mkv"}),
             'img' : forms.FileInput(attrs={'class' : 'form-control form-control-sm'}),
             'description' : forms.Textarea(attrs={'class' : 'form-control','rows' : '3','placeholder':'Как я провёл лето...'})
         }
