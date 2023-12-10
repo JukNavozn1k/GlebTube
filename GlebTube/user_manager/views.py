@@ -56,5 +56,7 @@ class Logout(views.View):
 class Profile(views.View):
     def get(self,request,user):
         user = User.objects.get(username=user)
-        context = {'user': user}
+        isOwner = False
+        if request.user == user: isOwner = True
+        context = {'user': user,'isOwner':isOwner}
         return render(request,'profile.html',context=context)
