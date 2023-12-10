@@ -80,24 +80,22 @@
   <h3 id="comments_count">Комментарии ({{comments|length}})</h3>
   
   <div class="bg-white p-2">
-    
     <div class="d-flex flex-row align-items-start">
         <img class="rounded-circle" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" width="40">
         <textarea class="form-control ml-1 shadow-none textarea" id="comment" placeholder="Введите комментарий"></textarea>
     </div>
     <div class="mt-2 text-right">
         <button type="button" id="clearButton" class="btn btn-outline-primary btn-sm shadow-none">Очистить</button>
-        <button class="btn btn-primary btn-sm shadow-none" id="sendButton" type="button">Отправить</button>
+        <button hx-post="/watch/{{video.id}}/comment" hx-vars="comment:document.getElementById('comment').value" 
+         hx-target=".comment_list" hx-swap="afterbegin"
+         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+         class="btn btn-primary btn-sm shadow-none" id="sendButton" type="button">Отправить</button>
     </div>
 </div>
 
 <div class="comment_list">
-
-
-
-
 {% for comment in comments %}  
-  <div class="d-flex justify-content-center row comment_{{comment.id}}">
+  <div class="d-flex justify-content-center row">
       <div class="col"> <!--<div class="col-md-8"> -->
           <div class="d-flex flex-column comment-section">
               <div class="bg-white p-2">
