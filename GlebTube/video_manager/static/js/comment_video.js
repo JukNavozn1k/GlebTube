@@ -21,7 +21,7 @@ document.getElementById('clearButton').addEventListener('click', function () {
 
 document.body.addEventListener('htmx:afterRequest', function (evt) {
  
-  if (evt.detail.failed) {
+  if (evt.detail.xhr.status === 401) {
     alert("Ошибка: Необходима авторизация.");
   }
   else
