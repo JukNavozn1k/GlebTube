@@ -8,4 +8,5 @@ urlpatterns = [
    path('reg/',views.Reg.as_view()),
    path('logout/', views.Logout.as_view()),
    path('profile/<path:user>',views.Profile.as_view()),
+   path('delete/history',views.delete_history)
 ]

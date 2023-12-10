@@ -2,6 +2,7 @@
 
 
 {% block content %}
+{% csrf_token %}
 <div class="bg-white">
     <div class="container">
       <div class="text-center py-5">
@@ -15,13 +16,21 @@
           </div>
           <span class="profile_buttons">
               {% if isOwner %}
-              <a href="#" class="btn btn-success btn-sm">
-                Редактировать
-              </a>
+              <button type="button" class="btn btn-warning btn-sm">
+                Редактировать профиль
+              </button>
+              <button type="button" 
+              hx-confirm="Вы уверены, что хотите очистить историю?" 
+              hx-delete="/delete/history" 
+              hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                
+              class="btn btn-danger btn-sm">
+                Очистить историю
+              </button>
               {% else %}
-              <a href="#" class="btn btn-success btn-sm">
+              <button type="button" class="btn btn-success btn-sm">
                 Подписаться
-              </a>
+              </button>
               {% endif %}
           </span>
           <!--
