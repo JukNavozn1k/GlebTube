@@ -64,5 +64,5 @@ class Profile(views.View):
             context = {'user': user,'isOwner':isOwner}
             return render(request,'profile.html',context=context)
         except User.DoesNotExist: 
-            return HttpResponse("Не найден",status=401)
+            return render(request,'404.html')
       
