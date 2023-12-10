@@ -143,7 +143,7 @@ MARKDOWNX_MARKDOWN_EXTENSIONS = [
 
 BLEACH_ALLOWED_TAGS = [
     'a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol',
-    'strong', 'ul', 'h1', 'h2', 'h3','h4','h5','h6', 'p', 'img','s','pre','table', 'tr', 'th', 'td','thead','tbody','hr'
+    'strong', 'ul', 'h1', 'h2', 'h3','h4','h5','h6', 'p','s','pre','table', 'tr', 'th', 'td','thead','tbody','hr'
 ]
 
 BLEACH_ALLOWED_ATTRIBUTES = {
