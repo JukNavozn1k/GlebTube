@@ -32,7 +32,7 @@
                 <p class="card-text text-uppercase font-weight-bold text-truncate overflow-hidden">{{video.caption}}</p>
                 <div class="d-flex justify-content-between align-items-center">
                   <div class="btn-group">
-                    <small class="text-body-secondary">Дата выхода: {{video.date_uploaded}}, </small>
+                    <small class="text-body-secondary">Дата выхода: {{video.date_uploaded|date:"m.d.Y H:i" }} </small>
                     <small class="text-body-secondary">Количество просмотров: {{video.views}}</small>
                   </div>
                 </div>
