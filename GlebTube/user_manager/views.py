@@ -53,3 +53,6 @@ class Logout(views.View):
         return redirect('/')
   
 
+class Profile(views.View):
+    def get(self,request):
+        return render(request,'channel.html')
