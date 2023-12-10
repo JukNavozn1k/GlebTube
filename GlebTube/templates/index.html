@@ -35,7 +35,7 @@
       <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='/login';">Вход</button>
       <button type="button" class="btn btn-primary" onclick="location.href='/reg';">Регистрация</button>
       {% else %}
-      <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='/profile';">Профиль ({{request.user}})</button>
+      <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='/profile/{{request.user}}';">Профиль ({{request.user}})</button>
       <button type="button" class="btn btn-danger" onclick="location.href='/logout';">Выход</button>
       {% endif %}
     </div>
