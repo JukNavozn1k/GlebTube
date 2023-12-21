@@ -103,9 +103,11 @@ class UserVideos(UserContent):
 class UserLiked(UserContent):
     # Returns query of user liked videos    
     def get(self,request,user):
-            # user = User.objects.get(username=user)
+            user = User.objects.get(username=user)
             response = ''
-            return HttpResponse('пам парааам')
+            for liked_video in RateVideo.objects.all().filter(grade=1,author=user):
+                response += self.gen_template(liked_video.content)
+            return HttpResponse(response)
 
 
 
