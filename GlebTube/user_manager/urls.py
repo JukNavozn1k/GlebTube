@@ -10,7 +10,7 @@ urlpatterns = [
 
    path('profile/<path:user>',views.Profile.as_view()),
 
-   path('profile_content/<path:user>/videos',views.user_videos),
+   path('profile_content/<path:user>/videos',views.UserVideos.as_view()),
    path('profile_content<path:user>/liked_videos',views.user_liked),
 
    path('delete/history',views.delete_history)

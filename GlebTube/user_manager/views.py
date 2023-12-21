@@ -4,9 +4,12 @@ from django import views
 
 from . import forms
 from . import models
+from video_manager.models import Video
 
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.models import User
+
+
 
 
 
@@ -64,9 +67,40 @@ class Profile(views.View):
         except User.DoesNotExist: 
             return render(request,'404.html')
 
-# Returns query of user videos    
-def user_videos(request,user):
-    return HttpResponse('Куча улётной фигни')
+class UserContent(views.View):
+    # generates video template
+    def gen_template(self,video):
+            template = f"""
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 p-3 video_{video.id}">
+                    
+                    <div class="card shadow-sm border-0" onclick="location.href='/watch/{video.id}'" style="cursor: pointer;" title="{video.caption}">
+                    
+                    <img class="bd-placeholder-img card-img-top rounded" src="{video.img.url}" width="100%" height="200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
+                    <div class="card-body">
+                        <p class="card-text text-uppercase font-weight-bold text-truncate overflow-hidden">{video.caption}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <small class="text-body-secondary">Дата выхода: {video.date_uploaded} </small>
+                            <small class="text-body-secondary">Количество просмотров: {video.views}</small>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            """
+            return template
+
+
+class UserVideos(UserContent):
+   
+    # Returns query of user videos    
+    def get(self,request,user):
+            user = User.objects.get(username=user)
+            response = ''
+            for video in Video.objects.filter(author=user):
+                response += self.gen_template(video)
+
+            return HttpResponse(response)
 
 # Returns query of user liked videos 
 def user_liked(request,user):
