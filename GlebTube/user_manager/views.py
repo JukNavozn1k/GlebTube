@@ -68,6 +68,7 @@ class Profile(views.View):
 
 # Base model, stores similar methods
 class UserContent(views.View):
+    
     # generates video template
     def gen_template(self,video):
             template = f"""
@@ -94,18 +95,20 @@ class UserVideos(UserContent):
     # Returns query of user videos    
     def get(self,request,user):
             user = User.objects.get(username=user)
-            response = ''
+            response = f'<h3>Видео пользователя: {user.username}</h3 class="mb-3"><div class="row">'
             for video in Video.objects.filter(author=user):
                 response += self.gen_template(video)
+            response += '</div>'
             return HttpResponse(response)
 # Same as UserVideos   
 class UserLiked(UserContent):
     # Returns query of user liked videos    
     def get(self,request,user):
             user = User.objects.get(username=user)
-            response = ''
+            response = f'<h3>Видео, которые нравятся пользователю: {user.username}</h3 class="mb-3"><div class="row">'
             for liked_video in RateVideo.objects.all().filter(grade=1,author=user):
                 response += self.gen_template(liked_video.content)
+            response += '</div>'
             return HttpResponse(response)
 
 
