@@ -9,7 +9,7 @@ from video_manager.models import Video,RateVideo
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.models import User
 
-from datetime import datetime
+
 
 from django.http import Http404
 
