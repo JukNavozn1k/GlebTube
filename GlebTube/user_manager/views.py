@@ -68,6 +68,9 @@ class Profile(views.View):
 def user_videos(request,user):
     return HttpResponse('Куча улётной фигни')
 
+# Returns query of user liked videos 
+def user_liked(request,user):
+    return HttpResponse('Ещё больше улётной фигни')
 
 
 # Clean's request user history
