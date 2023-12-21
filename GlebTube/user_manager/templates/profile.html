@@ -59,18 +59,24 @@
   
     <ul class="nav nav  justify-content-center">
       <li class="nav-item">
-        <a class="nav-link py-4 active" href="#" hx-get="/profile_content/{{username}}/videos" hx-target=".user_content" >Видео пользователя</a>
+        <a class="nav-link py-4 active" href="#" hx-get="/profile_content/{{username}}/videos" hx-target=".row" >Видео пользователя</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link py-4" href="#" hx-get="/profile_content/{{username}}/liked_videos" hx-target=".user_content">Понравилось пользователю</a>
+        <a class="nav-link py-4" href="#" hx-get="/profile_content/{{username}}/liked_videos" hx-target=".row">Понравилось пользователю</a>
       </li>    
     </ul>
-  </div>
+
 
   <div class="user_content">
-    <p>Тут что то будет</p>
+  <div class="row">
+    <!--HTMX RESPONSE CONTENT-->
+   </div>
+    
   </div>  
   </div>
 
 </div>
+</div>
+</div>
+
 {% endblock %}
