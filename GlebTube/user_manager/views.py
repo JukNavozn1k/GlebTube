@@ -62,7 +62,7 @@ class Profile(views.View):
             
             isOwner = False
             if request.user == user: isOwner = True
-            context = {'user': user,'isOwner':isOwner}
+            context = {'username': user.username,'isOwner':isOwner}
             return render(request,'profile.html',context=context)
         except User.DoesNotExist: 
             return render(request,'404.html')
