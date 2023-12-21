@@ -81,7 +81,7 @@ class Watch(View):
               <div class="bg-white p-2">
                   <div class="d-flex flex-row user-info"><img class="rounded-circle" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" width="40">
                       <div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">{author}</span>
-                        <span class="date text-black-50">{'Только что'}</span></div>
+                        <span class="date text-black-50">Дата выхода: {date.strftime("%m.%d.%Y %H:%M")}</span></div>
                   </div>
                   <div class="mt-2">
                       <div class="md_content">
