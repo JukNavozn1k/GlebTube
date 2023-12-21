@@ -59,7 +59,6 @@ class Profile(views.View):
     def get(self,request,user):
         try:
             user = User.objects.get(username=user)
-            
             isOwner = False
             if request.user == user: isOwner = True
             context = {'username': user.username,'isOwner':isOwner}
@@ -67,6 +66,7 @@ class Profile(views.View):
         except User.DoesNotExist: 
             raise Http404("The requested resource was not found.")
 
+# Base model, stores similar methods
 class UserContent(views.View):
     # generates video template
     def gen_template(self,video):
@@ -89,8 +89,7 @@ class UserContent(views.View):
                 </div>
             """
             return template
-
-
+# Uses the methods of the underlying model to output the video queue
 class UserVideos(UserContent):
     # Returns query of user videos    
     def get(self,request,user):
@@ -99,7 +98,7 @@ class UserVideos(UserContent):
             for video in Video.objects.filter(author=user):
                 response += self.gen_template(video)
             return HttpResponse(response)
-    
+# Same as UserVideos   
 class UserLiked(UserContent):
     # Returns query of user liked videos    
     def get(self,request,user):
