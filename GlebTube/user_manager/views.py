@@ -9,7 +9,7 @@ from video_manager.models import Video
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.models import User
 
-
+from datetime import datetime
 
 
 
@@ -80,7 +80,7 @@ class UserContent(views.View):
                         <p class="card-text text-uppercase font-weight-bold text-truncate overflow-hidden">{video.caption}</p>
                         <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group">
-                            <small class="text-body-secondary">Дата выхода: {video.date_uploaded} </small>
+                            <small class="text-body-secondary">Дата выхода: {video.date_uploaded.strftime("%m.%d.%Y %H:%M")} </small>
                             <small class="text-body-secondary">Количество просмотров: {video.views}</small>
                         </div>
                         </div>
