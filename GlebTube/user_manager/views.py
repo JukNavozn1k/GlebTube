@@ -4,14 +4,14 @@ from django import views
 
 from . import forms
 from . import models
-from video_manager.models import Video
+from video_manager.models import Video,RateVideo
 
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.models import User
 
 from datetime import datetime
 
-
+from django.http import Http404
 
 # User auth
 class Login(views.View):
@@ -65,7 +65,7 @@ class Profile(views.View):
             context = {'username': user.username,'isOwner':isOwner}
             return render(request,'profile.html',context=context)
         except User.DoesNotExist: 
-            return render(request,'404.html')
+            raise Http404("The requested resource was not found.")
 
 class UserContent(views.View):
     # generates video template
@@ -92,19 +92,24 @@ class UserContent(views.View):
 
 
 class UserVideos(UserContent):
-   
     # Returns query of user videos    
     def get(self,request,user):
             user = User.objects.get(username=user)
             response = ''
             for video in Video.objects.filter(author=user):
                 response += self.gen_template(video)
-
             return HttpResponse(response)
+    
+class UserLiked(UserContent):
+    # Returns query of user liked videos    
+    def get(self,request,user):
+            # user = User.objects.get(username=user)
+            response = ''
+            return HttpResponse('пам парааам')
 
-# Returns query of user liked videos 
-def user_liked(request,user):
-    return HttpResponse('Ещё больше улётной фигни')
+
+
+
 
 
 # Clean's request user history
