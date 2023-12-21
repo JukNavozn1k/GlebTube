@@ -10,11 +10,7 @@ from django.contrib.auth.models import User
 
 
 
-'''
-Auth page
-Navigation bar
-Auth form
-'''
+# User auth
 class Login(views.View):
     def get(self,request):
         if request.user.is_authenticated: return redirect('/')
@@ -29,7 +25,8 @@ class Login(views.View):
             # login user...
             login(request,user)
             return redirect('/')
-
+        
+# User register
 class Reg(views.View):
     def get(self,request):
         if request.user.is_authenticated: return redirect('/')
@@ -48,13 +45,13 @@ class Reg(views.View):
                login(request,user)
                return redirect('/')
             else: return render(request, 'reg.html',context={'form':forms.AuthForm(),'alert':{'description':f'{form.errors}'}})
-
+# 
 class Logout(views.View):
     def get(self,request):
         logout(request)
         return redirect('/')
   
-
+# Shows user profile with additional info
 class Profile(views.View):
     def get(self,request,user):
         try:
@@ -67,6 +64,13 @@ class Profile(views.View):
         except User.DoesNotExist: 
             return render(request,'404.html')
 
+# Returns query of user videos    
+def user_videos(request,user):
+    return HttpResponse('Куча улётной фигни')
+
+
+
+# Clean's request user history
 def delete_history(request):
     if request.user.is_authenticated :
         models.History.objects.all().filter(viewer=request.user).delete()
