@@ -169,5 +169,5 @@ BLEACH_ALLOWED_ATTRIBUTES = {
     'a': ['href', 'title'],
     'abbr': ['title'],
     'acronym': ['title'],
-    'img': ['src', 'alt'],  # Allow 'src' and 'alt' attributes for images
+    # 'img': ['src', 'alt'],  # Allow 'src' and 'alt' attributes for images
 }
