@@ -33,6 +33,7 @@ The project is written in Django with the use of custom plugins to add various f
 
 - [x] Add enchanced video player
 - [x] Add new admin panel
+- [x] Add user profile 
 - [ ] Add basic video editor on edit form
 - [ ] Add CRUD operations for comments
 - [ ] Redesign some elements of the site, adapt for mobile devices
