@@ -61,7 +61,9 @@ class Profile(views.View):
             user = User.objects.get(username=user)
             isOwner = False
             if request.user == user: isOwner = True
-            context = {'username': user.username,'isOwner':isOwner}
+            
+            likes_count = RateVideo.objects.all().filter(grade=1,content__in = Video.objects.filter(author=user)).count()
+            context = {'username': user.username,'isOwner':isOwner,'likes_count':likes_count}
             return render(request,'profile.html',context=context)
         except User.DoesNotExist: 
             raise Http404("The requested resource was not found.")
