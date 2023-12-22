@@ -9,14 +9,14 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" width="120" alt class="ui-w-100 rounded-circle">
   
         <div class="col-md-8 col-lg-6 col-xl-5 p-0 mx-auto">
-          <h4 class="font-weight-bold my-4">{{user.username}}</h4>
+          <h4 class="font-weight-bold my-4">{{username}}</h4>
   
           <div class="text-muted mb-4">
             Здесь будет замечательное описание, когда-нибудь...
           </div>
           <span class="profile_buttons">
               {% if isOwner %}
-              <button type="button" class="btn btn-warning btn-sm">
+              <button type="button" class="btn btn-warning btn-sm" onclick="alert('В разработке...')">
                 Редактировать профиль
               </button>
               <button type="button" 
@@ -29,7 +29,7 @@
                 Очистить историю
               </button>
               {% else %}
-              <button type="button" class="btn btn-success btn-sm">
+              <button type="button" class="btn btn-success btn-sm" onclick="alert('В разработке...')">
                 Подписаться
               </button>
               {% endif %}
@@ -40,49 +40,40 @@
               <div class="d-inline-block text-dark">
                 
                 <span class="text-muted">Всего лайков: </span>
-                <strong>234</strong>
+                <strong>{{likes_count}}</strong>
               </div>
               
               <div class="d-inline-block text-dark ml-3">
                 <span class="text-muted">Всего подписчиков: </span>
-                <strong>111</strong>
+                <strong>...</strong>
               </div>
             </div>
-            <div>
-              
-              <a href="#" class="btn btn-default icon-btn md-btn-flat btn-sm ml-1">
-                <i class="ion ion-md-mail"></i>
-              </a>
+            <div>            
             </div>
           </div>
         </div>
 
 
-        <div class="text-center">
-          <a href="#" class="btn icon-btn borderless btn-outline-twitter btn-lg btn-round">
-            <span class="ion ion-logo-twitter"></span>
-          </a>
-          <a href="#" class="btn icon-btn borderless btn-outline-facebook btn-lg btn-round">
-            <span class="ion ion-logo-facebook"></span>
-          </a>
-          <a href="#" class="btn icon-btn borderless btn-outline-instagram btn-lg btn-round">
-            <span class="ion ion-logo-instagram"></span>
-          </a>
-        </div>
-      </div>
-    </div>
-    <hr class="m-0">
+        <div class="text-center">  
+        <hr class="m-0">
   
     <ul class="nav nav  justify-content-center">
       <li class="nav-item">
-        <a class="nav-link py-4 active" href="#">Видео пользователя</a>
+        <a class="nav-link py-4 active" href="#" hx-get="/profile_content/{{username}}/videos" hx-trigger="load,click" hx-target=".user_content" >Видео пользователя</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link py-4" href="#">Понравилось пользователю</a>
+        <a class="nav-link py-4" href="#" hx-get="/profile_content/{{username}}/liked_videos" hx-target=".user_content">Понравилось пользователю</a>
       </li>    
     </ul>
-  
+
+
+  <div class="user_content">
+    <!--HTMX RESPONSE CONTENT-->
+  </div>  
   </div>
 
+</div>
+</div>
+</div>
 
 {% endblock %}
