@@ -98,7 +98,7 @@ class UserVideos(UserContent):
     # Returns query of user videos    
     def get(self,request,user):
             user = User.objects.get(username=user)
-            response = f'<h5 class="card-title font-weight-bold">Видео пользователя: {user.username}</h5><div class="row">'
+            response = f'<h5 class="card-title font-weight-bold">Видео: {user.username}</h5><div class="row">'
             for video in Video.objects.filter(author=user):
                 response += self.gen_template(video)
             response += '</div>'
@@ -108,7 +108,7 @@ class UserLiked(UserContent):
     # Returns query of user liked videos    
     def get(self,request,user):
             user = User.objects.get(username=user)
-            response = f'<h5 class="card-title font-weight-bold">Видео, которые нравятся пользователю: {user.username}</h5><div class="row">'
+            response = f'<h5 class="card-title font-weight-bold">Видео, которые нравятся: {user.username}</h5><div class="row">'
             for liked_video in RateVideo.objects.all().filter(grade=1,author=user):
                 response += self.gen_template(liked_video.content)
             response += '</div>'
