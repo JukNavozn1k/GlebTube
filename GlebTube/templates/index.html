@@ -36,7 +36,7 @@
       <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='/login';">Вход</button>
       <button type="button" class="btn btn-primary" onclick="location.href='/reg';">Регистрация</button>
       {% else %}
-      <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='/profile/{{request.user}}';">Профиль ({{request.user}})</button>
+      <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='/profile/{{request.user}}';">Профиль</button>
       <button type="button" class="btn btn-danger" onclick="location.href='/logout';">Выход</button>
       {% endif %}
     </div>
@@ -60,7 +60,7 @@
         <li class="nav-item"><a href="/upload" class="nav-link px-2 text-body-secondary">Новое видео</a></li>
        
       </ul>
-      <p class="text-center text-body-secondary">2023-2024 GlebTube, Non-commercial project</p>
+      <p class="text-center text-body-secondary">2023-2024 GlebTube, Некоммерческий проект</p>
     </footer>
 
 
