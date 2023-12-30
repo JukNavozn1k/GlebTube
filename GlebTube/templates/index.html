@@ -19,7 +19,7 @@
   <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-2 mb-4 border-bottom">
     <div class="col-md-3 mb-2 mb-md-0">
       <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
-        <h5>GlebTube</h5>
+        <!-- <h5>GlebTube</h5> -->
       </a>
     </div>
 
@@ -31,7 +31,7 @@
       <li><a href="/upload" class="nav-link px-2">Загрузить видео</a></li>
     </ul>
 
-    <div class="col-md-3 text-end">
+    <div class="col-md-3">
       {% if not request.user.is_authenticated %}
       <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='/login';">Вход</button>
       <button type="button" class="btn btn-primary" onclick="location.href='/reg';">Регистрация</button>
