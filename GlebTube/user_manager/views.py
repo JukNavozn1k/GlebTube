@@ -81,7 +81,7 @@ class UserContent(views.View):
                     
                     <img class="bd-placeholder-img card-img-top rounded" src="{video.img.url}" width="100%" height="200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
                     <div class="card-body">
-                        <p class="card-text text-uppercase font-weight-bold text-truncate overflow-hidden">{video.caption}</p>
+                        <strong><p class="card-text text-uppercase font-weight-bold text-truncate overflow-hidden">{video.caption}</p></strong>
                         <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group">
                             <small class="text-body-secondary">Дата выхода: {video.date_uploaded.strftime("%m.%d.%Y %H:%M")} </small>
