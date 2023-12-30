@@ -1,7 +1,4 @@
-from django.shortcuts import render,redirect
-
-from django.views import View
-
+from django.shortcuts import render
 from video_manager import models
 
 def home(request):
@@ -11,4 +8,7 @@ def home(request):
 
 
 def handler404(request, *args, **argv):
-  return render(request,'404.html')
+  return render(request,'base_error.html',context={'error_code':'404'})
+
+def handler500(request, *args, **argv):
+  return render(request,'base_error.html',context={'error_code':'500'})
