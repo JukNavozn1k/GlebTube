@@ -64,7 +64,9 @@ class Profile(views.View):
             if request.user == user: isOwner = True
 
             likes_count = RateVideo.objects.all().filter(grade=1,content__in = Video.objects.filter(author=user)).count()
-            context = {'user': user,'isOwner':isOwner,'likes_count':likes_count}
+            subs_count = models.Subscription.objects.all().filter(author = user).count()
+
+            context = {'user': user,'isOwner':isOwner,'likes_count':likes_count,'subs_count':subs_count}
             return render(request,'profile.html',context=context)
         except User.DoesNotExist: 
             raise Http404("The requested resource was not found.")
@@ -115,6 +117,10 @@ class UserLiked(UserContent):
 
 
 class Subscribe(views.View):
+    '''
+        Responsible for the logic of 
+        subscribe/unsubscribe buttons in the profile
+    '''
     def get(self,request,user):
         user = User.objects.get(username=user)
         is_subscribed = models.Subscription.objects.all().filter(subscriber = request.user,author=user).exists()
@@ -151,7 +157,7 @@ class Subscribe(views.View):
 
 # Clean's request user history
 def delete_history(request):
-    if request.user.is_authenticated :
+    if request.user.is_authenticated:
         models.History.objects.all().filter(viewer=request.user).delete()
         return HttpResponse("",status=200)
     else: return HttpResponse("",status=403)
