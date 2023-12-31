@@ -62,16 +62,18 @@ class Profile(views.View):
             user = User.objects.get(username=user)
             isOwner = False
             if request.user == user: isOwner = True
-            
+
+            # Checking for subscribtion
+           
+            is_subscribed = models.Subscription.objects.all().filter(subscriber = request.user,author=user).exists()
             likes_count = RateVideo.objects.all().filter(grade=1,content__in = Video.objects.filter(author=user)).count()
-            context = {'user': user,'isOwner':isOwner,'likes_count':likes_count}
+            context = {'user': user,'isOwner':isOwner,'likes_count':likes_count,'is_subscribed':is_subscribed}
             return render(request,'profile.html',context=context)
         except User.DoesNotExist: 
             raise Http404("The requested resource was not found.")
 
 # Base model, stores similar methods
 class UserContent(views.View):
-    
     # generates video template
     def gen_template(self,video):
             template = f"""

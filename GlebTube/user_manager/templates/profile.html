@@ -45,7 +45,7 @@
               
               <div class="d-inline-block text-dark ml-3">
                 <span class="text-muted">Всего подписчиков: </span>
-                <strong>...</strong>
+                <strong>{{is_subscribed}}</strong>
               </div>
             </div>
             <div>            
@@ -59,10 +59,10 @@
   
     <ul class="nav nav  justify-content-center">
       <li class="nav-item">
-        <a class="nav-link py-4 active" href="#" hx-get="/profile_content/{{user.username}}/videos" hx-trigger="load,click" hx-target=".user_content" >Видео</a>
+        <a class="nav-link py-4 active" href="#" hx-get="/profile_action/{{user.username}}/videos" hx-trigger="load,click" hx-target=".user_content" >Видео</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link py-4" href="#" hx-get="/profile_content/{{user.username}}/liked_videos" hx-target=".user_content">Понравилось</a>
+        <a class="nav-link py-4" href="#" hx-get="/profile_action/{{user.username}}/liked_videos" hx-target=".user_content">Понравилось</a>
       </li>    
     </ul>
 
