@@ -29,20 +29,7 @@
               </button>
               {% else %}
               <!--SUB/UNSUB BUTTONS-->
-              <div class="subscription_area">
-              <button type="button" 
-              hx-put="profile_action/{{user.username}}/toggle_sub" 
-              hx-swap="outerHTML"
-              hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'         
-              {% if is_subscribed %} 
-              class="btn btn-danger btn-sm">
-              Отписаться
-              {% else %}
-
-              class="btn btn-outline-primary btn-sm">
-              Подписаться
-              {% endif %}
-              </button>
+              <div id="sub_btn_area" hx-get="/profile_action/{{user.username}}/subscribe" hx-trigger="load" hx-swap="innerHTML">
               </div>
               <!--SUB/UNSUB BUTTONS-->
               {% endif %}
@@ -58,7 +45,7 @@
               
               <div class="d-inline-block text-dark ml-3">
                 <span class="text-muted">Всего подписчиков: </span>
-                <strong>{{is_subscribed}}</strong>
+                <strong>In progress...</strong>
               </div>
             </div>
             <div>            

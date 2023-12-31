@@ -12,6 +12,7 @@ urlpatterns = [
 
    path('profile_action/<path:user>/videos',views.UserVideos.as_view()),
    path('profile_action/<path:user>/liked_videos',views.UserLiked.as_view()),
+   path('profile_action/<path:user>/subscribe',views.Subscribe.as_view()),
 
    path('delete/history',views.delete_history)
 ]
