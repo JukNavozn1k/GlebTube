@@ -23,15 +23,28 @@
               hx-confirm="Вы уверены, что хотите очистить историю?" 
               hx-delete="/delete/history" 
               hx-swap="none"
-              hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
-                
+              hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'         
               class="btn btn-danger btn-sm">
                 Очистить историю
               </button>
               {% else %}
-              <button type="button" class="btn btn-success btn-sm" onclick="alert('В разработке...')">
-                Подписаться
+              <!--SUB/UNSUB BUTTONS-->
+              <div class="subscription_area">
+              <button type="button" 
+              hx-put="profile_action/{{user.username}}/toggle_sub" 
+              hx-swap="outerHTML"
+              hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'         
+              {% if is_subscribed %} 
+              class="btn btn-danger btn-sm">
+              Отписаться
+              {% else %}
+
+              class="btn btn-outline-primary btn-sm">
+              Подписаться
+              {% endif %}
               </button>
+              </div>
+              <!--SUB/UNSUB BUTTONS-->
               {% endif %}
           </span>
          
