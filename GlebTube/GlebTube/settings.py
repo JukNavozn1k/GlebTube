@@ -32,7 +32,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,9 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_bleach',
     'markdownx',
+    'rest_framework',
     'social_django',
     'user_manager',
     'video_manager',
+    'api_vids',
 ]
 
 MIDDLEWARE = [
@@ -57,24 +58,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'GlebTube.urls'
-
-
-
-JAZZMIN_SETTINGS = {
-    "site_title": "GlebTube",
-    "site_header": "GlebTube (admin)",
-    "site_brand": "GlebTube",
-    "site_icon": "logo.png",
-    # Add your own branding here
-    "site_logo": 'small_logo.png',
-    "welcome_sign": "Добро пожаловать!",
-    # Copyright on the footer
-    "copyright": "GlebTube",
-    "user_avatar": None,
-    ############
-  
-}
-
 
 TEMPLATES = [
     {

@@ -312,20 +312,6 @@ bleach = {version = ">=5,<6", extras = ["css"]}
 Django = ">=3.2"
 
 [[package]]
-name = "django-jazzmin"
-version = "2.6.0"
-description = "Drop-in theme for django admin, that utilises AdminLTE 3 & Bootstrap 4 to make yo' admin look jazzy"
-optional = false
-python-versions = ">=3.6.2"
-files = [
-    {file = "django_jazzmin-2.6.0-py3-none-any.whl", hash = "sha256:fb554c2d564649c65243b13385121fdbdda58521f49544f9d7cb9c414a4908d4"},
-    {file = "django_jazzmin-2.6.0.tar.gz", hash = "sha256:5bb07055cf19183030724f976904fd8b6337559727959340a43832fab0531812"},
-]
-
-[package.dependencies]
-django = ">=2.2"
-
-[[package]]
 name = "django-markdownx"
 version = "4.0.5"
 description = "A comprehensive Markdown editor built for Django."
@@ -340,6 +326,20 @@ files = [
 Django = "*"
 Markdown = "*"
 Pillow = "*"
+
+[[package]]
+name = "djangorestframework"
+version = "3.15.1"
+description = "Web APIs for Django, made easy."
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "djangorestframework-3.15.1-py3-none-any.whl", hash = "sha256:3ccc0475bce968608cf30d07fb17d8e52d1d7fc8bfe779c905463200750cbca6"},
+    {file = "djangorestframework-3.15.1.tar.gz", hash = "sha256:f88fad74183dfc7144b2756d0d2ac716ea5b4c7c9840995ac3bfd8ec034333c1"},
+]
+
+[package.dependencies]
+django = ">=3.0"
 
 [[package]]
 name = "idna"
@@ -674,4 +674,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10.4"
-content-hash = "6a0abdc576f981ac7a03c02af405418104adb255d3f57250c59349367ae2ae49"
+content-hash = "92d1da71ecc2ee5e3250d7c4721dc1e58bb73f6fee7f1f28d6381cf26082788b"

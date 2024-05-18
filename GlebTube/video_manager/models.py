@@ -9,24 +9,26 @@ from django.contrib.auth.models import User
 
 class Video(models.Model):
     id = models.BigAutoField(primary_key=True)
-    caption = models.CharField(max_length=64,null = False)
-    description = models.TextField(max_length=1024)
+    caption = models.CharField(max_length=64,null = False,verbose_name="Название")
+    description = models.TextField(max_length=1024,verbose_name="Описание")
 
-    img = models.ImageField(upload_to='images_uploaded',null=True)
+    img = models.ImageField(upload_to='images_uploaded',null=True,verbose_name="Превью")
     video = models.FileField(upload_to='videos_uploaded',null=True,
-    validators=[FileExtensionValidator(allowed_extensions=['MOV','avi','mp4','webm','mkv'])])
+    validators=[FileExtensionValidator(allowed_extensions=['MOV','avi','mp4','webm','mkv'])],verbose_name="Видео")
     
-    views = models.PositiveBigIntegerField(default=0)
-    date_uploaded = models.DateTimeField(default=timezone.now)
-    author = models.ForeignKey(User,null=True,on_delete=models.CASCADE)
+    views = models.PositiveBigIntegerField(default=0,verbose_name="Количество просмотров")
+    date_uploaded = models.DateTimeField(default=timezone.now,verbose_name="Дата публикации")
+    author = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name="Автор")
 
+    def __str__(self) -> str:
+        return f"Id: {self.id} Caption: {self.caption}"
 
 
 # Rating models
 class Rate(models.Model):
     content = models.Field()
-    author = models.ForeignKey(User,on_delete=models.CASCADE)
-    grade = models.IntegerField(default=0,choices=[(-1, 'Dislike'), (0, 'None'), (1, 'Like')])
+    author = models.ForeignKey(User,on_delete=models.CASCADE,verbose_name="Автор")
+    grade = models.IntegerField(default=0,choices=[(-1, 'Dislike'), (0, 'None'), (1, 'Like')],verbose_name="Оценка")
     
     class Meta:
         unique_together = ['content', 'author']

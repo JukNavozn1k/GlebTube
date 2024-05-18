@@ -31,7 +31,8 @@ urlpatterns = [
     path('',include('user_manager.urls')),
     path('',include('video_manager.urls')),
     path('markdownx/', include('markdownx.urls')),
-    path('', include('social_django.urls', namespace='social'))
+    path('', include('social_django.urls', namespace='social')),
+    path('api_vids/',include('api_vids.urls')),
     
 ] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 
