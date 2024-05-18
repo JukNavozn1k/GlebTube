@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_bleach',
     'markdownx',
+    'social_django',
     'user_manager',
     'video_manager',
 ]
@@ -171,3 +172,15 @@ BLEACH_ALLOWED_ATTRIBUTES = {
     'acronym': ['title'],
     # 'img': ['src', 'alt'],  # Allow 'src' and 'alt' attributes for images
 }
+
+
+# Social auth
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.github.GithubOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+SOCIAL_AUTH_GITHUB_KEY = 'Ov23liI30oR2fKgOtORj'
+SOCIAL_AUTH_GITHUB_SECRET = '1104a98ea90a5f86d2b5a90086d16be350ed62e6'
+
+# Social auth
