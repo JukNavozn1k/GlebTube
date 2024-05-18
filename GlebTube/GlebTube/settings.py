@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'social_django',
     'user_manager',
     'video_manager',
+    'api_vids',
 ]
 
 MIDDLEWARE = [
