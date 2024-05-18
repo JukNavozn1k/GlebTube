@@ -45,11 +45,11 @@ class Reg(views.View):
                user = form.save() 
                user.set_password(user.password)
                user.save()
-               login(request,user)
+               login(request,user,backend='django.contrib.auth.backends.ModelBackend')
 
                return redirect('/')
             else: return render(request, 'reg.html',context={'form':forms.AuthForm(),'alert':{'description':f'{form.errors}'}})
-# 
+ 
 class Logout(views.View):
     def get(self,request):
         logout(request)
