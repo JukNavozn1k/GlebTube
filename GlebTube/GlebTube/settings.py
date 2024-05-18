@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_bleach',
     'markdownx',
+    'rest_framework',
     'social_django',
     'user_manager',
     'video_manager',
