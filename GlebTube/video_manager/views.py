@@ -52,14 +52,14 @@ class UploadVideo(View):
 
 class EditVideo(View):
     def get(self,request,video_id):
-       video = models.Video.objects.all().filter(id=video_id).first()
+       video = models.Video.objects.get(id=video_id,author=request.user)
        if request.user == video.author:
            form = forms.EditForm(instance=video)
            return render(request,'edit.html',context={'form':form})
        else: return redirect('/')
     def post(self,request,video_id):
-       video = models.Video.objects.all().filter(id=video_id).first()
-       if request.user == video.author:
+       video = models.Video.objects.get(id=video_id,author=request.user)
+       if video:
            form = forms.EditForm(request.POST,request.FILES,instance=video)
            if form.is_valid():
                form.save()
