@@ -19,6 +19,8 @@ from django.urls import path,include
 
 from django.conf import settings
 from django.conf.urls.static import static
+from debug_toolbar.toolbar import debug_toolbar_urls
+from .settings import DEBUG
 
 from django.conf.urls import (handler400, handler403, handler404, handler500)
 
@@ -34,7 +36,11 @@ urlpatterns = [
     path('', include('social_django.urls', namespace='social')),
     path('api_vids/',include('api_vids.urls')),
     
-] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+] 
+
+if DEBUG:
+    urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+    urlpatterns += debug_toolbar_urls()
 
 handler404 = 'GlebTube.views.handler404'
 handler500 = 'GlebTube.views.handler500'

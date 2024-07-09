@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from . import models,forms
 from user_manager.models import History as hist
+from .models import Video
 
 
 import bleach
@@ -16,7 +17,8 @@ class History(View):
       # return's all watched wideo in -watched order
       def get(self,request):
           if request.user.is_authenticated:
-            history = hist.objects.all().filter(viewer=request.user)
+            history = hist.objects.filter(viewer=request.user).select_related('video__author')
+            
             videos = [h.video for h in history][::-1]
             context = {'videos':videos,'title':'История'}
             return render(request,'main.html',context=context)
@@ -38,7 +40,7 @@ class UploadVideo(View):
             return redirect('/login')
 
         form = forms.UploadForm(request.POST,request.FILES)
-        form.author = User.objects.get(username=request.user)
+      
         if form.is_valid():
             video  = form.save()
             video.author = request.user
@@ -149,7 +151,7 @@ class Watch(View):
     
 def my_videos(request):
    if request.user.is_authenticated:
-        videos = models.Video.objects.all().filter(author=request.user)
+        videos = models.Video.objects.filter(author=request.user).select_related('author')
         context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
         return render(request,'main.html',context=context)
    else: return redirect('/login')
