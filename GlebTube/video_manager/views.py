@@ -3,6 +3,8 @@ from django.shortcuts import render,redirect,HttpResponse
 from django.views import View
 from django.contrib.auth.models import User
 
+from django.shortcuts import get_object_or_404
+
 from django.db.models import Q
 from . import models,forms
 from user_manager.models import History as hist
@@ -17,9 +19,9 @@ class History(View):
       # return's all watched wideo in -watched order
       def get(self,request):
           if request.user.is_authenticated:
-            history = hist.objects.filter(viewer=request.user).select_related('video__author')
+            history = hist.objects.filter(viewer=request.user).order_by('-id').select_related('video__author')
             
-            videos = [h.video for h in history][::-1]
+            videos = [h.video for h in history]
             context = {'videos':videos,'title':'История'}
             return render(request,'main.html',context=context)
           else: return redirect('/login')
@@ -52,20 +54,17 @@ class UploadVideo(View):
 
 class EditVideo(View):
     def get(self,request,video_id):
-       video = models.Video.objects.get(id=video_id,author=request.user)
-       if request.user == video.author:
-           form = forms.EditForm(instance=video)
-           return render(request,'edit.html',context={'form':form})
-       else: return redirect('/')
+       video = get_object_or_404(Video,author=request.user,id=video_id)
+       form = forms.EditForm(instance=video)
+       return render(request,'edit.html',context={'form':form})
+     
     def post(self,request,video_id):
-       video = models.Video.objects.get(id=video_id,author=request.user)
-       if video:
-           form = forms.EditForm(request.POST,request.FILES,instance=video)
-           if form.is_valid():
-               form.save()
-               return render(request,'edit.html',context={'form':forms.EditForm(instance=video),'success_alert':{'description':f'Видео успешно отредактировано.','title':'Редактировать видео'}})
-           else: return render(request,'edit.html',context={'form':forms.EditForm(instance=video),'error_alert':{'description':f'{form.errors}','title':'Редактировать видео'}})
-       else: return redirect('/')
+        video = get_object_or_404(Video,author=request.user,id=video_id)
+        form = forms.EditForm(request.POST,request.FILES,instance=video)
+        if form.is_valid():
+            form.save()
+            return render(request,'edit.html',context={'form':forms.EditForm(instance=video),'success_alert':{'description':f'Видео успешно отредактировано.','title':'Редактировать видео'}})
+        else: return render(request,'edit.html',context={'form':forms.EditForm(instance=video),'error_alert':{'description':f'{form.errors}','title':'Редактировать видео'}})
    
    
 
@@ -118,7 +117,7 @@ class Watch(View):
         if not rate is None:
             grade = rate.grade
 
-        comments = models.CommentVideo.objects.all().filter(instance=video).order_by('-id')
+        comments = models.CommentVideo.objects.all().filter(instance=video).order_by('-id').select_related('author')
         context = {'video':video,'likes':likes,'dislikes':dislikes,'grade':grade,'comments':comments} 
         return render(request,'watch.html',context=context)
 
@@ -150,11 +149,10 @@ class Watch(View):
         
     
 def my_videos(request):
-   if request.user.is_authenticated:
-        videos = models.Video.objects.filter(author=request.user).select_related('author')
+        videos = models.Video.objects.filter().select_related('author')
         context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
         return render(request,'main.html',context=context)
-   else: return redirect('/login')
+
 
 
 def delete_video(request,video_id):
