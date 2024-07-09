@@ -17,9 +17,9 @@ class History(View):
       # return's all watched wideo in -watched order
       def get(self,request):
           if request.user.is_authenticated:
-            history = hist.objects.filter(viewer=request.user).select_related('video__author')
+            history = hist.objects.filter(viewer=request.user).order_by('-id').select_related('video__author')
             
-            videos = [h.video for h in history][::-1]
+            videos = [h.video for h in history]
             context = {'videos':videos,'title':'История'}
             return render(request,'main.html',context=context)
           else: return redirect('/login')
