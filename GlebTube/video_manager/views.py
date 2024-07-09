@@ -17,7 +17,7 @@ class History(View):
       # return's all watched wideo in -watched order
       def get(self,request):
           if request.user.is_authenticated:
-            history = hist.objects.filter(viewer=request.user).prefetch_related('video')
+            history = hist.objects.filter(viewer=request.user).select_related('video__author')
             
             videos = [h.video for h in history][::-1]
             context = {'videos':videos,'title':'История'}
