@@ -151,7 +151,7 @@ class Watch(View):
     
 def my_videos(request):
    if request.user.is_authenticated:
-        videos = models.Video.objects.all().filter(author=request.user)
+        videos = models.Video.objects.filter(author=request.user).select_related('author')
         context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
         return render(request,'main.html',context=context)
    else: return redirect('/login')
