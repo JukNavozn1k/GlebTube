@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "debug_toolbar",
     'django_bleach',
     'markdownx',
     'rest_framework',
@@ -55,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = 'GlebTube.urls'
@@ -167,3 +169,10 @@ SOCIAL_AUTH_GITHUB_KEY = 'Ov23liI30oR2fKgOtORj'
 SOCIAL_AUTH_GITHUB_SECRET = '1104a98ea90a5f86d2b5a90086d16be350ed62e6'
 
 # Social auth
+
+
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]
