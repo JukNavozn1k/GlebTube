@@ -40,7 +40,7 @@ class UploadVideo(View):
             return redirect('/login')
 
         form = forms.UploadForm(request.POST,request.FILES)
-        form.author = User.objects.get(username=request.user)
+      
         if form.is_valid():
             video  = form.save()
             video.author = request.user
