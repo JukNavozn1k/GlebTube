@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from . import models,forms
 from user_manager.models import History as hist
+from .models import Video
 
 
 import bleach
@@ -16,7 +17,8 @@ class History(View):
       # return's all watched wideo in -watched order
       def get(self,request):
           if request.user.is_authenticated:
-            history = hist.objects.filter(viewer=request.user)
+            history = hist.objects.filter(viewer=request.user).prefetch_related('video')
+            
             videos = [h.video for h in history][::-1]
             context = {'videos':videos,'title':'История'}
             return render(request,'main.html',context=context)
