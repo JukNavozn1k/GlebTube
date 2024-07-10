@@ -15,7 +15,7 @@
                   </div>
                   {% if comment.author == request.user %}
                   <button type="button" class="btn btn-outline-danger btn-sm shadow-none float-right"
-                    hx-delete="/watch/{{comment.id}}/rm_comment" 
+                    hx-delete="/rm_comment/{{comment.id}}" 
                     hx-target="closest div.d-flex.justify-content-center.row" 
                     hx-swap="outerHTML"
                     hx-headers='{"X-CSRFToken": "{{csrf_token}}"}'

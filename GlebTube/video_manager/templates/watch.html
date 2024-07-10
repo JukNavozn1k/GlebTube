@@ -56,7 +56,7 @@
     </div>
     <div class="mt-2 text-right">
         <button type="button" id="clearButton" class="btn btn-outline-primary btn-sm shadow-none"><i class="bi bi-trash"> Очистить</i></button>
-        <button hx-post="/watch/{{video.id}}/comment" hx-vars="comment:document.getElementById('comment').value" 
+        <button hx-post="/add_comment_video/{{video.id}}" hx-vars="comment:document.getElementById('comment').value" 
          hx-target=".comment_list"
          hx-swap="afterbegin"
          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
