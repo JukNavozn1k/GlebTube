@@ -58,13 +58,20 @@ class EditVideo(View):
             return render(request,'edit.html',context={'form':forms.EditForm(instance=video),'success_alert':{'description':f'Видео успешно отредактировано.','title':'Редактировать видео'}})
         else: return render(request,'edit.html',context={'form':forms.EditForm(instance=video),'error_alert':{'description':f'{form.errors}','title':'Редактировать видео'}})
 
-class Watch(View):
+class VideoView(View):
     def get(self,request,video_id):
         video = get_object_or_404(Video,id=video_id)
         video.views += 1
         video.save()
-        context = {'video':video} 
+        comments = models.CommentVideo.objects.all().filter(instance=video).order_by('-id').select_related('author')
+        context = {'video':video,'comments': comments} 
         return render(request,'watch.html',context=context)
+    def delete(self,request,video_id):
+        if request.user.is_authenticated :
+                video = get_object_or_404(Video,author=request.user,id=video_id)
+                video.delete()
+                return HttpResponse("",status=200)
+        else: return HttpResponse("",status=403)
 def my_videos(request):
         videos = models.Video.objects.filter().select_related('author')
         context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
@@ -89,9 +96,3 @@ class CommentVideo(View):
            
 
 
-def delete_video(request,video_id):
-   if request.user.is_authenticated :
-        video = get_object_or_404(Video,author=request.user,id=video_id)
-        video.delete()
-        return HttpResponse("",status=200)
-   else: return HttpResponse("",status=403)
