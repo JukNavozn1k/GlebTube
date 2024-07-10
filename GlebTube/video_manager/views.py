@@ -1,19 +1,12 @@
 from django.shortcuts import render,redirect,HttpResponse
 
 from django.views import View
-from django.contrib.auth.models import User
 
 from django.shortcuts import get_object_or_404
 
-from django.db.models import Q
 from . import models,forms
 from user_manager.models import History as hist
 from .models import Video
-
-
-import bleach
-from django.utils.safestring import mark_safe
-from markdownx.utils import markdownify
 
 class History(View):
       # return's all watched wideo in -watched order
@@ -67,44 +60,33 @@ class EditVideo(View):
 
 class Watch(View):
     def get(self,request,video_id):
-        video = models.Video.objects.all().filter(id=video_id).first()
-        
+        video = get_object_or_404(Video,id=video_id)
         video.views += 1
         video.save()
-
-        # rates = models.RateVideo.objects.all().filter(content=video)
-        # likes = rates.filter(grade=1).count()
-            
-        comments = models.CommentVideo.objects.all().filter(instance=video).order_by('-id').select_related('author')
         context = {'video':video} 
         return render(request,'watch.html',context=context)
-
-    # processing all actions with video
-    def post(self,request,obj_id,action):
-        if request.user.is_authenticated:
-          video = models.Video.objects.all().filter(id=obj_id).first()
-          author = request.user
-          if action == "comment":
-                comment = request.POST.get('comment')
-                new_comment = models.CommentVideo(author=author,instance=video,content=comment)
-                new_comment.save()
-                return render(request,'comment.html',context={'comment':new_comment})
-          
-        return render(request, 'alerts/error.html',context={'desc' : 'Невозможно добавить комментарий'})
-    def delete(self,request,obj_id,action):
-        print(obj_id)
-        if action == "rm_comment":
-            comment = get_object_or_404(models.CommentVideo,id=obj_id)
-            if comment.author == request.user: 
-                comment.delete()
-                return HttpResponse("")
-            return render(request,'alerts/error.html',context={'desc' : 'Невозможно удалить комментарий'})
-        return render(request,'alerts/error.html',context={'desc' : 'Мы пытаемся её исправить =('})
 def my_videos(request):
         videos = models.Video.objects.filter().select_related('author')
         context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
         return render(request,'main.html',context=context)
 
+class CommentVideo(View):
+    # processing all actions with video
+    def post(self,request,video_id):
+        if request.user.is_authenticated:
+            video = get_object_or_404(Video,id=video_id)
+            comment = request.POST.get('comment')
+            new_comment = models.CommentVideo(author=request.user,instance=video,content=comment)
+            new_comment.save()
+            return render(request,'comment.html',context={'comment':new_comment})
+        return render(request,'alerts/error.html',context={'desc' : 'Невозможно удалить комментарий'})
+    def delete(self,request,comment_id):
+            comment = get_object_or_404(models.CommentVideo,id=comment_id)
+            if comment.author == request.user: 
+                comment.delete()
+                return HttpResponse("")
+            return render(request,'alerts/error.html',context={'desc' : 'Невозможно удалить комментарий'})
+           
 
 
 def delete_video(request,video_id):
