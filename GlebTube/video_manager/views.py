@@ -74,31 +74,6 @@ class EditVideo(View):
 
 
 class Watch(View):
-    def comment_generator(self,date,author,comment):
-        return f'''
-            <div class="d-flex justify-content-center row">
-      <div class="col"> <!--<div class="col-md-8"> -->
-          <div class="d-flex flex-column comment-section">
-              <div class="bg-white p-2">
-                  <div class="d-flex flex-row user-info"><img class="rounded-circle" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" width="40">
-                      <div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">{author}</span>
-                        <span class="date text-black-50">Дата выхода: {date.strftime("%m.%d.%Y %H:%M")}</span></div>
-                  </div>
-                  <div class="mt-2">
-                      <div class="md_content">
-                      <p class="comment-text">{comment}</p>
-                    </div>
-                  </div> 
-              </div>
-          </div>
-      </div>
-  </div>
-  '''
-
-
-
-
-
     def get(self,request,video_id):
         video = models.Video.objects.all().filter(id=video_id).first()
         
@@ -133,8 +108,7 @@ class Watch(View):
                 new_comment = models.CommentVideo(author=author,instance=video,content=comment)
                 cleaned_comment = bleach.clean(comment,tags=bleach.ALLOWED_TAGS, attributes=bleach.ALLOWED_ATTRIBUTES)
                 new_comment.save()
-                return HttpResponse(self.comment_generator(new_comment.date_uploaded,new_comment.author,mark_safe(markdownify(cleaned_comment))))
-
+                return render(request,'comment.html',context={'comment':new_comment})
           elif action in rate_actions:
                 rate = models.RateVideo.objects.filter(Q(content=video) & Q(author=author)).first()
                 if rate is None:
