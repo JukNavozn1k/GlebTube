@@ -7,15 +7,22 @@
             <div class="bg-white p-2">
                 <div class="d-flex flex-row user-info"><img class="rounded-circle" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" width="40">
                     <div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">{{comment.author}}</span>
-                      <span class="date text-black-50">Дата выхода: {{comment.date_uploaded|date:"m.d.Y H:i"}}</span></div>
+                      <span class="date text-black-50">Дата: {{comment.date_uploaded|date:"m.d.Y"}}</span></div>
                 </div>
                 <div class="mt-2">
                     <div class="md_content">
                     <p class="comment-text">{{comment.content|formatted_markdown|bleach}}</p>
                   </div>
-                  <button type="button" class="btn btn-outline-danger btn-sm shadow-none float-right">
+                  {% if comment.author == request.user %}
+                  <button type="button" class="btn btn-outline-danger btn-sm shadow-none float-right"
+                    hx-delete="/watch/{{comment.id}}/rm_comment" 
+                    hx-target="closest div.d-flex.justify-content-center.row" 
+                    hx-swap="outerHTML"
+                    hx-headers='{"X-CSRFToken": "{{csrf_token}}"}'
+                  >
                     <i class="bi bi-trash"> Удалить</i>
                   </button>
+                  {% endif %}
                 </div>    
             </div>    
         </div>
