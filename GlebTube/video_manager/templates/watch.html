@@ -4,6 +4,8 @@
 
 {%block content %}
 
+{% load formatted_markdown %}
+{% load bleach_tags %}
 
 
 {% load static %}
@@ -38,41 +40,10 @@
     </div>
   </div>
 <div class="post float-right" data-post-id="{{video.id}}">
+<div class = "rate_container">
+  {% include 'rates.html' %}
+</div>
 
-{% if grade == 0 %}
-<div class="post-ratings-container">
-  <div class="post-rating">
-    <span class="post-rating-button material-icons">thumb_up</span>
-    <span class="post-rating-count">{{likes}}</span>
-  </div>
-  <div class="post-rating">
-    <span class="post-rating-button material-icons">thumb_down</span>
-    <span class="post-rating-count">{{dislikes}}</span>
-  </div>
-</div>
-{% elif grade == 1 %}
-<div class="post-ratings-container">
-  <div class="post-rating post-rating-selected">
-    <span class="post-rating-button material-icons">thumb_up</span>
-    <span class="post-rating-count">{{likes}}</span>
-  </div>
-  <div class="post-rating">
-    <span class="post-rating-button material-icons">thumb_down</span>
-    <span class="post-rating-count">{{dislikes}}</span>
-  </div>
-</div>
-{% elif grade == -1 %}
-<div class="post-ratings-container">
-  <div class="post-rating">
-    <span class="post-rating-button material-icons">thumb_up</span>
-    <span class="post-rating-count">{{likes}}</span>
-  </div>
-  <div class="post-rating post-rating-selected">
-    <span class="post-rating-button material-icons">thumb_down</span>
-    <span class="post-rating-count">{{dislikes}}</span>
-  </div>
-</div>
-{% endif %}
 
 <!-- COMMENT(s) -->
 </div class="comment_form">
@@ -98,6 +69,7 @@
 {% for comment in comments %}  
 {% include 'comment.html' %}
 {% endfor %} 
+</div>
 </div>
 </div>
 
