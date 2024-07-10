@@ -9,22 +9,7 @@
       <h3>GlebTube
         {% if title %} - {{title}} {% endif %}
       </h3>
-      <div class="row">  
-        {% for video in videos %}
-        {% include 'video_card.html' %}
-        {% endfor %}
-
-        {% if not videos %}
-        <div class="px-4 py-5 my-5 text-center">
-          <img class="d-block mx-auto mb-4" src="{% static 'logo.png' %}" alt="" width="144" height="144">
-          <h1 class="display-5 fw-bold text-body-emphasis">Упс...</h1>
-          <div class="col-lg-6 mx-auto">
-            <p class="lead mb-4">На данной странице пока нет контента.</p>
-            
-          </div>
-        </div>
-        {% endif %}
-      </div>
+      {% include 'video_list.html' %}
     </div>
   </div>
 {% endblock %}
