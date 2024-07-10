@@ -24,9 +24,10 @@ class Video(models.Model):
 
 # Rating models
 class Rate(models.Model):
+    CHOICES = [(0, 'Not rated'), (1, 'Rated')]
     content = models.Field()
     author = models.ForeignKey(User,on_delete=models.CASCADE,verbose_name="Автор")
-    grade = models.IntegerField(default=0,choices=[(-1, 'Dislike'), (0, 'None'), (1, 'Like')],verbose_name="Оценка")
+    grade = models.BooleanField(default=0,choices=CHOICES,verbose_name="Оценка")
     
     class Meta:
         unique_together = ['content', 'author']
