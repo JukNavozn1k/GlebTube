@@ -39,8 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "debug_toolbar",
-    'django_bleach',
-    'markdownx',
     'social_django',
     'user_manager',
     'video_manager',
@@ -135,27 +133,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-BLEACH_DEFAULT_WIDGET = 'wysiwyg.widgets.WysiwygWidget'
-
-
-MARKDOWNX_MARKDOWN_EXTENSIONS = [
-    'tables'
-]
-
-
-BLEACH_ALLOWED_TAGS = [
-    'a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol',
-    'strong', 'ul', 'h1', 'h2', 'h3','h4','h5','h6', 'p','s','pre','table', 'tr', 'th', 'td','thead','tbody','hr'
-]
-
-BLEACH_ALLOWED_ATTRIBUTES = {
-    'a': ['href', 'title'],
-    'abbr': ['title'],
-    'acronym': ['title'],
-    # 'img': ['src', 'alt'],  # Allow 'src' and 'alt' attributes for images
-}
-
 
 # Social auth
 AUTHENTICATION_BACKENDS = (
