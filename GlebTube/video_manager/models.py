@@ -5,8 +5,6 @@ from django.utils import timezone
 
 from django.contrib.auth.models import User
 
-# from polymorphic.models import PolymorphicModel
-
 class Video(models.Model):
     id = models.BigAutoField(primary_key=True)
     caption = models.CharField(max_length=64,null = False,verbose_name="Название")
@@ -35,7 +33,7 @@ class Rate(models.Model):
         abstract = True
 
 class RateVideo(Rate):
-    content = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Video")
+    content = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео")
     pass
 
 
@@ -51,4 +49,4 @@ class Comment(models.Model):
         # unique_together = ['instance', 'author'] user can send many comments to one video/comment
         abstract = True
 class CommentVideo(Comment):
-    instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Video")
+    instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео")
