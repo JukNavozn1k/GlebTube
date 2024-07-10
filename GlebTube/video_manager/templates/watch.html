@@ -35,13 +35,16 @@
       <div class="md_content">
       <p class="card-text">{{video.description|formatted_markdown|bleach}}</p>
     </div>
-      <p class="card-text"><small class="text-muted"><i class="bi bi-clock-fill"> Дата: </i>{{video.date_uploaded|date:"m.d.Y H:i"}}  <i class="bi bi-binoculars-fill"> Просмотры: {{video.views}} </i></small></p>
-      <p class="card-text"><small class="text-muted"><i class="bi bi-person-circle">  Автор: </i> <a href="/profile/{{video.author}}">{{video.author}}</a></small></p>
+      <p class="card-text">
+        <i class="bi bi-star-fill"> Количество Звёзд: {{video.views}} </i>
+        <i class="bi bi-binoculars-fill"> Количество просмотров: {{video.views}} </i></p>
+      <p class="card-text"><i class="bi bi-clock-fill"> Дата выхода: {{video.date_uploaded|date:"m.d.Y"}}</i></p>
+      <p class="card-text"><i class="bi bi-person-circle">  Автор:  <a href="/profile/{{video.author}}">{{video.author}} </i></a></p>
     </div>
   </div>
 <div class="post float-right" data-post-id="{{video.id}}">
 <div class = "rate_container">
-  {% include 'rates.html' %}
+  ...
 </div>
 
 
