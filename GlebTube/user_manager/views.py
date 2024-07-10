@@ -131,5 +131,5 @@ class Subscribe(views.View):
 def delete_history(request):
     if request.user.is_authenticated:
         models.History.objects.all().filter(viewer=request.user).delete()
-        return render(request,'base_success_alert.html',context={'success_desc': 'История очищена'})
+        return render(request,'alerts/success.html',context={'desc': 'История очищена'})
     else: HttpResponse("")
