@@ -4,8 +4,7 @@
 
 {%block content %}
 
-{% load formatted_markdown %}
-{% load bleach_tags %}
+
 
 {% load static %}
 {% csrf_token %}
@@ -97,27 +96,8 @@
 
 <div class="comment_list">
 {% for comment in comments %}  
-  <div class="d-flex justify-content-center row">
-      <div class="col"> <!--<div class="col-md-8"> -->
-          <div class="d-flex flex-column comment-section">
-              <div class="bg-white p-2">
-                  <div class="d-flex flex-row user-info"><img class="rounded-circle" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" width="40">
-                      <div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">{{comment.author}}</span>
-                        <span class="date text-black-50">Дата выхода: {{comment.date_uploaded|date:"m.d.Y H:i"}}</span></div>
-                  </div>
-                  <div class="mt-2">
-                      <div class="md_content">
-                      <p class="comment-text">{{comment.content|formatted_markdown|bleach}}</p>
-                    </div>
-                  </div>
-                 
-              </div>
-             
-              
-          </div>
-      </div>
-  </div>
-  {% endfor %} 
+{% include 'comment.html' %}
+{% endfor %} 
 </div>
 </div>
 
