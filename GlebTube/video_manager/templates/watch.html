@@ -4,10 +4,6 @@
 
 {%block content %}
 
-{% load formatted_markdown %}
-{% load bleach_tags %}
-
-
 {% load static %}
 {% csrf_token %}
 
@@ -33,7 +29,7 @@
       <h5 class="card-title text-uppercase font-weight-bold">{{video.caption}}</h5>
       <h6 class="card-subtitle mb-2 text-muted">Описание</h6>
       <div class="md_content">
-      <p class="card-text">{{video.description|formatted_markdown|bleach}}</p>
+      <p class="card-text">{{video.description}}</p>
     </div>
       <p class="card-text">
         <i class="bi bi-star-fill"> Количество Звёзд: {{video.views}} </i>
