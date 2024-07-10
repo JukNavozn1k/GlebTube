@@ -65,13 +65,6 @@ class EditVideo(View):
             form.save()
             return render(request,'edit.html',context={'form':forms.EditForm(instance=video),'success_alert':{'description':f'Видео успешно отредактировано.','title':'Редактировать видео'}})
         else: return render(request,'edit.html',context={'form':forms.EditForm(instance=video),'error_alert':{'description':f'{form.errors}','title':'Редактировать видео'}})
-   
-   
-
-
-
-
-
 
 class Watch(View):
     def get(self,request,video_id):
