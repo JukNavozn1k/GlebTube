@@ -71,49 +71,21 @@ class Profile(views.View):
         except User.DoesNotExist: 
             raise Http404("The requested resource was not found.")
 
-# Base model, stores similar methods
-class UserContent(views.View):
-    # generates video template
-    def gen_template(self,video):
-            template = f"""
-            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 p-3 video_{video.id}">
-                    
-                    <div class="card shadow-sm border-0" onclick="location.href='/watch/{video.id}'" style="cursor: pointer;" title="{video.caption}">
-                    
-                    <img class="bd-placeholder-img card-img-top rounded" src="{video.img.url}" width="100%" height="200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
-                    <div class="card-body">
-                        <strong><p class="card-text text-uppercase font-weight-bold text-truncate overflow-hidden">{video.caption}</p></strong>
-                        <div class="d-flex justify-content-between align-items-center">
-                        <div class="btn-group">
-                            <small class="text-body-secondary">Дата выхода: {video.date_uploaded.strftime("%m.%d.%Y %H:%M")} </small>
-                            <small class="text-body-secondary">Количество просмотров: {video.views}</small>
-                        </div>
-                        </div>
-                    </div>
-                    </div>
-                </div>
-            """
-            return template
+
 # Uses the methods of the underlying model to output the video queue
-class UserVideos(UserContent):
+class UserVideos(views.View):
     # Returns query of user videos    
     def get(self,request,user):
-            user = User.objects.get(username=user)
-            response = f'<h5 class="card-title font-weight-bold">Видео: {user.username}</h5><div class="row">'
-            for video in Video.objects.filter(author=user):
-                response += self.gen_template(video)
-            response += '</div>'
-            return HttpResponse(response)
+            queryset = Video.objects.filter(author__username = user)
+            return render(request,'video_list.html', context={'videos': queryset})
 # Same as UserVideos   
-class UserLiked(UserContent):
+class UserLiked(views.View):
     # Returns query of user liked videos    
     def get(self,request,user):
             user = User.objects.get(username=user)
-            response = f'<h5 class="card-title font-weight-bold">Видео, которые нравятся: {user.username}</h5><div class="row">'
-            for liked_video in RateVideo.objects.all().filter(grade=1,author=user):
-                response += self.gen_template(liked_video.content)
-            response += '</div>'
-            return HttpResponse(response)
+            queryset = RateVideo.objects.all().filter(grade=1,author=user).select_related('content')
+            queryset = [q.content for q in queryset]
+            return render(request,'video_list.html',context={'videos': queryset})
 
 
 class Subscribe(views.View):
