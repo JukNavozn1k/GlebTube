@@ -41,11 +41,9 @@ INSTALLED_APPS = [
     "debug_toolbar",
     'django_bleach',
     'markdownx',
-    'rest_framework',
     'social_django',
     'user_manager',
     'video_manager',
-    'api_vids',
 ]
 
 MIDDLEWARE = [

@@ -33,8 +33,6 @@ urlpatterns = [
     path('',include('video_manager.urls')),
     path('markdownx/', include('markdownx.urls')),
     path('', include('social_django.urls', namespace='social')),
-    path('api_vids/',include('api_vids.urls')),
-    
 ] 
 
 if DEBUG:
