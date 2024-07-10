@@ -28,7 +28,6 @@ from . import views
 
 urlpatterns = [
     path('',views.home),
-    path('/',views.home),
     path('admin/', admin.site.urls),
     path('',include('user_manager.urls')),
     path('',include('video_manager.urls')),
