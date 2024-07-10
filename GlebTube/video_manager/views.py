@@ -109,8 +109,7 @@ def my_videos(request):
 
 def delete_video(request,video_id):
    if request.user.is_authenticated :
-        video = models.Video.objects.filter(id=video_id, author=request.user).first()
-        if video is None: return HttpResponse("",status=403)
-        else: video.delete()
+        video = get_object_or_404(Video,author=request.user,id=video_id)
+        video.delete()
         return HttpResponse("",status=200)
    else: return HttpResponse("",status=403)
