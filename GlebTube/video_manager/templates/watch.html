@@ -59,7 +59,6 @@
         <button hx-post="/watch/{{video.id}}/comment" hx-vars="comment:document.getElementById('comment').value" 
          hx-target=".comment_list"
          hx-swap="afterbegin"
-         
          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
          class="btn btn-primary btn-sm shadow-none" id="sendButton" type="button"><i class="bi bi-send"> Отправить</i></button>
     </div>
