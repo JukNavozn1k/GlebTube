@@ -35,8 +35,8 @@ class Subscription(models.Model):
             Allows you to register subscriptions. 
             Unsubscription is performed by deleting records
       '''
-      subscriber = models.ForeignKey(User,unique=True,on_delete=models.CASCADE,related_name='subscriber')
-      author = models.ForeignKey(User,unique=True,on_delete=models.CASCADE,related_name='author')
+      subscriber = models.ForeignKey(User,on_delete=models.CASCADE,related_name='subscriber')
+      author = models.ForeignKey(User,on_delete=models.CASCADE,related_name='author')
       class Meta:
             constraints = [
                   models.UniqueConstraint(fields=['subscriber', 'author'], name='unique_users')
