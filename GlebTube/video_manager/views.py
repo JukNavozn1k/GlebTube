@@ -110,7 +110,7 @@ class Watch(View):
                 rate.save()
                 return HttpResponse("Good!",status=200)
           
-        return render(request, 'base_error_alert.html',context={'err_desc' : 'Невозможно добавить комментарий'})
+        return render(request, 'alerts/error.html',context={'desc' : 'Невозможно добавить комментарий'})
     def delete(self,request,obj_id,action):
         print(obj_id)
         if action == "rm_comment":
@@ -118,8 +118,8 @@ class Watch(View):
             if comment.author == request.user: 
                 comment.delete()
                 return HttpResponse("")
-            return render(request,'base_error_alert.html',context={'err_desc' : 'Невозможно удалить комментарий'})
-        return render(request,'base_error_alert.html',context={'err_desc' : 'Мы пытаемся её исправить =('})
+            return render(request,'alerts/error.html',context={'desc' : 'Невозможно удалить комментарий'})
+        return render(request,'alerts/error.html',context={'desc' : 'Мы пытаемся её исправить =('})
 def my_videos(request):
         videos = models.Video.objects.filter().select_related('author')
         context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
