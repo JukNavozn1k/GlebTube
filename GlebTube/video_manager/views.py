@@ -84,22 +84,11 @@ class Watch(View):
         if request.user.is_authenticated:
           video = models.Video.objects.all().filter(id=obj_id).first()
           author = request.user
-          rate_actions = {'dislike':-1,'unrate' : 0,'like':1} 
-
           if action == "comment":
                 comment = request.POST.get('comment')
                 new_comment = models.CommentVideo(author=author,instance=video,content=comment)
                 new_comment.save()
                 return render(request,'comment.html',context={'comment':new_comment})
-          elif action in rate_actions:
-                rate = models.RateVideo.objects.filter(Q(content=video) & Q(author=author)).first()
-                if rate is None:
-                    rate = models.RateVideo()
-                    rate.content = video
-                    rate.author = author
-                rate.grade = rate_actions[action]
-                rate.save()
-                return HttpResponse("Good!",status=200)
           
         return render(request, 'alerts/error.html',context={'desc' : 'Невозможно добавить комментарий'})
     def delete(self,request,obj_id,action):
