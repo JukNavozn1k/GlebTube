@@ -11,6 +11,7 @@
     {% endblock %}</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
 
@@ -24,20 +25,20 @@
     </div>
 
     <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-      <li><a href="/" class="nav-link px-2">Главная</a></li>
+      <li><a href="/" class="nav-link px-2"><i class="bi bi-house"> Главная</i></a></li>
      
-      <li><a href="/my_videos" class="nav-link px-2">Мои видео</a></li>
-      <li><a href="/history" class="nav-link px-2">История</a></li>
-      <li><a href="/upload" class="nav-link px-2">Новое видео</a></li>
+      <li><a href="/my_videos" class="nav-link px-2"><i class="bi bi-camera-reels"> Мои видео</i></a></li>
+      <li><a href="/history" class="nav-link px-2"><i class="bi bi-clock-history"> История</i></a></li>
+      <li><a href="/upload" class="nav-link px-2"><i class="bi bi-plus-circle"> Новое видео</i></a></li>
     </ul>
 
     <div class="col-md-3">
       {% if not request.user.is_authenticated %}
-      <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='/login';">Вход</button>
-      <button type="button" class="btn btn-primary" onclick="location.href='/reg';">Регистрация</button>
+      <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='/login';"><i class="bi bi-box-arrow-in-right"> Вход</i></button>
+      <button type="button" class="btn btn-primary" onclick="location.href='/reg';"><i class="bi bi-sign-intersection-fill"> Регистрация</i></button>
       {% else %}
-      <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='/profile/{{request.user}}';">Профиль</button>
-      <button type="button" class="btn btn-danger" onclick="location.href='/logout';">Выход</button>
+      <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='/profile/{{request.user}}';"><i class="bi bi-person-circle"> Профиль</i></button>
+      <button type="button" class="btn btn-danger" onclick="location.href='/logout';"><i class="bi bi-box-arrow-left"> Выход</i></button>
       {% endif %}
     </div>
   </header>
@@ -48,22 +49,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/htmx.org/dist/htmx.min.js"></script>
-    <script src="https://unpkg.com/htmx.org/dist/ext/response-targets.js"></script>
-
-
-
-    <footer class="py-4 my-4">
-      <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-        <li class="nav-item"><a href="/" class="nav-link px-2 text-body-secondary">Главная</a></li>
-        <li class="nav-item"><a href="/my_videos" class="nav-link px-2 text-body-secondary">Мои видео</a></li>
-        <li class="nav-item"><a href="/history" class="nav-link px-2 text-body-secondary">История</a></li>
-        <li class="nav-item"><a href="/upload" class="nav-link px-2 text-body-secondary">Новое видео</a></li>
-       
-      </ul>
-      <p class="text-center text-body-secondary">2023-2024 GlebTube, Некоммерческий проект</p>
-    </footer>
-
-
-  
+    <script src="https://unpkg.com/htmx.org/dist/ext/response-targets.js"></script> 
 </body>
 </html>

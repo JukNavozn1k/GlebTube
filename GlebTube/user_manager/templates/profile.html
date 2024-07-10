@@ -14,18 +14,21 @@
           <div class="text-muted mb-4">
             Здесь будет замечательное описание, когда-нибудь...
           </div>
+          <div class="alert_container">
+            
+          </div>
           <span class="profile_buttons">
               {% if isOwner %}
               <button type="button" class="btn btn-warning btn-sm" onclick="alert('В разработке...')">
-                Редактировать профиль
+                <i class="bi bi-pencil-square">  Редактировать профиль</i>
               </button>
               <button type="button" 
-              hx-confirm="Вы уверены, что хотите очистить историю?" 
               hx-delete="/delete/history" 
-              hx-swap="none"
+              hx-swap="innerHTML"
+              hx-target=".alert_container"
               hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'         
               class="btn btn-danger btn-sm">
-                Очистить историю
+              <i class="bi bi-trash">  Очистить историю</i>
               </button>
               {% else %}
               <!--SUB/UNSUB BUTTONS-->
@@ -39,12 +42,12 @@
             <div>
               <div class="d-inline-block text-dark">
                 
-                <span class="text-muted">Всего лайков: </span>
+                <span class="text-muted"><i class="bi bi-star-fill"> Всего звёзд:</i></span>
                 <strong>{{likes_count}}</strong>
               </div>
               
               <div class="d-inline-block text-dark ml-3">
-                <span class="text-muted">Всего подписчиков: </span>
+                <span class="text-muted"><i class="bi bi-people"> Всего подписчиков:</i> </span>
                 <strong>{{subs_count}}</strong>
               </div>
             </div>
@@ -59,10 +62,10 @@
   
     <ul class="nav nav  justify-content-center">
       <li class="nav-item">
-        <a class="nav-link py-4 active" href="#" hx-get="/profile_action/{{user.username}}/videos" hx-trigger="load,click" hx-target=".user_content" >Видео</a>
+        <a class="nav-link py-4 active" href="#" hx-get="/profile_action/{{user.username}}/videos" hx-trigger="load,click" hx-target=".user_content" ><i class="bi bi-camera-reels">  Видео</i></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link py-4" href="#" hx-get="/profile_action/{{user.username}}/liked_videos" hx-target=".user_content">Понравилось</a>
+        <a class="nav-link py-4" href="#" hx-get="/profile_action/{{user.username}}/liked_videos" hx-target=".user_content"><i class="bi bi-star-fill"> Понравилось</i></a>
       </li>    
     </ul>
 

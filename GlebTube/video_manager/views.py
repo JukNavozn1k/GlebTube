@@ -20,7 +20,6 @@ class History(View):
       def get(self,request):
           if request.user.is_authenticated:
             history = hist.objects.filter(viewer=request.user).order_by('-id').select_related('video__author')
-            
             videos = [h.video for h in history]
             context = {'videos':videos,'title':'История'}
             return render(request,'main.html',context=context)
@@ -90,16 +89,15 @@ class Watch(View):
         return render(request,'watch.html',context=context)
 
     # processing all actions with video
-    def post(self,request,video_id,action):
+    def post(self,request,obj_id,action):
         if request.user.is_authenticated:
-          video = models.Video.objects.all().filter(id=video_id).first()
+          video = models.Video.objects.all().filter(id=obj_id).first()
           author = request.user
           rate_actions = {'dislike':-1,'unrate' : 0,'like':1} 
 
           if action == "comment":
                 comment = request.POST.get('comment')
                 new_comment = models.CommentVideo(author=author,instance=video,content=comment)
-                cleaned_comment = bleach.clean(comment,tags=bleach.ALLOWED_TAGS, attributes=bleach.ALLOWED_ATTRIBUTES)
                 new_comment.save()
                 return render(request,'comment.html',context={'comment':new_comment})
           elif action in rate_actions:
@@ -112,9 +110,16 @@ class Watch(View):
                 rate.save()
                 return HttpResponse("Good!",status=200)
           
-        return HttpResponse("Ошибка: Необходима авторизация", status=401)
-        
-    
+        return render(request, 'base_error_alert.html',context={'err_desc' : 'Невозможно добавить комментарий'})
+    def delete(self,request,obj_id,action):
+        print(obj_id)
+        if action == "rm_comment":
+            comment = get_object_or_404(models.CommentVideo,id=obj_id)
+            if comment.author == request.user: 
+                comment.delete()
+                return HttpResponse("")
+            return render(request,'base_error_alert.html',context={'err_desc' : 'Невозможно удалить комментарий'})
+        return render(request,'base_error_alert.html',context={'err_desc' : 'Мы пытаемся её исправить =('})
 def my_videos(request):
         videos = models.Video.objects.filter().select_related('author')
         context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
