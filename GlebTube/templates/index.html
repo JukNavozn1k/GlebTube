@@ -25,20 +25,20 @@
     </div>
 
     <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-      <li><a href="/" class="nav-link px-2">Главная</a></li>
+      <li><a href="/" class="nav-link px-2"><i class="bi bi-house"> Главная</i></a></li>
      
-      <li><a href="/my_videos" class="nav-link px-2">Мои видео</a></li>
-      <li><a href="/history" class="nav-link px-2">История</a></li>
-      <li><a href="/upload" class="nav-link px-2">Новое видео</a></li>
+      <li><a href="/my_videos" class="nav-link px-2"><i class="bi bi-camera-reels"> Мои видео</i></a></li>
+      <li><a href="/history" class="nav-link px-2"><i class="bi bi-clock-history"> История</i></a></li>
+      <li><a href="/upload" class="nav-link px-2"><i class="bi bi-plus-circle"> Новое видео</i></a></li>
     </ul>
 
     <div class="col-md-3">
       {% if not request.user.is_authenticated %}
-      <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='/login';">Вход</button>
-      <button type="button" class="btn btn-primary" onclick="location.href='/reg';">Регистрация</button>
+      <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='/login';"><i class="bi bi-box-arrow-in-right"> Вход</i></button>
+      <button type="button" class="btn btn-primary" onclick="location.href='/reg';"><i class="bi bi-sign-intersection-fill"> Регистрация</i></button>
       {% else %}
-      <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='/profile/{{request.user}}';">Профиль</button>
-      <button type="button" class="btn btn-danger" onclick="location.href='/logout';">Выход</button>
+      <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='/profile/{{request.user}}';"><i class="bi bi-person-circle"> Профиль</i></button>
+      <button type="button" class="btn btn-danger" onclick="location.href='/logout';"><i class="bi bi-box-arrow-left"> Выход</i></button>
       {% endif %}
     </div>
   </header>

@@ -132,7 +132,7 @@ class Subscribe(views.View):
               hx-swap="outerHTML"
               hx-headers='{{"X-CSRFToken": "{csrf.get_token(request)}"}}'         
               class="btn btn-danger btn-sm">
-                Отписаться
+                <i class="bi bi-dash-lg">  Отписаться</i>
               </button>
             '''
         else:
@@ -142,7 +142,7 @@ class Subscribe(views.View):
               hx-swap="outerHTML"
               hx-headers='{{"X-CSRFToken": "{csrf.get_token(request)}"}}'         
               class="btn btn-outline-primary btn-sm">
-                Подписаться
+                <i class="bi bi-plus-lg"> Подписаться</i>
               </button>
             '''
         return HttpResponse(response)

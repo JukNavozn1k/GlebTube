@@ -8,12 +8,12 @@
         {% if request.user == video.author and author_buttons %}
         <div class = "mt-1 float-right">
         <button type="button" class="btn btn-sm btn-warning" onclick="event.stopPropagation();location.href='/edit/video/{{video.id}}';">
-          Изменить
+          <i class="bi bi-pencil-square"> Изменить</i>
           </button>
         <button type="button"hx-confirm="Вы уверены, что хотите удалить это видео?" hx-delete="/delete/video/{{video.id}}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
          hx-target=".video_{{video.id}}" hx-swap="outerHTML"
          class="btn btn-sm btn-danger delete-button" onclick="event.stopPropagation();">
-          Удалить
+         <i class="bi bi-trash"> Удалить</i>
         </button>
       </div>
           {% endif %}
