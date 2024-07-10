@@ -61,9 +61,11 @@ class EditVideo(View):
 class VideoView(View):
     def get(self,request,video_id):
         video = get_object_or_404(Video,id=video_id)
+        # PUT YOUR CELERY HERE
         video.views += 1
         video.save()
-        comments = models.CommentVideo.objects.all().filter(instance=video).order_by('-id').select_related('author')
+        # PUT YOUR CELERY HERE
+        comments = models.CommentVideo.objects.all().filter(instance=video).order_by('-id').prefetch_related('author')
         context = {'video':video,'comments': comments} 
         return render(request,'watch.html',context=context)
     def delete(self,request,video_id):
