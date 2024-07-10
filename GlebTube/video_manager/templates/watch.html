@@ -35,7 +35,7 @@
       <div class="md_content">
       <p class="card-text">{{video.description|formatted_markdown|bleach}}</p>
     </div>
-      <p class="card-text"><small class="text-muted"><i class="bi bi-clock-fill"> Дата выхода: </i>{{video.date_uploaded|date:"m.d.Y H:i"}} Количество просмотров: {{video.views}}</small></p>
+      <p class="card-text"><small class="text-muted"><i class="bi bi-clock-fill"> Дата: </i>{{video.date_uploaded|date:"m.d.Y H:i"}}  <i class="bi bi-binoculars-fill"> Просмотры: {{video.views}} </i></small></p>
       <p class="card-text"><small class="text-muted"><i class="bi bi-person-circle">  Автор: </i> <a href="/profile/{{video.author}}">{{video.author}}</a></small></p>
     </div>
   </div>
@@ -47,7 +47,7 @@
 
 <!-- COMMENT(s) -->
 </div class="comment_form">
-  <h3 id="comments_count"><i class="bi bi-chat-dots-fill">  Комментарии</i> ({{comments|length}})</h3>
+  <h3 id="comments_count"><i class="bi bi-chat-dots-fill">  Комментарии</i></h3>
   
   <div class="bg-white p-2">
     <div class="d-flex flex-row align-items-start">
