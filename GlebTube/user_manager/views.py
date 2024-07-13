@@ -91,10 +91,6 @@ class UserLiked(views.View):
 
 
 class Subscribe(views.View):
-    '''
-        Responsible for the logic of 
-        subscribe/unsubscribe buttons in the profile
-    '''
     def get(self,request,user):
         user = get_object_or_404(User,id=user)
         is_subscribed = models.Subscription.objects.all().filter(subscriber = request.user,author=user).exists()
