@@ -117,5 +117,5 @@ class RateVideoView(View):
             if not created:
                 rate_video.grade = not rate_video.grade
                 rate_video.save()
-        return self.get(request,video) 
+        return self.get(request,video_id) 
    
