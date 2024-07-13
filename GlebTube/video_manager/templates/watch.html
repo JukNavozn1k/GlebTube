@@ -39,9 +39,10 @@
     </div>
   </div>
 <div class="post float-right" data-post-id="{{video.id}}">
-<div class = "rate_container float-right">
-  <button type="button" class="btn btn-warning btn-sm shadow-none"><i class="bi bi-star"> Поставить звезду</i></button>
-  <button type="button" class="btn btn-outline-danger btn-sm shadow-none"><i class="bi bi-star-fill">Убрать звезду</i></button>
+<div class = "rate_container float-right"
+hx-get="/rate_video/{{video.id}}" hx-swap="innerHTML" hx-trigger="load">
+
+
 </div>
 
 
