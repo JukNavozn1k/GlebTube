@@ -42,8 +42,6 @@ class UploadVideo(View):
             return render(request,'upload.html',context={'form':forms.UploadForm(),'success_alert':{'description':f'Видео успешно загружено.','title':'Новое видео'}})
         else: return render(request,'upload.html',context={'form':forms.UploadForm(),'error_alert':{'description':f'{form.errors}','title':'Новое видео'}})
 
-
-
 class EditVideo(View):
     def get(self,request,video_id):
        video = get_object_or_404(Video,author=request.user,id=video_id)
@@ -98,3 +96,26 @@ class CommentVideo(View):
            
 
 
+
+class RateVideoView(View):
+    def get(self,request,video_id):
+        if request.user.is_authenticated:
+            video = get_object_or_404(Video, id=video_id)
+            user = request.user
+            rate_video, created = models.RateVideo.objects.get_or_create(content=video, author=user)
+            context = {'video': video}
+            if rate_video.grade == True: 
+                return render(request,'rate_video/unrate_btn.html',context=context)
+            else: return render(request,'rate_video/rate_btn.html',context=context)
+        return HttpResponse("", status=401)
+    # processing all actions with video
+    def put(self,request,video_id):
+        if request.user.is_authenticated:
+            video = get_object_or_404(Video,id=video_id)
+            user = request.user
+            rate_video, created = models.RateVideo.objects.get_or_create(content=video, author=user)
+            if not created:
+                rate_video.grade = not rate_video.grade
+                rate_video.save()
+        return self.get(request,video_id) 
+   
