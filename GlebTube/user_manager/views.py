@@ -64,7 +64,7 @@ class Profile(views.View):
             if request.user == user: isOwner = True
 
             likes_count = RateVideo.objects.all().filter(grade=1,content__in = Video.objects.filter(author=user)).count()
-            subs_count = models.Subscription.objects.all().filter(author = user).count()
+            subs_count = models.Subscription.objects.all().filter(author = user,active=True).count()
 
             context = {'user': user,'isOwner':isOwner,'likes_count':likes_count,'subs_count':subs_count}
             return render(request,'profile.html',context=context)
