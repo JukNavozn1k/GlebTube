@@ -43,6 +43,7 @@ class Subscription(models.Model):
       '''
       subscriber = models.ForeignKey(User,on_delete=models.CASCADE,related_name='subscriber',verbose_name='Подписчик')
       author = models.ForeignKey(User,on_delete=models.CASCADE,related_name='author',verbose_name='Автор')
+      active = models.BooleanField(verbose_name='Подписка активна',default=False)
       class Meta:
             constraints = [
                   models.UniqueConstraint(fields=['subscriber', 'author'], name='unique_users')

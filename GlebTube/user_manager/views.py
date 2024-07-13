@@ -93,35 +93,20 @@ class UserLiked(views.View):
 class Subscribe(views.View):
     def get(self,request,user):
         user = get_object_or_404(User,id=user)
-        is_subscribed = models.Subscription.objects.all().filter(subscriber = request.user,author=user).exists()
-        response = ''
-        if  is_subscribed:
-            response += f'''
-           <button type="button" 
-              hx-put="/profile_action/{user.id}/subscribe" 
-              hx-swap="outerHTML"
-              hx-headers='{{"X-CSRFToken": "{csrf.get_token(request)}"}}'         
-              class="btn btn-danger btn-sm">
-                <i class="bi bi-dash-lg">  Отписаться</i>
-              </button>
-            '''
-        else:
-            response += f'''
-           <button type="button" 
-              hx-put="/profile_action/{user.id}/subscribe" 
-              hx-swap="outerHTML"
-              hx-headers='{{"X-CSRFToken": "{csrf.get_token(request)}"}}'         
-              class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-plus-lg"> Подписаться</i>
-              </button>
-            '''
-        return HttpResponse(response)
+        if request.user.is_authenticated:
+            subscription,created = models.Subscription.objects.get_or_create(subscriber = request.user,author=user)
+            context = {'user' : user}
+            if subscription.active:
+                return render(request,'sub_buttons/unsub.html',context=context)
+            else: 
+                return render(request,'sub_buttons/sub.html',context=context)
+        return HttpResponse("",status=401)
     def put(self,request,user):
         user = get_object_or_404(User,id=user)
-        is_subscribed = models.Subscription.objects.all().filter(subscriber = request.user,author=user).exists()
-        if is_subscribed:
-            models.Subscription.objects.get(subscriber = request.user,author=user).delete()
-        else: models.Subscription(subscriber = request.user,author=user).save()
+        subscription,created = models.Subscription.objects.get_or_create(subscriber = request.user,author=user)
+        if not created:
+            subscription.active = not subscription.active
+            subscription.save()
         return self.get(request,user.id)
 
 
