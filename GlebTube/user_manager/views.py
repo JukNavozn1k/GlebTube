@@ -13,6 +13,8 @@ from django.middleware import csrf
 
 from django.http import Http404
 
+from django.shortcuts import get_object_or_404
+
 # User auth
 class Login(views.View):
     def get(self,request):
@@ -59,7 +61,7 @@ class Logout(views.View):
 class Profile(views.View):
     def get(self,request,user):
         try:
-            user = User.objects.get(username=user)
+            user = get_object_or_404(User,id=user)
             isOwner = False
             if request.user == user: isOwner = True
 
@@ -76,13 +78,13 @@ class Profile(views.View):
 class UserVideos(views.View):
     # Returns query of user videos    
     def get(self,request,user):
-            queryset = Video.objects.filter(author__username = user)
+            queryset = Video.objects.filter(author__id = user)
             return render(request,'video_list.html', context={'videos': queryset})
 # Same as UserVideos   
 class UserLiked(views.View):
     # Returns query of user liked videos    
     def get(self,request,user):
-            user = User.objects.get(username=user)
+            user = get_object_or_404(User,id=user)
             queryset = RateVideo.objects.all().filter(grade=1,author=user).select_related('content')
             queryset = [q.content for q in queryset]
             return render(request,'video_list.html',context={'videos': queryset})
@@ -94,13 +96,13 @@ class Subscribe(views.View):
         subscribe/unsubscribe buttons in the profile
     '''
     def get(self,request,user):
-        user = User.objects.get(username=user)
+        user = get_object_or_404(User,id=user)
         is_subscribed = models.Subscription.objects.all().filter(subscriber = request.user,author=user).exists()
         response = ''
         if  is_subscribed:
             response += f'''
            <button type="button" 
-              hx-put="/profile_action/{user.username}/subscribe" 
+              hx-put="/profile_action/{user.id}/subscribe" 
               hx-swap="outerHTML"
               hx-headers='{{"X-CSRFToken": "{csrf.get_token(request)}"}}'         
               class="btn btn-danger btn-sm">
@@ -110,7 +112,7 @@ class Subscribe(views.View):
         else:
             response += f'''
            <button type="button" 
-              hx-put="/profile_action/{user.username}/subscribe" 
+              hx-put="/profile_action/{user.id}/subscribe" 
               hx-swap="outerHTML"
               hx-headers='{{"X-CSRFToken": "{csrf.get_token(request)}"}}'         
               class="btn btn-outline-primary btn-sm">
@@ -119,12 +121,12 @@ class Subscribe(views.View):
             '''
         return HttpResponse(response)
     def put(self,request,user):
-        user = User.objects.get(username=user)
+        user = get_object_or_404(User,id=user)
         is_subscribed = models.Subscription.objects.all().filter(subscriber = request.user,author=user).exists()
         if is_subscribed:
             models.Subscription.objects.get(subscriber = request.user,author=user).delete()
         else: models.Subscription(subscriber = request.user,author=user).save()
-        return HttpResponse(self.get(request,user))
+        return self.get(request,user.id)
 
 
 # Clean's request user history
