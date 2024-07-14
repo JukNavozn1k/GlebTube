@@ -76,7 +76,7 @@ class VideoView(View):
                 return HttpResponse("",status=200)
         else: return HttpResponse("",status=403)
 def my_videos(request):
-        videos = models.Video.objects.filter().select_related('author')
+        videos = models.Video.objects.filter(author=request.user)
         context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
         return render(request,'main.html',context=context)
 

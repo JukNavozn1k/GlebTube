@@ -58,18 +58,15 @@ class Logout(views.View):
 # Shows user profile with additional info
 class Profile(views.View):
     def get(self,request,user):
-        try:
-            user = get_object_or_404(User,id=user)
-            isOwner = False
-            if request.user == user: isOwner = True
+        user = get_object_or_404(User,id=user)
+        isOwner = request.user == user
 
-            likes_count = RateVideo.objects.all().filter(grade=1,content__in = Video.objects.filter(author=user)).count()
-            subs_count = models.Subscription.objects.all().filter(author = user,active=True).count()
+        likes_count = RateVideo.objects.all().filter(grade=1,content__in = Video.objects.filter(author=user)).count()
+        subs_count = models.Subscription.objects.all().filter(author = user,active=True).count()
 
-            context = {'user': user,'isOwner':isOwner,'likes_count':likes_count,'subs_count':subs_count}
-            return render(request,'profile.html',context=context)
-        except User.DoesNotExist: 
-            raise Http404("The requested resource was not found.")
+        context = {'user': user,'isOwner':isOwner,'likes_count':likes_count,'subs_count':subs_count}
+        return render(request,'profile.html',context=context)
+       
 
 
 # Uses the methods of the underlying model to output the video queue
