@@ -79,8 +79,7 @@ class UserVideos(views.View):
 class UserLiked(views.View):
     # Returns query of user liked videos    
     def get(self,request,user):
-            user = get_object_or_404(User,id=user)
-            queryset = RateVideo.objects.all().filter(grade=1,author=user).select_related('content')
+            queryset = RateVideo.objects.all().filter(grade=1,author__id=user).select_related('content')
             queryset = [q.content for q in queryset]
             return render(request,'video_list.html',context={'videos': queryset})
 
