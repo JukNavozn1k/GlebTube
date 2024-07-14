@@ -61,11 +61,11 @@ class VideoView(View):
     def get(self,request,video_id):
         video = get_object_or_404(Video,id=video_id)
         # PUT YOUR CELERY HERE
-        video.views += 1
-        video.stars_count = models.RateVideo.objects.filter(content=video,grade=1).count()
-        video.save()
-        if request.user.is_authenticated: 
-            hist.objects.create(viewer=request.user,video=video)
+        # video.views += 1
+        # video.stars_count = models.RateVideo.objects.filter(content=video,grade=1).count()
+        # video.save()
+        # if request.user.is_authenticated: 
+        #     hist.objects.create(viewer=request.user,video=video)
         # PUT YOUR CELERY HERE
         
         context = {'video':video} 
@@ -100,10 +100,6 @@ class CommentVideo(View):
                 models.CommentVideo.objects.filter(id=comment_id,author__id = request.user.id).delete()
                 return HttpResponse("")
            
-                
-           
-
-
 
 class RateVideoView(View):
     def get(self,request,video_id):
