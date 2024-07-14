@@ -155,3 +155,9 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+
+def showToolbar(request):
+    return True
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': showToolbar,
+}
