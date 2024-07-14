@@ -60,7 +60,9 @@ class VideoView(View):
     def get(self,request,video_id):
         video = get_object_or_404(Video,id=video_id)
         # PUT YOUR CELERY HERE
+
         video.views += 1
+        video.stars_count = models.RateVideo.objects.filter(content=video,grade=1).count()
         video.save()
         # PUT YOUR CELERY HERE
         comments = models.CommentVideo.objects.all().filter(instance=video).order_by('-id').prefetch_related('author')

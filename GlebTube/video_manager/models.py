@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q,F,Count,Case,When
 
 from django.core.validators import FileExtensionValidator
 from django.utils import timezone
@@ -15,6 +16,7 @@ class Video(models.Model):
     validators=[FileExtensionValidator(allowed_extensions=['MOV','avi','mp4','webm','mkv'])],verbose_name="Видео")
     
     views = models.PositiveBigIntegerField(default=0,verbose_name="Количество просмотров")
+    stars_count = models.PositiveBigIntegerField(default=0,verbose_name='Количество звёзд')
     date_uploaded = models.DateTimeField(default=timezone.now,verbose_name="Дата публикации")
     author = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name="Автор")
 
@@ -39,7 +41,8 @@ class Rate(models.Model):
         abstract = True
 
 class RateVideo(Rate):
-    content = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео")
+    content = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='rates')
+
     class Meta:
         verbose_name = 'Рейтинг видео'
         verbose_name_plural = verbose_name
