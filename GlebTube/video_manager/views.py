@@ -63,8 +63,7 @@ class VideoView(View):
         video = get_object_or_404(Video,id=video_id)
         # PUT YOUR CELERY HERE
        
-        if request.user.is_authenticated: tasks.statVideo.delay(video.id,request.user.id)
-        else:  tasks.statVideo.delay(video.id)
+        tasks.inc_views.delay(video.id)
         # PUT YOUR CELERY HERE
         
         context = {'video':video} 
