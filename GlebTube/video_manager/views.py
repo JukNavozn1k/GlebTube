@@ -63,7 +63,7 @@ class VideoView(View):
         video = get_object_or_404(Video,id=video_id)
         # PUT YOUR CELERY HERE
        
-        tasks.inc_views.delay(video.id)
+        tasks.refresh_stats.delay(video.id)
         # PUT YOUR CELERY HERE
         
         context = {'video':video} 
