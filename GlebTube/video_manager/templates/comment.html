@@ -10,7 +10,7 @@
                     <div class="md_content">
                     <p class="comment-text">{{comment.content}}</p>
                   </div>
-                  {% if True %}
+                  {% if comment.author == request.user %}
                   <button type="button" class="btn btn-outline-danger btn-sm shadow-none float-right"
                     hx-delete="/rm_comment/{{comment.id}}" 
                     hx-target="closest div.d-flex.justify-content-center.row" 
