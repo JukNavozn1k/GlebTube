@@ -42,7 +42,7 @@
 <div class = "rate_container float-right"
 hx-get="/rate_video/{{video.id}}" hx-swap="innerHTML" hx-trigger="load">
 
-
+{% include 'loading_spinner.html' %}
 </div>
 
 
@@ -68,15 +68,8 @@ hx-get="/rate_video/{{video.id}}" hx-swap="innerHTML" hx-trigger="load">
 <div class="comment_list"
 hx-get="/fetch/comments/{{video.id}}/"
 hx-trigger="load"
-hx-swap="innerHTML"
->
-
-<div class="d-flex justify-content-center">
-  <div class="spinner-border" role="status">
-    <span class="sr-only">Loading...</span>
-  </div>
-</div>
-
+hx-swap="innerHTML">
+{% include 'loading_spinner.html' %}
 </div>
 </div>
 </div>
