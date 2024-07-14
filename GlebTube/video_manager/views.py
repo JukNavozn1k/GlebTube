@@ -12,7 +12,7 @@ class History(View):
       # return's all watched wideo in -watched order
       def get(self,request):
           if request.user.is_authenticated:
-            history = hist.objects.filter(viewer=request.user).order_by('-id').select_related('video__author')
+            history = hist.objects.filter(viewer=request.user).order_by('-id').select_related('video')
             videos = [h.video for h in history]
             context = {'videos':videos,'title':'История'}
             return render(request,'main.html',context=context)
@@ -30,8 +30,7 @@ class UploadVideo(View):
             return redirect('/login')
         return render(request,'upload.html',context={'form':forms.UploadForm(),'title':'Новое видео'})
     def post(self,request):
-        if not request.user.is_authenticated:
-            return redirect('/login')
+        if not request.user.is_authenticated: return HttpResponse("",status=401)
 
         form = forms.UploadForm(request.POST,request.FILES)
       
@@ -44,11 +43,13 @@ class UploadVideo(View):
 
 class EditVideo(View):
     def get(self,request,video_id):
+       if not request.user.is_authenticated: return HttpResponse("",status=401)
        video = get_object_or_404(Video,author=request.user,id=video_id)
        form = forms.EditForm(instance=video)
        return render(request,'edit.html',context={'form':form})
      
     def post(self,request,video_id):
+        if not request.user.is_authenticated: return HttpResponse("",status=401)
         video = get_object_or_404(Video,author=request.user,id=video_id)
         form = forms.EditForm(request.POST,request.FILES,instance=video)
         if form.is_valid():
@@ -76,7 +77,8 @@ class VideoView(View):
                 return HttpResponse("",status=200)
         else: return HttpResponse("",status=403)
 def my_videos(request):
-        videos = models.Video.objects.filter().select_related('author')
+        if not request.user.is_authenticated: return redirect('/')
+        videos = models.Video.objects.filter(author=request.user)
         context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
         return render(request,'main.html',context=context)
 
@@ -91,11 +93,12 @@ class CommentVideo(View):
             return render(request,'comment.html',context={'comment':new_comment})
         return render(request,'alerts/error.html',context={'desc' : 'Невозможно удалить комментарий'})
     def delete(self,request,comment_id):
-            comment = get_object_or_404(models.CommentVideo,id=comment_id)
-            if comment.author == request.user: 
+            try:
+                comment = get_object_or_404(models.CommentVideo,id=comment_id,author__id = request.user.id)
                 comment.delete()
                 return HttpResponse("")
-            return render(request,'alerts/error.html',context={'desc' : 'Невозможно удалить комментарий'})
+            except:
+                return render(request,'alerts/error.html',context={'desc' : 'Невозможно удалить комментарий'})
            
 
 
