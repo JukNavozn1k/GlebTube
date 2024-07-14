@@ -1,10 +1,11 @@
 from django.db import models
-from django.db.models import Q,F,Count,Case,When
 
 from django.core.validators import FileExtensionValidator
 from django.utils import timezone
 
 from django.contrib.auth.models import User
+
+from . import tasks
 
 class Video(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -26,26 +27,21 @@ class Video(models.Model):
     def __str__(self) -> str:
         return f"Id: {self.id} Caption: {self.caption}"
 
+class UserVideoRelation(models.Model):
 
-# Rating models
-class Rate(models.Model):
     CHOICES = [(0, 'Без оценки'), (1, 'С оценкой')]
-    content = models.Field()
     author = models.ForeignKey(User,on_delete=models.CASCADE,verbose_name="Автор")
     grade = models.BooleanField(default=0,choices=CHOICES,verbose_name="Оценка")
-    
+    video = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='rates')
     def __str__(self) -> str:
         return f'{self.id} : {self.author} -> {self.grade}'
     class Meta:
-        unique_together = ['content', 'author']
-        abstract = True
-
-class RateVideo(Rate):
-    content = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='rates')
-
-    class Meta:
         verbose_name = 'Рейтинг видео'
+        unique_together = ['video', 'author']
         verbose_name_plural = verbose_name
+    # def save(self,*args,**kwargs):
+    #     tasks.refresh_stats(self.video__id)
+    #     super().save(*args,**kwargs)
 
 # Comment models
 class Comment(models.Model):

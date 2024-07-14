@@ -1,5 +1,5 @@
 from celery import shared_task
-from .models import Video,RateVideo
+from .models import Video,UserVideoRelation
 
 from django.db.models import F
 
@@ -7,7 +7,7 @@ from django.db.models import F
 @shared_task
 def refresh_stats(video_id):
     video = Video.objects.get(id=video_id)
-    video.views = F('views') + 1
-    video.stars_count = RateVideo.objects.filter(grade=1,content__id=video_id).count()
+    video.views = UserVideoRelation.objects.filter(video__id=video_id).count()
+    video.stars_count = UserVideoRelation.objects.filter(grade=1,video__id=video_id).count()
     video.save()
  
