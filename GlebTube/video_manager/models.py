@@ -18,27 +18,31 @@ class Video(models.Model):
     date_uploaded = models.DateTimeField(default=timezone.now,verbose_name="Дата публикации")
     author = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name="Автор")
 
+    class Meta: 
+        verbose_name = 'Видео'
+        verbose_name_plural = verbose_name
     def __str__(self) -> str:
         return f"Id: {self.id} Caption: {self.caption}"
 
 
 # Rating models
 class Rate(models.Model):
-    CHOICES = [(0, 'Not rated'), (1, 'Rated')]
+    CHOICES = [(0, 'Без оценки'), (1, 'С оценкой')]
     content = models.Field()
     author = models.ForeignKey(User,on_delete=models.CASCADE,verbose_name="Автор")
     grade = models.BooleanField(default=0,choices=CHOICES,verbose_name="Оценка")
     
+    def __str__(self) -> str:
+        return f'{self.id} : {self.author} -> {self.grade}'
     class Meta:
         unique_together = ['content', 'author']
         abstract = True
 
 class RateVideo(Rate):
     content = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео")
-    pass
-
-
-   
+    class Meta:
+        verbose_name = 'Рейтинг видео'
+        verbose_name_plural = verbose_name
 
 # Comment models
 class Comment(models.Model):
@@ -49,5 +53,10 @@ class Comment(models.Model):
     class Meta:
         # unique_together = ['instance', 'author'] user can send many comments to one video/comment
         abstract = True
+    def __str__(self) -> str:
+        return f'{self.id} : {self.author} -> {self.instance}'
 class CommentVideo(Comment):
     instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео")
+    class Meta:
+         verbose_name = 'Комментарий под видео'
+         verbose_name_plural = 'Коментарии под видео'
