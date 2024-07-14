@@ -30,5 +30,20 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  redis:
+    image: redis:7.2.5-alpine
+    hostname: redis
+  worker:
+    build: 
+      context: .
+    hostname: worker
+    entrypoint: celery
+    command: -A celery_app.app worker --loglevel=info
+    volumes:
+      - ./:/app
+    links: 
+      - redis
+    depends_on:
+      - redis
 volumes:
   postgres_data:
