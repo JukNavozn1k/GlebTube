@@ -65,10 +65,18 @@ hx-get="/rate_video/{{video.id}}" hx-swap="innerHTML" hx-trigger="load">
     </div>
 </div>
 
-<div class="comment_list">
-{% for comment in comments %}  
-{% include 'comment.html' %}
-{% endfor %} 
+<div class="comment_list"
+hx-get="/fetch/comments/{{video.id}}/"
+hx-trigger="load"
+hx-swap="innerHTML"
+>
+
+<div class="d-flex justify-content-center">
+  <div class="spinner-border" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
+
 </div>
 </div>
 </div>

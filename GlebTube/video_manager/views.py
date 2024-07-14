@@ -67,8 +67,8 @@ class VideoView(View):
         if request.user.is_authenticated: 
             hist.objects.create(viewer=request.user,video=video)
         # PUT YOUR CELERY HERE
-        comments = models.CommentVideo.objects.all().filter(instance=video).order_by('-id').prefetch_related('author')
-        context = {'video':video,'comments': comments} 
+        
+        context = {'video':video} 
         return render(request,'watch.html',context=context)
     def delete(self,request,video_id):
         if request.user.is_authenticated :
@@ -83,7 +83,10 @@ def my_videos(request):
         return render(request,'main.html',context=context)
 
 class CommentVideo(View):
-    # processing all actions with video
+    def get(self,request,video_id):
+        comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').prefetch_related('author')
+        context = {'comments':comments}
+        return render(request,'comment_list.html',context=context)
     def post(self,request,video_id):
         if request.user.is_authenticated:
             video = get_object_or_404(Video,id=video_id)
