@@ -30,8 +30,7 @@ class UploadVideo(View):
             return redirect('/login')
         return render(request,'upload.html',context={'form':forms.UploadForm(),'title':'Новое видео'})
     def post(self,request):
-        if not request.user.is_authenticated:
-            return redirect('/login')
+        if not request.user.is_authenticated: return HttpResponse("",status=401)
 
         form = forms.UploadForm(request.POST,request.FILES)
       
@@ -44,11 +43,13 @@ class UploadVideo(View):
 
 class EditVideo(View):
     def get(self,request,video_id):
+       if not request.user.is_authenticated: return HttpResponse("",status=401)
        video = get_object_or_404(Video,author=request.user,id=video_id)
        form = forms.EditForm(instance=video)
        return render(request,'edit.html',context={'form':form})
      
     def post(self,request,video_id):
+        if not request.user.is_authenticated: return HttpResponse("",status=401)
         video = get_object_or_404(Video,author=request.user,id=video_id)
         form = forms.EditForm(request.POST,request.FILES,instance=video)
         if form.is_valid():
