@@ -161,3 +161,5 @@ def showToolbar(request):
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': showToolbar,
 }
+
+CELERY_BROKER_URL = 'redis://redis:6379/0'
