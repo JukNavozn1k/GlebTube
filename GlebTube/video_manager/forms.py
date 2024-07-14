@@ -5,7 +5,7 @@ from . import models
 class UploadForm(forms.ModelForm):
     class Meta:
         model =  models.Video
-        exclude = ['date_uploaded','author','views']
+        exclude = ['date_uploaded','author','views','stars_count']
         widgets = {
             
             'caption' : forms.TextInput(attrs={'class' : 'form-control','placeholder':'Моё первое видео!'}),
@@ -25,7 +25,7 @@ class UploadForm(forms.ModelForm):
 class EditForm(forms.ModelForm):
     class Meta:
         model =  models.Video
-        exclude = ['date_uploaded','author','views','video']
+        exclude = ['date_uploaded','author','views','video','stars_count']
         widgets = {
             
             'caption' : forms.TextInput(attrs={'class' : 'form-control','placeholder':'Моё первое видео!'}),
