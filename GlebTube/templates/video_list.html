@@ -1,7 +1,12 @@
 {% load static %}
 <div class="row">  
     {% for video in videos %}
-    {% include 'video_card.html' %}
+  
+    {% if  author_buttons == True %}
+    {% include 'video_edit_card.html' %}
+    {% else %}
+    {%include 'video_card.html' %}
+    {% endif %}
     {% endfor %}
     {% if not videos %}
     <div class="px-4 py-5 my-5 text-center">
