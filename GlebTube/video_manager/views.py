@@ -8,6 +8,7 @@ from . import models,forms
 from user_manager.models import History as hist
 from .models import Video
 
+from . import tasks
 class History(View):
       # return's all watched wideo in -watched order
       def get(self,request):
@@ -61,11 +62,9 @@ class VideoView(View):
     def get(self,request,video_id):
         video = get_object_or_404(Video,id=video_id)
         # PUT YOUR CELERY HERE
-        # video.views += 1
-        # video.stars_count = models.RateVideo.objects.filter(content=video,grade=1).count()
-        # video.save()
-        # if request.user.is_authenticated: 
-        #     hist.objects.create(viewer=request.user,video=video)
+       
+        if request.user.is_authenticated: tasks.statVideo.delay(video.id,request.user.id)
+        else:  tasks.statVideo.delay(video.id)
         # PUT YOUR CELERY HERE
         
         context = {'video':video} 
