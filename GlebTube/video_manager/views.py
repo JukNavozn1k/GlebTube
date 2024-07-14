@@ -93,11 +93,12 @@ class CommentVideo(View):
             return render(request,'comment.html',context={'comment':new_comment})
         return render(request,'alerts/error.html',context={'desc' : 'Невозможно удалить комментарий'})
     def delete(self,request,comment_id):
-            comment = get_object_or_404(models.CommentVideo,id=comment_id)
-            if comment.author == request.user: 
+            try:
+                comment = get_object_or_404(models.CommentVideo,id=comment_id,author__id = request.user.id)
                 comment.delete()
                 return HttpResponse("")
-            return render(request,'alerts/error.html',context={'desc' : 'Невозможно удалить комментарий'})
+            except:
+                return render(request,'alerts/error.html',context={'desc' : 'Невозможно удалить комментарий'})
            
 
 
