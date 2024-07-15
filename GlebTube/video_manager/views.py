@@ -33,7 +33,7 @@ class EditVideo(View):
        if not request.user.is_authenticated: return HttpResponse("",status=401)
        video = get_object_or_404(Video,author=request.user,id=video_id)
        form = forms.EditForm(instance=video)
-       return render(request,'gt_form.html',context={'form':form})
+       return render(request,'gt_form.html',context={'form':form,'title':'Редактировать видео'})
      
     def post(self,request,video_id):
         if not request.user.is_authenticated: return HttpResponse("",status=401)
