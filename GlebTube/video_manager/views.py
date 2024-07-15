@@ -48,9 +48,9 @@ class VideoView(View):
     def get(self,request,video_id):
         video = get_object_or_404(Video,id=video_id)
         if request.user.is_authenticated: 
-            tasks.create_user_video_relation.delay(video.id,request.user.id)
-            tasks.add_view.delay(video.id,request.user.id)
+            tasks.refresh_history.delay(video.id,request.user.id)
         context = {'video':video} 
+        tasks.refresh_views.delay(video_id)
         return render(request,'watch.html',context=context)
     def delete(self,request,video_id):
         if request.user.is_authenticated :
@@ -98,6 +98,6 @@ class RateVideoView(View):
             if not created:
                 rate_video.grade = not rate_video.grade
                 rate_video.save()
-                tasks.refresh_stats.delay(video.id)
+                tasks.refresh_rates.delay(video.id)
         return self.get(request,video_id) 
    
