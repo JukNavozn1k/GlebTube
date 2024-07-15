@@ -27,5 +27,7 @@ def remove_comment(comment_id,author_id):
     CommentVideo.objects.filter(id=comment_id,author__id = author_id).delete()
 
 @shared_task
-def post_comment(comment):
-    comment.save()
+def post_comment(video_id,author_id,comment):
+    from .models import CommentVideo
+    new_comment = CommentVideo(author_id=author_id,instance_id=video_id,content=comment)
+    new_comment.save()
