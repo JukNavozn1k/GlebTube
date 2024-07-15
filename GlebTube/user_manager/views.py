@@ -9,8 +9,6 @@ from video_manager.models import Video,UserVideoRelation
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.models import User
 
-from django.http import Http404
-
 from django.shortcuts import get_object_or_404
 
 # User auth
