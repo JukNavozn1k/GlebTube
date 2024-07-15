@@ -6,7 +6,6 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 
 from . import tasks
-
 class Video(models.Model):
     id = models.BigAutoField(primary_key=True)
     caption = models.CharField(max_length=64,null = False,verbose_name="Название")
@@ -29,13 +28,13 @@ class Video(models.Model):
 
 class UserVideoRelation(models.Model):
 
-    CHOICES_RATE = [(0, 'Без оценки'), (1, 'С оценкой')]
-    CHOICES_VIEW = [(0, 'Не смотрел'), (1, 'Смотрел')]
+    CHOICES = [(0, 'Без оценки'), (1, 'С оценкой')]
+   
     user = models.ForeignKey(User,on_delete=models.CASCADE,verbose_name="Зритель")
-    grade = models.BooleanField(default=0,choices=CHOICES_RATE,verbose_name="Оценка")
+    grade = models.BooleanField(default=0,choices=CHOICES,verbose_name="Оценка")
     video = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='rates')
     def __str__(self) -> str:
-        return f'{self.id} : {self.user} -> Grade:  {self.grade} -> Viewed: {self.viewed}'
+        return f'{self.id} : {self.user} -> {self.CHOICES[self.grade][1]}'
     class Meta:
         verbose_name = 'Пользователь-видео'
         verbose_name_plural = 'Пользователи-видео'

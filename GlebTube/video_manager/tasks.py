@@ -1,9 +1,14 @@
 from celery import shared_task
 
 @shared_task
+def add_view(video_id,user_id):
+    from user_manager.models import WatchHistory
+    WatchHistory.objects.create(video__id=video_id,viewer__id=user_id)
+
+@shared_task
 def create_user_video_relation(video_id,user_id):
     from .models import UserVideoRelation
-    UserVideoRelation.objects.get_or_create(video__id=video_id,user__id=user_id)
+    UserVideoRelation.objects.get_or_create(video_id=video_id,user_id=user_id)
     refresh_stats.delay(video_id)
 
 # updates views & stars count models.Video
