@@ -72,6 +72,14 @@ class ProfileMenu(views.View):
         context = {'isOwner':isOwner,'stars_count':stars_count,'subscribers_count':subscribers_count}
         return render(request,'profile_menu.html',context=context)
 
+class ProfileEdit(views.View):
+    def get(self,request):
+      
+        
+        
+        context = {}
+        return render(request,'profile_menu.html',context=context)
+
 
 
 # Uses the methods of the underlying model to output the video queue
