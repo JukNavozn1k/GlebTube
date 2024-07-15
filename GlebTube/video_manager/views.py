@@ -47,7 +47,9 @@ class EditVideo(View):
 class VideoView(View):
     def get(self,request,video_id):
         video = get_object_or_404(Video,id=video_id)
-        if request.user.is_authenticated: tasks.create_user_video_relation.delay(video.id,request.user.id)
+        if request.user.is_authenticated: 
+            tasks.create_user_video_relation.delay(video.id,request.user.id)
+            tasks.add_view.delay(video.id,request.user.id)
         context = {'video':video} 
         return render(request,'watch.html',context=context)
     def delete(self,request,video_id):
@@ -81,7 +83,7 @@ class RateVideoView(View):
         if request.user.is_authenticated:
             video = get_object_or_404(Video, id=video_id)
             user = request.user
-            rate_video, created = models.UserVideoRelation.objects.get_or_create(video=video, user=user,viewed=1)
+            rate_video, created = models.UserVideoRelation.objects.get_or_create(video=video, user=user)
             context = {'video': video}
             if rate_video.grade == True: 
                 return render(request,'rate_video/unrate_btn.html',context=context)
@@ -92,7 +94,7 @@ class RateVideoView(View):
         if request.user.is_authenticated:
             video = get_object_or_404(Video,id=video_id)
             user = request.user
-            rate_video, created = models.UserVideoRelation.objects.get_or_create(video=video, user=user,viewed=1)
+            rate_video, created = models.UserVideoRelation.objects.get_or_create(video=video, user=user)
             if not created:
                 rate_video.grade = not rate_video.grade
                 rate_video.save()

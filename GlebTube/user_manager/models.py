@@ -8,7 +8,17 @@ from django.db.models.signals import post_save
 
 
 from django.core.exceptions import ValidationError
-  
+
+class WatchHistory(models.Model):
+      '''
+          Allows you to record your watch history.
+      '''
+      viewer = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name='Зритель')
+      video = models.ForeignKey(Video,null=True,on_delete=models.CASCADE,verbose_name='Видео')
+      class Meta:
+        verbose_name = 'Просмотр'
+        verbose_name_plural = 'История просмотров'
+
 class UserAdditional(models.Model):
       '''
             Allows you to augment the user entity with additional attributes 
