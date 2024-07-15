@@ -122,7 +122,7 @@ class History(views.View):
           if request.user.is_authenticated:
             tasks.clear_history.delay(request.user.id)
             return render(request,'alerts/success.html',context={'desc': 'История очищена'})
-          else: HttpResponse("",status=401)
+          else: return render(request,'alerts/error.html',context={'desc': 'История не очищена'})
 
 def my_videos(request):
         if not request.user.is_authenticated: return redirect('/')
