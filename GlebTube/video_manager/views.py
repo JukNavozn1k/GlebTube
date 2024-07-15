@@ -98,5 +98,6 @@ class RateVideoView(View):
             if not created:
                 rate_video.grade = not rate_video.grade
                 rate_video.save()
+                tasks.refresh_stats.delay(video.id)
         return self.get(request,video_id) 
    
