@@ -24,7 +24,7 @@ class UserAdditional(models.Model):
             Allows you to augment the user entity with additional attributes 
             without modifying the standard User class
       '''
-      user = models.OneToOneField(User,unique=True,on_delete=models.CASCADE,verbose_name='Пользователь')
+      user = models.OneToOneField(User,unique=True,on_delete=models.CASCADE,verbose_name='Пользователь',related_name='additional')
       profile_description = models.TextField(max_length=1024,default='Здесь будет замечательное описание, когда-нибудь... ',verbose_name='Описание')
       avatar = models.ImageField(upload_to='user_avatars',default='user_avatars/default.png',verbose_name='Аватар')
 
