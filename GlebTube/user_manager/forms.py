@@ -34,16 +34,16 @@ class AuthForm(forms.ModelForm):
 class UserAdditionalForm(forms.ModelForm):    
     class Meta:
         model = UserAdditional
+        exclude = []
         
-        fields = ['profile_description','avatar']
-        widgets = {
+        # widgets = {
             
-            'profile_description' : forms.TextInput(attrs={'class' : 'form-control','placeholder':'Ахуительное описание...'}),
-            'avatar' : forms.FileInput(attrs={'class' : 'form-control form-control-sm'}),
+        #     'profile_description' : forms.TextInput(attrs={'class' : 'form-control','placeholder':'Ахуительное описание...'}),
+        #     'avatar' : forms.FileInput(attrs={'class' : 'form-control form-control-sm'}),
            
-        }
-        labels = {
-            'profile_description' : 'Описание профиля',
-            'avatar' : 'Аватар',
-        }
+        # }
+        # labels = {
+        #     'profile_description' : 'Описание профиля',
+        #     'avatar' : 'Аватар',
+        # }
        
