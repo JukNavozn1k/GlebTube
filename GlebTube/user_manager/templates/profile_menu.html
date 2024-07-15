@@ -1,8 +1,8 @@
 <span class="profile_buttons">
     {% if isOwner %}
-    <button type="button" class="btn btn-warning btn-sm" onclick="alert('В разработке...')">
+    <a type="button" class="btn btn-warning btn-sm" href="/profile/edit/">
       <i class="bi bi-pencil-square">  Редактировать профиль</i>
-    </button>
+    </a>
     <button type="button" 
     hx-delete="/delete/history" 
     hx-swap="innerHTML"
