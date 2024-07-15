@@ -38,9 +38,10 @@ class UserVideoRelation(models.Model):
     def __str__(self) -> str:
         return f'{self.id} : {self.user} -> {self.grade}'
     class Meta:
-        verbose_name = 'Рейтинг видео'
+        verbose_name = 'Пользователь-видео'
+        verbose_name_plural = 'Пользователи-видео'
+
         unique_together = ['video', 'user']
-        verbose_name_plural = verbose_name
     def save(self,*args,**kwargs):
         tasks.refresh_stats(self.video.id)
         super().save(*args,**kwargs)
@@ -59,5 +60,5 @@ class Comment(models.Model):
 class CommentVideo(Comment):
     instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео")
     class Meta:
-         verbose_name = 'Комментарий под видео'
-         verbose_name_plural = 'Коментарии под видео'
+         verbose_name = 'Комментарий-Видео'
+         verbose_name_plural = 'Коментарии-Видео'
