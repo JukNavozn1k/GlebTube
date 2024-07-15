@@ -15,7 +15,7 @@ class UploadVideo(View):
     def get(self,request):
         if not request.user.is_authenticated:
             return redirect('/login')
-        return render(request,'upload.html',context={'form':forms.UploadForm(),'title':'Новое видео'})
+        return render(request,'gt_form.html',context={'form':forms.UploadForm(),'title':'Новое видео'})
     def post(self,request):
         if not request.user.is_authenticated: return HttpResponse("",status=401)
 
@@ -25,15 +25,15 @@ class UploadVideo(View):
             video  = form.save()
             video.author = request.user
             video.save()
-            return render(request,'upload.html',context={'form':forms.UploadForm(),'success_alert':{'description':f'Видео успешно загружено.','title':'Новое видео'}})
-        else: return render(request,'upload.html',context={'form':forms.UploadForm(),'error_alert':{'description':f'{form.errors}','title':'Новое видео'}})
+            return render(request,'gt_form.html',context={'form':forms.UploadForm(),'success_alert':{'description':f'Видео успешно загружено.','title':'Новое видео'}})
+        else: return render(request,'gt_form.html',context={'form':forms.UploadForm(),'error_alert':{'description':f'{form.errors}','title':'Новое видео'}})
 
 class EditVideo(View):
     def get(self,request,video_id):
        if not request.user.is_authenticated: return HttpResponse("",status=401)
        video = get_object_or_404(Video,author=request.user,id=video_id)
        form = forms.EditForm(instance=video)
-       return render(request,'edit.html',context={'form':form})
+       return render(request,'gt_form.html',context={'form':form})
      
     def post(self,request,video_id):
         if not request.user.is_authenticated: return HttpResponse("",status=401)
@@ -41,8 +41,8 @@ class EditVideo(View):
         form = forms.EditForm(request.POST,request.FILES,instance=video)
         if form.is_valid():
             form.save()
-            return render(request,'edit.html',context={'form':forms.EditForm(instance=video),'success_alert':{'description':f'Видео успешно отредактировано.','title':'Редактировать видео'}})
-        else: return render(request,'edit.html',context={'form':forms.EditForm(instance=video),'error_alert':{'description':f'{form.errors}','title':'Редактировать видео'}})
+            return render(request,'gt_form.html',context={'form':forms.EditForm(instance=video),'success_alert':{'description':f'Видео успешно отредактировано.','title':'Редактировать видео'}})
+        else: return render(request,'gt_form.html',context={'form':forms.EditForm(instance=video),'error_alert':{'description':f'{form.errors}','title':'Редактировать видео'}})
 
 class VideoView(View):
     def get(self,request,video_id):
