@@ -39,9 +39,9 @@ class UserVideoRelation(models.Model):
         verbose_name = 'Рейтинг видео'
         unique_together = ['video', 'author']
         verbose_name_plural = verbose_name
-    # def save(self,*args,**kwargs):
-    #     tasks.refresh_stats(self.video__id)
-    #     super().save(*args,**kwargs)
+    def save(self,*args,**kwargs):
+        tasks.refresh_stats(self.video__id)
+        super().save(*args,**kwargs)
 
 # Comment models
 class Comment(models.Model):
