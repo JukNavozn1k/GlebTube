@@ -4,7 +4,6 @@ from django import views
 
 from . import forms
 from . import models
-
 from . import tasks
 
 from video_manager.models import Video,UserVideoRelation
@@ -121,9 +120,9 @@ class History(views.View):
           else: return redirect('/login')
       def delete(self,request):
           if request.user.is_authenticated:
-            models.WatchHistory.objects.filter(viewer__id=request.user.id).delete()
+            tasks.clear_history.delay(request.user.id)
             return render(request,'alerts/success.html',context={'desc': 'История очищена'})
-          else: HttpResponse("")
+          else: HttpResponse("",status=401)
 
 def my_videos(request):
         if not request.user.is_authenticated: return redirect('/')
