@@ -101,12 +101,14 @@ class Subscribe(views.View):
                 return render(request,'sub_buttons/sub.html',context=context)
         return HttpResponse("",status=401)
     def put(self,request,user):
-        user = get_object_or_404(User,id=user)
-        subscription,created = models.Subscription.objects.get_or_create(subscriber = request.user,author=user)
-        if not created:
-            subscription.active = not subscription.active
-            subscription.save()
-        return self.get(request,user.id)
+        if request.user.is_authenticated:
+            user = get_object_or_404(User,id=user)
+            subscription,created = models.Subscription.objects.get_or_create(subscriber = request.user,author=user)
+            if not created:
+                subscription.active = not subscription.active
+                subscription.save()
+            return self.get(request,user.id)
+        return HttpResponse("",status=401)
 
 
 class History(views.View):
