@@ -17,7 +17,7 @@ urlpatterns = [
 
    path('accounts/profile/', home),
 
-   path('delete/history',views.delete_history),
+   path('delete/history',views.History.as_view()),
    path('history/',views.History.as_view()),
 
    path('my_videos/',views.my_videos),

@@ -102,13 +102,6 @@ class Subscribe(views.View):
         return self.get(request,user.id)
 
 
-# Clean's request user history
-def delete_history(request):
-    if request.user.is_authenticated:
-        models.History.objects.all().filter(viewer=request.user).delete()
-        return render(request,'alerts/success.html',context={'desc': 'История очищена'})
-    else: HttpResponse("")
-
 class History(views.View):
       # return's all watched wideo in -watched order
       def get(self,request):
@@ -119,8 +112,9 @@ class History(views.View):
           else: return redirect('/login')
       def delete(self,request):
           if request.user.is_authenticated:
-            return render(request,'main.html')
-          else: return redirect('/login')
+            # models.History.objects.all().filter(viewer=request.user).delete()
+            return render(request,'alerts/success.html',context={'desc': 'История очищена'})
+          else: HttpResponse("")
 
 def my_videos(request):
         if not request.user.is_authenticated: return redirect('/')
