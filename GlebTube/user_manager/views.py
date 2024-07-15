@@ -76,6 +76,14 @@ class ProfileEdit(views.View):
     def get(self,request):
         form = forms.UserAdditionalForm(instance=request.user.additional)
         return render(request,'gt_form.html',context={'form':form,'title': 'Редактировать профиль'})
+    def post(self,request):
+        if not request.user.is_authenticated: return HttpResponse("",status=401)
+        
+        form = forms.UserAdditionalForm(request.POST,request.FILES,instance=request.user.additional)
+        if form.is_valid():
+            form.save()
+            return render(request,'gt_form.html',context={'form':forms.UserAdditionalForm(instance=request.user.additional),'success_alert':{'description':f'Профиль успешно отредактирован.','title':'Редактировать профиль'}})
+        else: return render(request,'gt_form.html',context={'form':forms.UserAdditionalForm(instance=request.user.additional),'error_alert':{'description':f'{form.errors}','title':'Редактировать профиль'}})
 
 # Uses the methods of the underlying model to output the video queue
 class UserVideos(views.View):

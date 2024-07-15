@@ -6,13 +6,13 @@
 <div class="bg-white">
     <div class="container">
       <div class="text-center py-5">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" width="120" alt class="ui-w-100 rounded-circle">
+        <img src="{{user.additional.avatar.url}}" width="120" alt class="ui-w-100 rounded-circle">
   
         <div class="col-md-8 col-lg-6 col-xl-5 p-0 mx-auto">
           <h4 class="font-weight-bold my-4">{{user.username}}</h4>
   
           <div class="text-muted mb-4">
-            Здесь будет замечательное описание, когда-нибудь...
+            {{user.additional.profile_description}}
           </div>
           <div class="alert_container">
             
