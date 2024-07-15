@@ -108,3 +108,22 @@ def delete_history(request):
         models.History.objects.all().filter(viewer=request.user).delete()
         return render(request,'alerts/success.html',context={'desc': 'История очищена'})
     else: HttpResponse("")
+
+class History(views.View):
+      # return's all watched wideo in -watched order
+      def get(self,request):
+          if request.user.is_authenticated:
+            videos = []
+            context = {'videos':videos,'title':'История'}
+            return render(request,'main.html',context=context)
+          else: return redirect('/login')
+      def delete(self,request):
+          if request.user.is_authenticated:
+            return render(request,'main.html')
+          else: return redirect('/login')
+
+def my_videos(request):
+        if not request.user.is_authenticated: return redirect('/')
+        videos = models.Video.objects.filter(author=request.user)
+        context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
+        return render(request,'main.html',context=context)
