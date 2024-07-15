@@ -5,24 +5,10 @@ from django.views import View
 from django.shortcuts import get_object_or_404
 
 from . import models,forms
-from user_manager.models import History as hist
 from .models import Video
 
 from . import tasks
-class History(View):
-      # return's all watched wideo in -watched order
-      def get(self,request):
-          if request.user.is_authenticated:
-            history = hist.objects.filter(viewer=request.user).order_by('-id').select_related('video')
-            videos = [h.video for h in history]
-            context = {'videos':videos,'title':'История'}
-            return render(request,'main.html',context=context)
-          else: return redirect('/login')
-      def delete(self,request):
-          if request.user.is_authenticated:
-            hist.objects.all().filter(viewer=request.user).delete() 
-            return render(request,'main.html')
-          else: return redirect('/login')
+
 
 
 class UploadVideo(View):
@@ -61,8 +47,10 @@ class EditVideo(View):
 class VideoView(View):
     def get(self,request,video_id):
         video = get_object_or_404(Video,id=video_id)
-        if request.user.is_authenticated: models.UserVideoRelation.objects.get_or_create(video=video,user=request.user) 
+        if request.user.is_authenticated: 
+            tasks.refresh_history.delay(video.id,request.user.id)
         context = {'video':video} 
+        tasks.refresh_views.delay(video_id)
         return render(request,'watch.html',context=context)
     def delete(self,request,video_id):
         if request.user.is_authenticated :
@@ -70,11 +58,6 @@ class VideoView(View):
                 video.delete()
                 return HttpResponse("",status=200)
         else: return HttpResponse("",status=403)
-def my_videos(request):
-        if not request.user.is_authenticated: return redirect('/')
-        videos = models.Video.objects.filter(author=request.user)
-        context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
-        return render(request,'main.html',context=context)
 
 class CommentVideo(View):
     def get(self,request,video_id):
@@ -115,5 +98,6 @@ class RateVideoView(View):
             if not created:
                 rate_video.grade = not rate_video.grade
                 rate_video.save()
+                tasks.refresh_rates.delay(video.id)
         return self.get(request,video_id) 
    

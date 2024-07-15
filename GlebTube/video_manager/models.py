@@ -6,7 +6,6 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 
 from . import tasks
-
 class Video(models.Model):
     id = models.BigAutoField(primary_key=True)
     caption = models.CharField(max_length=64,null = False,verbose_name="Название")
@@ -29,20 +28,21 @@ class Video(models.Model):
 
 class UserVideoRelation(models.Model):
 
-    CHOICES_RATE = [(0, 'Без оценки'), (1, 'С оценкой')]
-    CHOICES_VIEW = [(0, 'Не смотрел'), (1, 'Смотрел')]
+    CHOICES = [(0, 'Без оценки'), (1, 'С оценкой')]
+   
     user = models.ForeignKey(User,on_delete=models.CASCADE,verbose_name="Зритель")
-    grade = models.BooleanField(default=0,choices=CHOICES_RATE,verbose_name="Оценка")
-    viewed = models.BooleanField(default=0,choices=CHOICES_VIEW,verbose_name="Просмотр")
+    grade = models.BooleanField(default=0,choices=CHOICES,verbose_name="Оценка")
     video = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='rates')
     def __str__(self) -> str:
-        return f'{self.id} : {self.author} -> {self.grade}'
+        return f'{self.id} : {self.user} -> {self.CHOICES[self.grade][1]}'
     class Meta:
-        verbose_name = 'Рейтинг видео'
+        verbose_name = 'Пользователь-видео'
+        verbose_name_plural = 'Пользователи-видео'
+
         unique_together = ['video', 'user']
-        verbose_name_plural = verbose_name
+    
     def save(self,*args,**kwargs):
-        tasks.refresh_stats(self.video.id)
+        tasks.refresh_rates.delay(self.video.id)
         super().save(*args,**kwargs)
 
 # Comment models
@@ -59,5 +59,5 @@ class Comment(models.Model):
 class CommentVideo(Comment):
     instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео")
     class Meta:
-         verbose_name = 'Комментарий под видео'
-         verbose_name_plural = 'Коментарии под видео'
+         verbose_name = 'Комментарий-Видео'
+         verbose_name_plural = 'Коментарии-Видео'
