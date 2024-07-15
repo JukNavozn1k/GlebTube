@@ -32,6 +32,7 @@ urlpatterns = [
     path('',include('user_manager.urls')),
     path('',include('video_manager.urls')),
     path('', include('social_django.urls', namespace='social')),
+    path('accounts/profile/', views.home),
 ] 
 
 if DEBUG:

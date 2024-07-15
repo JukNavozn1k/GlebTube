@@ -1,7 +1,7 @@
 from django.urls import path
 
 from . import views
-from GlebTube.views import home
+
 
 
 urlpatterns = [
@@ -14,8 +14,8 @@ urlpatterns = [
    path('profile_action/<int:user>/videos',views.UserVideos.as_view()),
    path('profile_action/<int:user>/liked_videos',views.UserLiked.as_view()),
    path('profile_action/<int:user>/subscribe',views.Subscribe.as_view()),
-
-   path('accounts/profile/', home),
+   path('/profile_action/<int:user>/fetch_menu',views.ProfileMenu.as_view()),
+   
 
    path('delete/history',views.History.as_view()),
    path('history/',views.History.as_view()),
