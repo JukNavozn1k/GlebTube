@@ -1,9 +1,10 @@
 from celery import shared_task
 
 @shared_task
-def add_view(video_id,user_id):
+def add_view(video_id,viewer_id):
     from user_manager.models import WatchHistory
-    WatchHistory.objects.create(video__id=video_id,viewer__id=user_id)
+    new_watch = WatchHistory(video_id=video_id,viewer_id=viewer_id)
+    new_watch.save()
 
 @shared_task
 def create_user_video_relation(video_id,user_id):
