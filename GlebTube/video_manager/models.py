@@ -36,7 +36,7 @@ class UserVideoRelation(models.Model):
     viewed = models.BooleanField(default=0,choices=CHOICES_VIEW,verbose_name="Просмотр")
     video = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='rates')
     def __str__(self) -> str:
-        return f'{self.id} : {self.author} -> {self.grade}'
+        return f'{self.id} : {self.user} -> {self.grade}'
     class Meta:
         verbose_name = 'Рейтинг видео'
         unique_together = ['video', 'user']
