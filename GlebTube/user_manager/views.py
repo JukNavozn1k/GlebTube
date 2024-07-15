@@ -106,14 +106,14 @@ class History(views.View):
       # return's all watched wideo in -watched order
       def get(self,request):
           if request.user.is_authenticated:
-            videos = UserVideoRelation.objects.filter(user__id=request.user.id,viewed=1).select_related('video')
-            videos = [v.video for v in videos]
+            # videos = UserVideoRelation.objects.filter(user__id=request.user.id,viewed=1).select_related('video')
+            videos = []
             context = {'videos':videos,'title':'История'}
             return render(request,'main.html',context=context)
           else: return redirect('/login')
       def delete(self,request):
           if request.user.is_authenticated:
-            UserVideoRelation.objects.update(user=request.user,viewed=0)
+            # UserVideoRelation.objects.update(user=request.user,viewed=0)
             return render(request,'alerts/success.html',context={'desc': 'История очищена'})
           else: HttpResponse("")
 
