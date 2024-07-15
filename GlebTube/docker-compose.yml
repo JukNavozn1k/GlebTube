@@ -2,12 +2,14 @@ services:
   web:
     build: 
       context: .
+    env_file:
+      - .env
     environment:
-      DB_NAME: gtdb
-      DB_USER: gleb
-      DB_PASS: 1234
-      DB_HOST: db  # This is the service name defined in docker-compose.yml
-      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_HOST: ${DB_HOST}  # This is the service name defined in docker-compose.yml
+      DB_PORT: ${DB_PORT}
     ports:
       - "8000:8000"
     volumes:
@@ -16,15 +18,16 @@ services:
       - db
     command: > 
       sh -c "python manage.py runserver 0.0.0.0:8000"
-  
 
   db:
     image: postgres:16.3-alpine3.20
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: gtdb
-      POSTGRES_USER: gleb
-      PGPORT : 5432
-      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      PGPORT : ${DB_PORT}
+      POSTGRES_PASSWORD: ${DB_PASS}
     ports:
       - "5432:5432"
     volumes:
@@ -33,6 +36,7 @@ services:
   redis:
     image: redis:7.2.5-alpine
     hostname: redis
+
   worker:
     build: 
       context: .
@@ -45,6 +49,14 @@ services:
       - redis
     depends_on:
       - redis
+      - db
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      PGPORT : ${DB_PORT}
+      POSTGRES_PASSWORD: ${DB_PASS}
   flower:
     build: 
       context: .
@@ -59,6 +71,7 @@ services:
       - "5555:5555"
     depends_on:
       - redis
+      - db
 
 volumes:
   postgres_data:

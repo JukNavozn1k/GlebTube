@@ -1,13 +1,11 @@
 from celery import shared_task
-from .models import Video,RateVideo
-from user_manager.models import History
 
-# inc view count and adds to hist if user is authenticated
+
+# updates views & stars count models.Video
 @shared_task
-def statVideo(video_id,user_id=None):
-    video = Video.objects.get(Video,id=video_id)
-    video.views += 1
-    video.stars_count = RateVideo.objects.filter(content=video,grade=1).count()
+def refresh_stats(video_id):
+    from .models import Video,UserVideoRelation
+    video = Video.objects.get(id=video_id)
+    video.views = UserVideoRelation.objects.filter(video__id=video_id).count()
+    video.stars_count = UserVideoRelation.objects.filter(grade=1,video__id=video_id).count()
     video.save()
-    if not (user_id is None): 
-            History.objects.create(viewer__id=user_id,video=video)

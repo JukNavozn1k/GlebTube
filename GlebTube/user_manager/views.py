@@ -4,12 +4,10 @@ from django import views
 
 from . import forms
 from . import models
-from video_manager.models import Video,RateVideo
+from video_manager.models import Video,UserVideoRelation
 
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.models import User
-
-from django.http import Http404
 
 from django.shortcuts import get_object_or_404
 
@@ -61,7 +59,7 @@ class Profile(views.View):
         user = get_object_or_404(User,id=user)
         isOwner = request.user == user
 
-        likes_count = RateVideo.objects.all().filter(grade=1,content__in = Video.objects.filter(author=user)).count()
+        likes_count = UserVideoRelation.objects.all().filter(grade=1,video__in = Video.objects.filter(author=user)).count()
         subs_count = models.Subscription.objects.all().filter(author = user,active=True).count()
 
         context = {'user': user,'isOwner':isOwner,'likes_count':likes_count,'subs_count':subs_count}
@@ -79,7 +77,7 @@ class UserVideos(views.View):
 class UserLiked(views.View):
     # Returns query of user liked videos    
     def get(self,request,user):
-            queryset = RateVideo.objects.all().filter(grade=1,author__id=user).select_related('content')
+            queryset = UserVideoRelation.objects.all().filter(grade=1,user__id=user).select_related('content')
             queryset = [q.content for q in queryset]
             return render(request,'video_list.html',context={'videos': queryset})
 
