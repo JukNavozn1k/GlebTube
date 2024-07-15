@@ -33,15 +33,16 @@ class UserVideoRelation(models.Model):
     CHOICES_VIEW = [(0, 'Не смотрел'), (1, 'Смотрел')]
     user = models.ForeignKey(User,on_delete=models.CASCADE,verbose_name="Зритель")
     grade = models.BooleanField(default=0,choices=CHOICES_RATE,verbose_name="Оценка")
-    viewed = models.BooleanField(default=0,choices=CHOICES_VIEW,verbose_name="Просмотр")
+    viewed = models.BooleanField(default=1,choices=CHOICES_VIEW,verbose_name="Просмотр")
     video = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='rates')
     def __str__(self) -> str:
-        return f'{self.id} : {self.user} -> {self.grade}'
+        return f'{self.id} : {self.user} -> Grade:  {self.grade} -> Viewed: {self.viewed}'
     class Meta:
         verbose_name = 'Пользователь-видео'
         verbose_name_plural = 'Пользователи-видео'
 
         unique_together = ['video', 'user']
+    
     def save(self,*args,**kwargs):
         tasks.refresh_stats.delay(self.video.id)
         super().save(*args,**kwargs)

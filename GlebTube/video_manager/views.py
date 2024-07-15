@@ -81,7 +81,7 @@ class RateVideoView(View):
         if request.user.is_authenticated:
             video = get_object_or_404(Video, id=video_id)
             user = request.user
-            rate_video, created = models.UserVideoRelation.objects.get_or_create(video=video, user=user)
+            rate_video, created = models.UserVideoRelation.objects.get_or_create(video=video, user=user,viewed=1)
             context = {'video': video}
             if rate_video.grade == True: 
                 return render(request,'rate_video/unrate_btn.html',context=context)
@@ -92,7 +92,7 @@ class RateVideoView(View):
         if request.user.is_authenticated:
             video = get_object_or_404(Video,id=video_id)
             user = request.user
-            rate_video, created = models.UserVideoRelation.objects.get_or_create(video=video, user=user)
+            rate_video, created = models.UserVideoRelation.objects.get_or_create(video=video, user=user,viewed=1)
             if not created:
                 rate_video.grade = not rate_video.grade
                 rate_video.save()
