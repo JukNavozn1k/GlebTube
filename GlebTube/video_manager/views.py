@@ -47,7 +47,7 @@ class EditVideo(View):
 class VideoView(View):
     def get(self,request,video_id):
         video = get_object_or_404(Video,id=video_id)
-        if request.user.is_authenticated: models.UserVideoRelation.objects.get_or_create(video=video,user=request.user) 
+        if request.user.is_authenticated: tasks.create_user_video_relation.delay(video.id,request.user.id)
         context = {'video':video} 
         return render(request,'watch.html',context=context)
     def delete(self,request,video_id):
