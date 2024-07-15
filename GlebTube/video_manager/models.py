@@ -42,7 +42,7 @@ class UserVideoRelation(models.Model):
         unique_together = ['video', 'user']
     
     def save(self,*args,**kwargs):
-        tasks.refresh_stats.delay(self.video.id)
+        tasks.refresh_rates.delay(self.video.id)
         super().save(*args,**kwargs)
 
 # Comment models
