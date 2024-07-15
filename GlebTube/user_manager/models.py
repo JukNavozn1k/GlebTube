@@ -59,12 +59,3 @@ class Subscription(models.Model):
         if self.author == self.subscriber:
             raise ValidationError("User and linked user cannot be the same.")
 
-
-# Automatically binds User Additional proxy to User
-@receiver(post_save, sender=User)
-def create_additional(sender, instance, created, **kwargs):
-    if created:
-        UserAdditional.objects.create(user=instance)
-
-post_save.connect(create_additional, sender=User)
-       

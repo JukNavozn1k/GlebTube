@@ -74,16 +74,17 @@ class ProfileMenu(views.View):
 
 class ProfileEdit(views.View):
     def get(self,request):
-        form = forms.UserAdditionalForm(instance=request.user.additional)
+        instance,created = models.UserAdditional.objects.get_or_create(user=request.user)
+        form = forms.UserAdditionalForm(instance=instance)
         return render(request,'gt_form.html',context={'form':form,'title': 'Редактировать профиль'})
     def post(self,request):
         if not request.user.is_authenticated: return HttpResponse("",status=401)
-        
-        form = forms.UserAdditionalForm(request.POST,request.FILES,instance=request.user.additional)
+        instance,created = models.UserAdditional.objects.get_or_create(user=request.user)
+        form = forms.UserAdditionalForm(request.POST,request.FILES,instance=instance)
         if form.is_valid():
             form.save()
-            return render(request,'gt_form.html',context={'form':forms.UserAdditionalForm(instance=request.user.additional),'success_alert':{'description':f'Профиль успешно отредактирован.','title':'Редактировать профиль'}})
-        else: return render(request,'gt_form.html',context={'form':forms.UserAdditionalForm(instance=request.user.additional),'error_alert':{'description':f'{form.errors}','title':'Редактировать профиль'}})
+            return render(request,'gt_form.html',context={'form':forms.UserAdditionalForm(instance=instance),'success_alert':{'description':f'Профиль успешно отредактирован.','title':'Редактировать профиль'}})
+        else: return render(request,'gt_form.html',context={'form':forms.UserAdditionalForm(instance=instance),'error_alert':{'description':f'{form.errors}','title':'Редактировать профиль'}})
 
 # Uses the methods of the underlying model to output the video queue
 class UserVideos(views.View):
