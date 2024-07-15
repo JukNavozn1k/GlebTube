@@ -74,13 +74,7 @@ class ProfileMenu(views.View):
 
 class ProfileEdit(views.View):
     def get(self,request):
-      
-        
-        
-        context = {}
-        return render(request,'profile_menu.html',context=context)
-
-
+        return render(request,'edit.html',context={'form':forms.UserAdditional()})
 
 # Uses the methods of the underlying model to output the video queue
 class UserVideos(views.View):
