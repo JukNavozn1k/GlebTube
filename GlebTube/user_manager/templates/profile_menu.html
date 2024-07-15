@@ -1,0 +1,36 @@
+<span class="profile_buttons">
+    {% if isOwner %}
+    <button type="button" class="btn btn-warning btn-sm" onclick="alert('В разработке...')">
+      <i class="bi bi-pencil-square">  Редактировать профиль</i>
+    </button>
+    <button type="button" 
+    hx-delete="/delete/history" 
+    hx-swap="innerHTML"
+    hx-target=".alert_container"
+    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'         
+    class="btn btn-danger btn-sm">
+    <i class="bi bi-trash">  Очистить историю</i>
+    </button>
+    {% else %}
+    <!--SUB/UNSUB BUTTONS-->
+    <div id="sub_btn_area" hx-get="/profile_action/{{user.id}}/subscribe" hx-trigger="load" hx-swap="innerHTML">
+    </div>
+    <!--SUB/UNSUB BUTTONS-->
+    {% endif %}
+</span>
+
+<div class="d-flex justify-content-center align-items-center py-4">
+  <div>
+    <div class="d-inline-block text-dark">
+      
+      <span class="text-muted"><i class="bi bi-star-fill"> Всего звёзд:</i></span>
+      <strong>{{stars_count}}</strong>
+    </div>
+    
+    <div class="d-inline-block text-dark ml-3">
+      <span class="text-muted"><i class="bi bi-people"> Всего подписчиков:</i> </span>
+      <strong>{{subscribers_count}}</strong>
+    </div>
+  </div>
+
+</div>

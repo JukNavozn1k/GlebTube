@@ -60,13 +60,19 @@ class Logout(views.View):
 class Profile(views.View):
     def get(self,request,user):
         user = get_object_or_404(User,id=user)
-        isOwner = request.user == user
-
-        tasks.refresh_user_stats.delay(user.id)
-        
-        context = {'user': user,'isOwner':isOwner}
+        context = {'user': user}
         return render(request,'profile.html',context=context)
-       
+class ProfileMenu(views.View):
+    def get(self,request,user):
+        user = get_object_or_404(User,id=user)
+        isOwner = request.user == user
+        
+        stars_count = UserVideoRelation.objects.all().filter(grade=1,video__in = Video.objects.filter(author__id=user)).count()
+        subscribers_count = models.Subscription.objects.all().filter(author__id = user,active=True).count()
+
+        context = {'user': user,'isOwner':isOwner,'stars_count':stars_count,'subscribers_count':subscribers_count}
+        return render(request,'profile_menu.html',context=context)
+
 
 
 # Uses the methods of the underlying model to output the video queue
