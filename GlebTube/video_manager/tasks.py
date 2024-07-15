@@ -17,7 +17,6 @@ def refresh_views(video_id):
 @shared_task
 def refresh_rates(video_id):
     from .models import Video,UserVideoRelation
-    from django.db.models import F
     video = Video.objects.get(id=video_id)
     video.stars_count = UserVideoRelation.objects.filter(grade=1,video__id=video_id).count()
     video.save()
