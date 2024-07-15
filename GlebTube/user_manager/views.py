@@ -67,10 +67,10 @@ class ProfileMenu(views.View):
         user = get_object_or_404(User,id=user)
         isOwner = request.user == user
         
-        stars_count = UserVideoRelation.objects.all().filter(grade=1,video__in = Video.objects.filter(author__id=user)).count()
-        subscribers_count = models.Subscription.objects.all().filter(author__id = user,active=True).count()
+        stars_count = UserVideoRelation.objects.all().filter(grade=1,video__in = Video.objects.filter(author__id=user.id)).count()
+        subscribers_count = models.Subscription.objects.all().filter(author__id = user.id,active=True).count()
 
-        context = {'user': user,'isOwner':isOwner,'stars_count':stars_count,'subscribers_count':subscribers_count}
+        context = {'isOwner':isOwner,'stars_count':stars_count,'subscribers_count':subscribers_count}
         return render(request,'profile_menu.html',context=context)
 
 
