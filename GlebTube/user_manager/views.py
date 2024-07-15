@@ -4,6 +4,9 @@ from django import views
 
 from . import forms
 from . import models
+
+from . import tasks
+
 from video_manager.models import Video,UserVideoRelation
 
 from django.contrib.auth import authenticate,login,logout
@@ -59,9 +62,8 @@ class Profile(views.View):
         user = get_object_or_404(User,id=user)
         isOwner = request.user == user
 
-        # UserVideoRelation.objects.all().filter(grade=1,video__in = Video.objects.filter(author=user)).count()
-        # models.Subscription.objects.all().filter(author = user,active=True).count()
-
+        tasks.refresh_user_stats.delay(user.id)
+        
         context = {'user': user,'isOwner':isOwner}
         return render(request,'profile.html',context=context)
        
