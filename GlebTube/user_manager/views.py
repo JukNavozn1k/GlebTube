@@ -59,10 +59,10 @@ class Profile(views.View):
         user = get_object_or_404(User,id=user)
         isOwner = request.user == user
 
-        likes_count = UserVideoRelation.objects.all().filter(grade=1,video__in = Video.objects.filter(author=user)).count()
-        subs_count = models.Subscription.objects.all().filter(author = user,active=True).count()
+        # UserVideoRelation.objects.all().filter(grade=1,video__in = Video.objects.filter(author=user)).count()
+        # models.Subscription.objects.all().filter(author = user,active=True).count()
 
-        context = {'user': user,'isOwner':isOwner,'likes_count':likes_count,'subs_count':subs_count}
+        context = {'user': user,'isOwner':isOwner}
         return render(request,'profile.html',context=context)
        
 
