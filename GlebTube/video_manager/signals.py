@@ -9,4 +9,3 @@ from . import tasks
 def video_signal(sender, instance, created,*args, **kwargs):
      if instance and created:   
         tasks.video_encode.delay(3,instance.id)
-        print("Task initiated")
