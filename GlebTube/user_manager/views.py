@@ -4,6 +4,9 @@ from django import views
 
 from . import forms
 from . import models
+
+from . import tasks
+
 from video_manager.models import Video,UserVideoRelation
 
 from django.contrib.auth import authenticate,login,logout
@@ -59,10 +62,9 @@ class Profile(views.View):
         user = get_object_or_404(User,id=user)
         isOwner = request.user == user
 
-        likes_count = UserVideoRelation.objects.all().filter(grade=1,video__in = Video.objects.filter(author=user)).count()
-        subs_count = models.Subscription.objects.all().filter(author = user,active=True).count()
-
-        context = {'user': user,'isOwner':isOwner,'likes_count':likes_count,'subs_count':subs_count}
+        tasks.refresh_user_stats.delay(user.id)
+        
+        context = {'user': user,'isOwner':isOwner}
         return render(request,'profile.html',context=context)
        
 
@@ -77,8 +79,8 @@ class UserVideos(views.View):
 class UserLiked(views.View):
     # Returns query of user liked videos    
     def get(self,request,user):
-            queryset = UserVideoRelation.objects.all().filter(grade=1,user__id=user).select_related('content')
-            queryset = [q.content for q in queryset]
+            queryset = UserVideoRelation.objects.all().filter(grade=1,user__id=user).select_related('video')
+            queryset = [q.video for q in queryset]
             return render(request,'video_list.html',context={'videos': queryset})
 
 
@@ -102,9 +104,23 @@ class Subscribe(views.View):
         return self.get(request,user.id)
 
 
-# Clean's request user history
-def delete_history(request):
-    if request.user.is_authenticated:
-        models.History.objects.all().filter(viewer=request.user).delete()
-        return render(request,'alerts/success.html',context={'desc': 'История очищена'})
-    else: HttpResponse("")
+class History(views.View):
+      # return's all watched wideo in -watched order
+      def get(self,request):
+          if request.user.is_authenticated:
+            videos = models.WatchHistory.objects.filter(viewer__id=request.user.id).select_related('video').order_by('-id')
+            videos = [v.video for v in videos]
+            context = {'videos':videos,'title':'История'}
+            return render(request,'main.html',context=context)
+          else: return redirect('/login')
+      def delete(self,request):
+          if request.user.is_authenticated:
+            models.WatchHistory.objects.filter(viewer__id=request.user.id).delete()
+            return render(request,'alerts/success.html',context={'desc': 'История очищена'})
+          else: HttpResponse("")
+
+def my_videos(request):
+        if not request.user.is_authenticated: return redirect('/')
+        videos = models.Video.objects.filter(author=request.user)
+        context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
+        return render(request,'main.html',context=context)

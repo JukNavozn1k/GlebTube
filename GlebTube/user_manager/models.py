@@ -9,7 +9,7 @@ from django.db.models.signals import post_save
 
 from django.core.exceptions import ValidationError
 
-class History(models.Model):
+class WatchHistory(models.Model):
       '''
           Allows you to record your watch history.
       '''
@@ -18,16 +18,18 @@ class History(models.Model):
       class Meta:
         verbose_name = 'Просмотр'
         verbose_name_plural = 'История просмотров'
-  
+
 class UserAdditional(models.Model):
       '''
             Allows you to augment the user entity with additional attributes 
             without modifying the standard User class
       '''
-      user = models.OneToOneField(User,unique=True,on_delete=models.CASCADE,verbose_name='Пользователь')
+      user = models.OneToOneField(User,unique=True,on_delete=models.CASCADE,verbose_name='Пользователь',related_name='additional')
       profile_description = models.TextField(max_length=1024,default='Здесь будет замечательное описание, когда-нибудь... ',verbose_name='Описание')
       avatar = models.ImageField(upload_to='user_avatars',default='user_avatars/default.png',verbose_name='Аватар')
 
+      stars_count = models.PositiveBigIntegerField(default=0,verbose_name='Количество звёзд')
+      subscribers_count = models.PositiveBigIntegerField(default=0,verbose_name='Количество подписчкиков')
       class Meta: 
           verbose_name = 'Дополнение к пользователю'
           verbose_name_plural = 'Дополнения к пользователям'

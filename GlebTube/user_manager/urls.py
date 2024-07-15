@@ -14,6 +14,11 @@ urlpatterns = [
    path('profile_action/<int:user>/videos',views.UserVideos.as_view()),
    path('profile_action/<int:user>/liked_videos',views.UserLiked.as_view()),
    path('profile_action/<int:user>/subscribe',views.Subscribe.as_view()),
+
    path('accounts/profile/', home),
-   path('delete/history',views.delete_history)
+
+   path('delete/history',views.History.as_view()),
+   path('history/',views.History.as_view()),
+
+   path('my_videos/',views.my_videos),
 ]
