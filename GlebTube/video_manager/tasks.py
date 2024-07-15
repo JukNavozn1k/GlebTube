@@ -16,8 +16,9 @@ def create_user_video_relation(video_id,user_id):
 @shared_task
 def refresh_stats(video_id):
     from .models import Video,UserVideoRelation
+    from django.db.models import F
     video = Video.objects.get(id=video_id)
-    video.views = UserVideoRelation.objects.filter(video__id=video_id).count()
+    video.views = F('views') + 1
     video.stars_count = UserVideoRelation.objects.filter(grade=1,video__id=video_id).count()
     video.save()
 
