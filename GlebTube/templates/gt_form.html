@@ -21,6 +21,13 @@
 <h1>{% block override_header %}Новое видео {% endblock %}</h1>
 
 {% block override_form %}
+
+<form enctype="multipart/form-data" method="POST" action="">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Подтвердить" class="btn btn-outline-primary"/>
+    </form>
+
 {% endblock %}
 </div>
 </div>
