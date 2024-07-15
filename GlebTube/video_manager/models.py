@@ -29,15 +29,17 @@ class Video(models.Model):
 
 class UserVideoRelation(models.Model):
 
-    CHOICES = [(0, 'Без оценки'), (1, 'С оценкой')]
-    author = models.ForeignKey(User,on_delete=models.CASCADE,verbose_name="Автор")
-    grade = models.BooleanField(default=0,choices=CHOICES,verbose_name="Оценка")
+    CHOICES_RATE = [(0, 'Без оценки'), (1, 'С оценкой')]
+    CHOICES_VIEW = [(0, 'Не смотрел'), (1, 'Смотрел')]
+    user = models.ForeignKey(User,on_delete=models.CASCADE,verbose_name="Зритель")
+    grade = models.BooleanField(default=0,choices=CHOICES_RATE,verbose_name="Оценка")
+    viewed = models.BooleanField(default=0,choices=CHOICES_VIEW,verbose_name="Просмотр")
     video = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='rates')
     def __str__(self) -> str:
         return f'{self.id} : {self.author} -> {self.grade}'
     class Meta:
         verbose_name = 'Рейтинг видео'
-        unique_together = ['video', 'author']
+        unique_together = ['video', 'user']
         verbose_name_plural = verbose_name
     def save(self,*args,**kwargs):
         tasks.refresh_stats(self.video.id)
