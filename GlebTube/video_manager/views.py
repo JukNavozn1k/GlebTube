@@ -61,11 +61,7 @@ class EditVideo(View):
 class VideoView(View):
     def get(self,request,video_id):
         video = get_object_or_404(Video,id=video_id)
-        # PUT YOUR CELERY HERE
-       
-        tasks.refresh_stats.delay(video.id)
-        # PUT YOUR CELERY HERE
-        
+        if request.user.is_authenticated: models.UserVideoRelation.objects.get_or_create(video=video,author=request.user) 
         context = {'video':video} 
         return render(request,'watch.html',context=context)
     def delete(self,request,video_id):
