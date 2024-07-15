@@ -7,16 +7,35 @@ from django.contrib.auth.models import User
 
 from . import tasks
 class Video(models.Model):
+
+    PENDING = 'Pending'
+    PROCESSING = 'Processing'
+    COMPLETED = 'Completed'
+    
+    STATUS_CHOICES = (
+        (PENDING, 'Pending'),
+        (PROCESSING, 'Processing'),
+        (COMPLETED, 'Completed'),
+    )
+
     id = models.BigAutoField(primary_key=True)
     caption = models.CharField(max_length=64,null = False,verbose_name="Название")
     description = models.TextField(max_length=1024,verbose_name="Описание")
 
-    img = models.ImageField(upload_to='images_uploaded',null=True,verbose_name="Превью")
-    video = models.FileField(upload_to='videos_uploaded',null=True,
-    validators=[FileExtensionValidator(allowed_extensions=['MOV','avi','mp4','webm','mkv'])],verbose_name="Видео")
+    thumbnail = models.ImageField(upload_to="thumbnails",null=True,blank=True,verbose_name='Превью')
+    video = models.FileField(upload_to='videos',null=True,
+    validators=[FileExtensionValidator(allowed_extensions=['mp4'])],verbose_name="Видео")
     
+    
+    duration = models.CharField(max_length=20, blank=True,null=True,verbose_name='Длительность')
+    hls = models.CharField(max_length=500,blank=True,null=True,verbose_name='HLS')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=PENDING,verbose_name='Статус')
+    is_running = models.BooleanField(default=False, verbose_name='В обработке')
+
+    # Cache fields
     views = models.PositiveBigIntegerField(default=0,verbose_name="Количество просмотров")
     stars_count = models.PositiveBigIntegerField(default=0,verbose_name='Количество звёзд')
+
     date_uploaded = models.DateTimeField(default=timezone.now,verbose_name="Дата публикации")
     author = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name="Автор")
 

@@ -5,18 +5,18 @@ from . import models
 class UploadForm(forms.ModelForm):
     class Meta:
         model =  models.Video
-        exclude = ['date_uploaded','author','views','stars_count']
+        fields = ['caption','description','video','thumbnail']
         widgets = {
             
             'caption' : forms.TextInput(attrs={'class' : 'form-control','placeholder':'Моё первое видео!'}),
             'video' : forms.FileInput(attrs={'class' : 'form-control form-control-sm',"accept" : "video/*"}),
-            'img' : forms.FileInput(attrs={'class' : 'form-control form-control-sm'}),
+            'thumbnail' : forms.FileInput(attrs={'class' : 'form-control form-control-sm'}),
             'description' : forms.Textarea(attrs={'class' : 'form-control','rows' : '3','placeholder':'Как я провёл лето...'})
         }
         labels = {
             'caption' : 'Название',
             'description' : 'Описание',
-            'img' : 'Превью',
+            'thumbnail' : 'Превью',
             'video' : 'Видео'
 
         }
@@ -25,12 +25,12 @@ class UploadForm(forms.ModelForm):
 class EditForm(forms.ModelForm):
     class Meta:
         model =  models.Video
-        exclude = ['date_uploaded','author','views','video','stars_count']
+        fields = ['caption','description','video','thumbnail']
         widgets = {
             
             'caption' : forms.TextInput(attrs={'class' : 'form-control','placeholder':'Моё первое видео!'}),
             'video' : forms.FileInput(attrs={'class' : 'form-control form-control-sm',"accept" : "video/*"}),
-            'img' : forms.FileInput(attrs={'class' : 'form-control form-control-sm'}),
+            'thumbnail' : forms.FileInput(attrs={'class' : 'form-control form-control-sm'}),
             'description' : forms.Textarea(attrs={'class' : 'form-control','rows' : '3','placeholder':'Как я провёл лето...'})
         }
         labels = {
