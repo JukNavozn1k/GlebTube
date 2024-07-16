@@ -33,18 +33,16 @@ def post_comment(video_id,author_id,comment):
     new_comment.save()
 
 
-import subprocess
-import os
-import json
-from celery import shared_task
-from time import sleep
-
-
-
 
 @shared_task
 def video_encode(duration,video_id):
+    import subprocess
+    import os
+    import json
+    from time import sleep
+
     from .models import Video
+
     try:
         sleep(duration)
         obj = Video.objects.filter(status='Pending',id=video_id).first()
