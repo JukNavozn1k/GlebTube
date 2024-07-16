@@ -1,3 +1,7 @@
+var player = new Plyr('#player', {
+    autoplay: true
+  });
+  
   (function () {
     var video = document.querySelector('#player');
   
