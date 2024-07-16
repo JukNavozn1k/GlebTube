@@ -114,7 +114,6 @@ def video_encode(duration,video_id):
 
             # Update the Video object status to 'Processed' or something similar
             obj.hls = output_hls_path 
-            obj.thumbnail = output_thumbnail_path
             obj.status = 'Completed'
             obj.is_running = False
             obj.save()
