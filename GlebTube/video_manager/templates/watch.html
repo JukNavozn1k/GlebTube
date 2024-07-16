@@ -18,7 +18,7 @@
 
 <div class="container mt-5">
   <div class="card mb-3 border-0">
-    <video preload="none" id="player" autoplay controls crossorigin></video>
+    <video preload="none" id="player" autoplay controls crossorigin playsinline controls data-poster="{{video.thumbnail.url}}"></video>
     <div class="card-body">
       <h5 class="card-title text-uppercase font-weight-bold">{{video.caption}}</h5>
       <h6 class="card-subtitle mb-2 text-muted">Описание</h6>
