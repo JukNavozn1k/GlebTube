@@ -11,7 +11,6 @@
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 <link rel="stylesheet" a href="{% static '/css/enchanced_player.css' %}"> 
 
-<link rel="stylesheet" a href="{% static '/css/rate_buttons.css' %}"> 
 <link rel="stylesheet" a href="{% static '/css/md_style.css' %}"> 
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -36,7 +35,7 @@
 <div class = "rate_container float-right"
 hx-get="/rate_video/{{video.id}}" hx-swap="innerHTML" hx-trigger="load">
 
-{% include 'loading_spinner.html' %}
+{% include 'loading_spinner_htmx.html' %}
 </div>
 
 
@@ -63,7 +62,7 @@ hx-get="/rate_video/{{video.id}}" hx-swap="innerHTML" hx-trigger="load">
 hx-get="/fetch/comments/{{video.id}}/"
 hx-trigger="load"
 hx-swap="innerHTML">
-{% include 'loading_spinner.html' %}
+{% include 'loading_spinner_htmx.html' %}
 </div>
 </div>
 </div>
