@@ -1,8 +1,15 @@
 from django.shortcuts import render
 from video_manager import models
 
+from django.conf import settings
+from django.core.cache import cache
+
 def home(request):
-    videos = models.Video.objects.all()
+    videos = cache.get(settings.CACHE_ALL_VIDEO_QUERYSET)
+    if not videos:
+       videos = models.Video.objects.all()
+       cache.set(settings.CACHE_ALL_VIDEO_QUERYSET,videos,timeout=60*60)
+    
     context = {'videos': videos, 'title':'Главная'}
     return render(request,'main.html',context=context)
 
