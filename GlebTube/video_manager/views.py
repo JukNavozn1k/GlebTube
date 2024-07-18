@@ -111,8 +111,7 @@ class VideoView(View):
         if request.user.is_authenticated: 
             tasks.refresh_history.delay(video.id,request.user.id)
 
-        hls_playlist_url = reverse('serve_hls_playlist', args=[video.id])
-        context = {'video':video,'hls_url': hls_playlist_url} 
+        context = {'video':video} 
         tasks.refresh_views.delay(video_id)
         return render(request,'watch.html',context=context)
     def delete(self,request,video_id):
