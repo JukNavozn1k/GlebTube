@@ -178,4 +178,7 @@ CACHES = {
 
 # Cache keys
 CACHE_ALL_VIDEO_QUERYSET = 'alL_videos_queryset'
-CACHE_VIDEO_ID = 'video_'
+CACHE_ALL_VIDEO_QUERYSET_TIMEOUT = 60*60*5
+
+
+DEFAULT_AVATAR_URL = 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png'
