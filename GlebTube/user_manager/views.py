@@ -60,7 +60,7 @@ class Profile(views.View):
     def get(self,request,user):
         user = get_object_or_404(User,id=user)
         context = {'user': user}
-        return render(request,'profile.html',context=context)
+        return render(request,'profile/profile.html',context=context)
 class ProfileMenu(views.View):
     def get(self,request,user):
         user = get_object_or_404(User,id=user)
@@ -70,7 +70,7 @@ class ProfileMenu(views.View):
         subscribers_count = models.Subscription.objects.all().filter(author__id = user.id,active=True).count()
 
         context = {'isOwner':isOwner,'stars_count':stars_count,'subscribers_count':subscribers_count}
-        return render(request,'profile_menu.html',context=context)
+        return render(request,'profile/profile_menu.html',context=context)
 
 class ProfileEdit(views.View):
     def get(self,request):
@@ -102,24 +102,24 @@ class UserLiked(views.View):
 
 
 class Subscribe(views.View):
+    def get_response_data(self,request,context,active):
+        if active:
+            return render(request,'sub_buttons/unsub.html',context=context)
+        return render(request,'sub_buttons/sub.html',context=context)
+
     def get(self,request,user):
         user = get_object_or_404(User,id=user)
         if request.user.is_authenticated:
             subscription,created = models.Subscription.objects.get_or_create(subscriber = request.user,author=user)
             context = {'user' : user}
-            if subscription.active:
-                return render(request,'sub_buttons/unsub.html',context=context)
-            else: 
-                return render(request,'sub_buttons/sub.html',context=context)
+            return self.get_response_data(request,context,subscription.active)
         return HttpResponse("",status=401)
     def put(self,request,user):
         if request.user.is_authenticated:
             user = get_object_or_404(User,id=user)
             subscription,created = models.Subscription.objects.get_or_create(subscriber = request.user,author=user)
-            if not created:
-                subscription.active = not subscription.active
-                subscription.save()
-            return self.get(request,user.id)
+            tasks.update_subscription.delay(request.user.id,user.id)
+            return self.get_response_data(request,{'user':user},not subscription.active)
         return HttpResponse("",status=401)
 
 
@@ -143,3 +143,6 @@ def my_videos(request):
         videos = models.Video.objects.filter(author=request.user)
         context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
         return render(request,'main.html',context=context)
+
+def rm_video_modal(request,video_id):
+    return render(request,'modals/rm_video_modal_confirm.html',context={'video_id':video_id})
