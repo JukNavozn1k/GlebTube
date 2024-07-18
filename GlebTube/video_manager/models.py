@@ -85,7 +85,7 @@ class Comment(models.Model):
     def __str__(self) -> str:
         return f'{self.id} : {self.author} -> {self.instance}'
 class CommentVideo(Comment):
-    instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео")
+    instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",db_index=True)
     class Meta:
          verbose_name = 'Комментарий-Видео'
          verbose_name_plural = 'Коментарии-Видео'

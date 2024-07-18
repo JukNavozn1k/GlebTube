@@ -15,6 +15,8 @@ urlpatterns = [
    path('profile_action/<int:user>/liked_videos',views.UserLiked.as_view()),
    path('profile_action/<int:user>/subscribe',views.Subscribe.as_view()),
    path('profile_action/<int:user>/fetch_menu',views.ProfileMenu.as_view()),
+
+   path('rm_video_modal/<int:video_id>',views.rm_video_modal),
    
    path('profile/edit/',views.ProfileEdit.as_view()),
 
