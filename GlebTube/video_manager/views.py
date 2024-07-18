@@ -25,8 +25,6 @@ from .models import Video
 
 def serve_hls_playlist(request, video_id):
     try:
-       
-       
         video = get_object_or_404(Video, pk=video_id)
            
         hls_playlist_path = video.hls
