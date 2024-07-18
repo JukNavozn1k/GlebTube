@@ -101,7 +101,7 @@ class VideoPlayer(View):
             return render(request,'video/video_loaded.html',context=context)
         else: 
             context = {'video':video} 
-            return render(request,'video/video_loading.html',context=context)
+            return render(request,'video/video_loading_delay.html',context=context)
             
 
 
