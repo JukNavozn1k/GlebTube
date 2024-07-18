@@ -8,7 +8,7 @@ def home(request):
     videos = cache.get(settings.CACHE_ALL_VIDEO_QUERYSET)
     if not videos:
        videos = models.Video.objects.all()
-       cache.set(settings.CACHE_ALL_VIDEO_QUERYSET,videos,timeout=60*60)
+       cache.set(settings.CACHE_ALL_VIDEO_QUERYSET,videos,timeout=settings.CACHE_ALL_VIDEO_QUERYSET_TIMEOUT)
     
     context = {'videos': videos, 'title':'Главная'}
     return render(request,'main.html',context=context)
