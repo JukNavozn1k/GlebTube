@@ -166,5 +166,6 @@ class RateVideoView(View):
                 rate_video.grade = not rate_video.grade
                 rate_video.save()
                 tasks.refresh_rates.delay(video.id)
-        return self.get_response_data(request,{'video':video},rate_video.grade)
+                return self.get_response_data(request,{'video':video},rate_video.grade)
+        return HttpResponse("", status=401)
    
