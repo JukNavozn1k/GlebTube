@@ -120,7 +120,7 @@ class CommentVideo(View):
             new_comment = models.CommentVideo(author=request.user,instance_id=video_id,content=comment)
             tasks.post_comment.delay(video_id,request.user.id,comment)
             return render(request,'comment.html',context={'comment':new_comment})
-        return render(request,'alerts/error.html',context={'desc' : 'Невозможно удалить комментарий'})
+        return render(request,'alerts/error.html',context={'desc' : 'Невозможно добавить комментарий'})
     def delete(self,request,comment_id):
                 if not request.user.is_authenticated: return render(request,'alerts/error.html',context={'desc' : 'Невозможно удалить комментарий'})
                 tasks.remove_comment.delay(comment_id,request.user.id)
