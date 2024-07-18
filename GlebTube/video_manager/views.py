@@ -116,10 +116,9 @@ class VideoView(View):
         return render(request,'watch.html',context=context)
     def delete(self,request,video_id):
         if request.user.is_authenticated :
-                video = get_object_or_404(Video,author=request.user,id=video_id)
-                video.delete()
+                tasks.remove_video.delay(video_id,request.user.id)
                 return HttpResponse("",status=200)
-        else: return HttpResponse("",status=403)
+        else: return HttpResponse("",status=401)
 
 class CommentVideo(View):
     def get(self,request,video_id):

@@ -35,6 +35,11 @@ def update_video_rate(video_id,author_id):
     refresh_rates.delay(video_id)
 
 @shared_task
+def remove_video(video_id,author_id):
+    from .models import Video
+    Video.objects.filter(id=video_id,author_id=author_id).delete()
+
+@shared_task
 def video_encode(duration,video_id):
     import subprocess
     import os
