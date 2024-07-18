@@ -25,8 +25,6 @@ from .models import Video
 
 def serve_hls_playlist(request, video_id):
     try:
-       
-       
         video = get_object_or_404(Video, pk=video_id)
            
         hls_playlist_path = video.hls
@@ -92,6 +90,20 @@ class EditVideo(View):
             form.save()
             return render(request,'gt_form.html',context={'form':forms.EditForm(instance=video),'success_alert':{'description':f'Видео успешно отредактировано.','title':'Редактировать видео'}})
         else: return render(request,'gt_form.html',context={'form':forms.EditForm(instance=video),'error_alert':{'description':f'{form.errors}','title':'Редактировать видео'}})
+
+
+class VideoPlayer(View):
+    def get(self,request,video_id):
+        video = get_object_or_404(Video,id=video_id)
+        if video.status == 'Completed':
+            hls_playlist_url = reverse('serve_hls_playlist', args=[video.id])
+            context = {'video':video,'hls_url': hls_playlist_url} 
+            return render(request,'video/video_loaded.html',context=context)
+        else: 
+            context = {'video':video} 
+            return render(request,'video/video_loading_delay.html',context=context)
+            
+
 
 class VideoView(View):
     def get(self,request,video_id):

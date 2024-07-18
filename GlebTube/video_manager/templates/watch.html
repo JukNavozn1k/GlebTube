@@ -17,31 +17,15 @@
 
 <div class="container mt-5">
   <div class="card mb-3 border-0">
-    {% if video.status == 'Completed' %}
-    <video preload="none" id="player" autoplay controls crossorigin playsinline controls data-poster="{{video.thumbnail.url}}"></video>
-    {% else %}
+  
+  {% include 'video/video_loading_load.html' %}
     
-    {% include 'loading_spinner.html' %}
-    <p class="text-muted text-center">Видео в обработке</p>
-    {% endif %}
-    <div class="card-body">
-      <h5 class="card-title text-uppercase font-weight-bold">{{video.caption}}</h5>
-      <h6 class="card-subtitle mb-2 text-muted">Описание</h6>
-      <div class="md_content">
-      <p class="card-text">{{video.description}}</p>
-    </div>
-      <p class="card-text">
-        <i class="bi bi-star-fill"> Количество Звёзд: {{video.stars_count}} </i>
-        <i class="bi bi-binoculars-fill"> Количество просмотров: {{video.views}} </i></p>
-      <p class="card-text"><i class="bi bi-clock-fill"> Дата выхода: {{video.date_uploaded|date:"m.d.Y"}}</i></p>
-      <p class="card-text"><i class="bi bi-person-circle">  Автор:  <a href="/profile/{{video.author.id}}">{{video.author}} </i></a></p>
-    </div>
   </div>
 <div class="post float-right" data-post-id="{{video.id}}">
 <div class = "rate_container float-right"
 hx-get="/rate_video/{{video.id}}" hx-swap="innerHTML" hx-trigger="revealed">
 
-{% include 'loading_spinner_htmx.html' %}
+{% include 'spinners/loading_spinner_htmx.html' %}
 </div>
 
 
@@ -68,16 +52,15 @@ hx-get="/rate_video/{{video.id}}" hx-swap="innerHTML" hx-trigger="revealed">
 hx-get="/fetch/comments/{{video.id}}/"
 hx-trigger="revealed"
 hx-swap="innerHTML">
-{% include 'loading_spinner_htmx.html' %}
+{% include 'spinners/loading_spinner_htmx.html' %}
 </div>
 </div>
 </div>
 
 <!--Scripts-->
 
-<script>var media_source = "{{ hls_url }}";</script>
+
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-<script src="https://cdn.jsdelivr.net/hls.js/latest/hls.js"></script>
-<script src="{% static '/js/player.js' %}"></script>
+
 <script src="{% static '/js/comment_video.js' %}"></script>
 {% endblock %}
