@@ -5,6 +5,8 @@ from django.utils import timezone
 
 from django.contrib.auth.models import User
 
+from django.conf import settings
+from django.core.cache import cache
 from . import tasks
 class Video(models.Model):
 
@@ -39,6 +41,10 @@ class Video(models.Model):
     date_uploaded = models.DateTimeField(default=timezone.now,verbose_name="Дата публикации")
     author = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name="Автор")
 
+
+    def save(self,*args,**kwargs):
+        cache.delete(settings.CACHE_ALL_VIDEO_QUERYSET)
+        super().save(*args,**kwargs)
     class Meta: 
         verbose_name = 'Видео'
         verbose_name_plural = verbose_name
