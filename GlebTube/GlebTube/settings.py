@@ -178,3 +178,4 @@ CACHES = {
 
 # Cache keys
 CACHE_ALL_VIDEO_QUERYSET = 'alL_videos_queryset'
+CACHE_VIDEO_ID = 'video_'
