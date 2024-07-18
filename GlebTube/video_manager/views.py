@@ -143,15 +143,18 @@ class CommentVideo(View):
            
 
 class RateVideoView(View):
+    def get_response_data(self,request,context,grade):
+        if grade == True: 
+                return render(request,'rate_video/unrate_btn.html',context=context)
+        else: return render(request,'rate_video/rate_btn.html',context=context)
+
     def get(self,request,video_id):
         if request.user.is_authenticated:
             video = get_object_or_404(Video, id=video_id)
             user = request.user
             rate_video, created = models.UserVideoRelation.objects.get_or_create(video=video, user=user)
             context = {'video': video}
-            if rate_video.grade == True: 
-                return render(request,'rate_video/unrate_btn.html',context=context)
-            else: return render(request,'rate_video/rate_btn.html',context=context)
+            return self.get_response_data(request,context,rate_video.grade)
         return HttpResponse("", status=401)
     # processing all actions with video
     def put(self,request,video_id):
@@ -163,5 +166,5 @@ class RateVideoView(View):
                 rate_video.grade = not rate_video.grade
                 rate_video.save()
                 tasks.refresh_rates.delay(video.id)
-        return self.get(request,video_id) 
+        return self.get_response_data(request,{'video':video},rate_video.grade)
    
