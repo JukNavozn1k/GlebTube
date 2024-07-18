@@ -98,20 +98,6 @@ def video_encode(duration,video_id):
 
             subprocess.run(cmd, check=True)
 
-
-            # generate thumbnail 
-            ffmpeg_cmd = [
-                'ffmpeg',
-                '-i', input_video_path,
-                '-ss', '2', 
-                '-vframes', '1',            
-                '-q:v', '2',  
-                '-y',               
-                output_thumbnail_path
-            ]
-            subprocess.run(ffmpeg_cmd, check=True)
-
-
             # Update the Video object status to 'Processed' or something similar
             obj.hls = output_hls_path 
             obj.status = 'Completed'
