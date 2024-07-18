@@ -21,10 +21,18 @@ from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from .models import Video
 
+from django.conf import settings
+from django.core.cache import cache
+
+
 
 def serve_hls_playlist(request, video_id):
     try:
-        video = get_object_or_404(Video, pk=video_id)
+        key = f'{settings.CACHE_VIDEO_ID}{video_id}'
+        video =  cache.get(key)
+        if not video: 
+            video = get_object_or_404(Video, pk=video_id)
+            cache.set(key,video,timeout=60*60)
         hls_playlist_path = video.hls
 
         with open(hls_playlist_path, 'r') as m3u8_file:
@@ -39,10 +47,13 @@ def serve_hls_playlist(request, video_id):
     except (Video.DoesNotExist, FileNotFoundError):
         return HttpResponse("Video or HLS playlist not found", status=404)
 
-
 def serve_hls_segment(request, video_id, segment_name):
     try:
-        video = get_object_or_404(Video, pk=video_id)
+        key = f'{settings.CACHE_VIDEO_ID}{video_id}'
+        video =  cache.get(key)
+        if not video: 
+            video = get_object_or_404(Video, pk=video_id)
+            cache.set(key,video,timeout=60*60)
         hls_directory = os.path.join(os.path.dirname(video.video.path), 'hls_output')
         segment_path = os.path.join(hls_directory, segment_name)
 
