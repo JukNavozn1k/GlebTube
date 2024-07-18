@@ -28,11 +28,10 @@ from django.core.cache import cache
 
 def serve_hls_playlist(request, video_id):
     try:
-        key = f'{settings.CACHE_VIDEO_ID}{video_id}'
-        video =  cache.get(key)
-        if not video: 
-            video = get_object_or_404(Video, pk=video_id)
-            cache.set(key,video,timeout=60*60)
+       
+       
+        video = get_object_or_404(Video, pk=video_id)
+           
         hls_playlist_path = video.hls
 
         with open(hls_playlist_path, 'r') as m3u8_file:
@@ -49,11 +48,7 @@ def serve_hls_playlist(request, video_id):
 
 def serve_hls_segment(request, video_id, segment_name):
     try:
-        key = f'{settings.CACHE_VIDEO_ID}{video_id}'
-        video =  cache.get(key)
-        if not video: 
-            video = get_object_or_404(Video, pk=video_id)
-            cache.set(key,video,timeout=60*60)
+        video = get_object_or_404(Video, pk=video_id)
         hls_directory = os.path.join(os.path.dirname(video.video.path), 'hls_output')
         segment_path = os.path.join(hls_directory, segment_name)
 
