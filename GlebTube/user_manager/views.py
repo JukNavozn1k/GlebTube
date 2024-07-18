@@ -69,7 +69,7 @@ class ProfileMenu(views.View):
         stars_count = UserVideoRelation.objects.all().filter(grade=1,video__in = Video.objects.filter(author__id=user.id)).count()
         subscribers_count = models.Subscription.objects.all().filter(author__id = user.id,active=True).count()
 
-        context = {'isOwner':isOwner,'stars_count':stars_count,'subscribers_count':subscribers_count}
+        context = {'isOwner':isOwner,'stars_count':stars_count,'subscribers_count':subscribers_count,'user':user}
         return render(request,'profile/profile_menu.html',context=context)
 
 class ProfileEdit(views.View):
