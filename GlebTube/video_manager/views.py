@@ -21,9 +21,6 @@ from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from .models import Video
 
-from django.conf import settings
-from django.core.cache import cache
-
 
 
 def serve_hls_playlist(request, video_id):
