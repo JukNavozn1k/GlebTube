@@ -1,5 +1,6 @@
 var player = new Plyr('#player', {
-    autoplay: true
+    autoplay: true,
+  
   });
   
   (function () {
