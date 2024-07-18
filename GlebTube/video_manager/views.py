@@ -162,10 +162,7 @@ class RateVideoView(View):
             video = get_object_or_404(Video,id=video_id)
             user = request.user
             rate_video, created = models.UserVideoRelation.objects.get_or_create(video=video, user=user)
-            if not created:
-                rate_video.grade = not rate_video.grade
-                rate_video.save()
-                tasks.refresh_rates.delay(video.id)
-                return self.get_response_data(request,{'video':video},rate_video.grade)
+            tasks.update_video_rate.delay(video_id,user.id)
+            return self.get_response_data(request,{'video':video},not rate_video.grade)
         return HttpResponse("", status=401)
    

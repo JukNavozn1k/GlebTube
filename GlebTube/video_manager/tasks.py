@@ -32,7 +32,13 @@ def post_comment(video_id,author_id,comment):
     new_comment = CommentVideo(author_id=author_id,instance_id=video_id,content=comment)
     new_comment.save()
 
-
+@shared_task
+def update_video_rate(video_id,author_id):
+    from .models import UserVideoRelation
+    user_video_relation = UserVideoRelation.objects.get(video_id=video_id, user_id=author_id)
+    user_video_relation.grade = not user_video_relation.grade
+    user_video_relation.save()
+    refresh_rates.delay(video_id)
 
 @shared_task
 def video_encode(duration,video_id):
