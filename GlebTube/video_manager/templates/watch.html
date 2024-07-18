@@ -7,6 +7,8 @@
 {% load static %}
 {% csrf_token %}
 
+{% load user_filters %}
+
 <!--Styles-->
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 <link rel="stylesheet" a href="{% static '/css/enchanced_player.css' %}"> 
@@ -35,7 +37,7 @@ hx-get="/rate_video/{{video.id}}" hx-swap="innerHTML" hx-trigger="revealed">
   
   <div class="bg-white p-2">
     <div class="d-flex flex-row align-items-start">
-        <img class="rounded-circle" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" width="50" height="50">
+        <img class="rounded-circle" src="{{user.additional.avatar | parse_avatar}}" width="50" height="50">
         <textarea class="form-control ml-1 shadow-none textarea" id="comment" placeholder="Введите комментарий"></textarea>
     </div>
     <div class="mt-2 text-right">

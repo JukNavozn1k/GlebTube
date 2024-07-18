@@ -2,11 +2,12 @@
 
 
 {% block content %}
+{% load user_filters %}
 {% csrf_token %}
 <div class="bg-white">
     <div class="container">
       <div class="text-center py-5">
-        <img src="{{user.additional.avatar.url}}" width="120" height="120" alt class="ui-w-100 rounded-circle">
+        <img src="{{user.additional.avatar| parse_avatar}}" width="120" height="120" alt class="ui-w-100 rounded-circle">
   
         <div class="col-md-8 col-lg-6 col-xl-5 p-0 mx-auto">
           <h4 class="font-weight-bold my-4">{{user.username}}</h4>
