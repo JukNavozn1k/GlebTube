@@ -60,7 +60,7 @@ class Profile(views.View):
     def get(self,request,user):
         user = get_object_or_404(User,id=user)
         context = {'user': user}
-        return render(request,'profile.html',context=context)
+        return render(request,'profile/profile.html',context=context)
 class ProfileMenu(views.View):
     def get(self,request,user):
         user = get_object_or_404(User,id=user)
@@ -70,7 +70,7 @@ class ProfileMenu(views.View):
         subscribers_count = models.Subscription.objects.all().filter(author__id = user.id,active=True).count()
 
         context = {'isOwner':isOwner,'stars_count':stars_count,'subscribers_count':subscribers_count}
-        return render(request,'profile_menu.html',context=context)
+        return render(request,'profile/profile_menu.html',context=context)
 
 class ProfileEdit(views.View):
     def get(self,request):
@@ -143,3 +143,6 @@ def my_videos(request):
         videos = models.Video.objects.filter(author=request.user)
         context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
         return render(request,'main.html',context=context)
+
+def rm_video_modal(request,video_id):
+    return render(request,'modals/rm_video_modal_confirm.html',context={'video_id':video_id})
