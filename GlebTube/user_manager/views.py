@@ -139,7 +139,7 @@ class History(views.View):
           else: return render(request,'alerts/error.html',context={'desc': 'История не очищена'})
 
 def my_videos(request):
-        if not request.user.is_authenticated: return redirect('/')
+        if not request.user.is_authenticated: return redirect('/login')
         videos = models.Video.objects.filter(author=request.user)
         context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
         return render(request,'main.html',context=context)
