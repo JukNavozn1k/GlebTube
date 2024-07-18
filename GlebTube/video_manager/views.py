@@ -10,6 +10,10 @@ from .models import Video
 
 from . import tasks
 
+from django.db.models import Prefetch
+
+from django.contrib.auth.models import User
+
 import os 
 from django.shortcuts import render
 from django.urls import reverse
@@ -105,7 +109,9 @@ class VideoView(View):
 
 class CommentVideo(View):
     def get(self,request,video_id):
-        comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').prefetch_related('author').select_related('author__additional')
+        users_with_additional =  Prefetch('author',User.objects.all().select_related('additional'))
+        comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').prefetch_related(
+           users_with_additional)
         context = {'comments':comments}
         return render(request,'comment_list.html',context=context)
     def post(self,request,video_id):
