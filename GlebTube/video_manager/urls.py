@@ -11,6 +11,7 @@ urlpatterns = [
   path('add_comment_video/<int:video_id>',views.CommentVideo.as_view()),
   path('rm_comment/<int:comment_id>/',views.CommentVideo.as_view()),
   
+  path('fetch/video/<int:video_id>/',views.VideoPlayer.as_view()),
   path('fetch/comments/<int:video_id>/',views.CommentVideo.as_view()),
   path('rate_video/<int:video_id>/',views.RateVideoView.as_view()),
 
