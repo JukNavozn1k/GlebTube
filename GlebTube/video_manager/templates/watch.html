@@ -17,12 +17,8 @@
 
 <div class="container mt-5">
   <div class="card mb-3 border-0">
-    <div class="video_wrapper"
-    hx-get="/fetch/video/{{video.id}}"
-    hx-trigger="load, every 5000ms"
-    hx-swap="outerHTML">
+  
   {% include 'video/video_loading.html' %}
-  </div>
     
   </div>
 <div class="post float-right" data-post-id="{{video.id}}">
