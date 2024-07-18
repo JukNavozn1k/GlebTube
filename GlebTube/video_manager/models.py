@@ -41,7 +41,10 @@ class Video(models.Model):
     date_uploaded = models.DateTimeField(default=timezone.now,verbose_name="Дата публикации")
     author = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name="Автор")
 
-
+    def delete(self,*args,**kwargs):
+        cache.delete(settings.CACHE_ALL_VIDEO_QUERYSET)
+        super().delete(*args,**kwargs)
+    
     def save(self,*args,**kwargs):
         cache.delete(settings.CACHE_ALL_VIDEO_QUERYSET)
         super().save(*args,**kwargs)
