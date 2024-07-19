@@ -111,16 +111,14 @@ class VideoView(View):
         if request.user.is_authenticated: 
             tasks.refresh_history.delay(video.id,request.user.id)
 
-        hls_playlist_url = reverse('serve_hls_playlist', args=[video.id])
-        context = {'video':video,'hls_url': hls_playlist_url} 
+        context = {'video':video} 
         tasks.refresh_views.delay(video_id)
         return render(request,'watch.html',context=context)
     def delete(self,request,video_id):
         if request.user.is_authenticated :
-                video = get_object_or_404(Video,author=request.user,id=video_id)
-                video.delete()
+                tasks.remove_video.delay(video_id,request.user.id)
                 return HttpResponse("",status=200)
-        else: return HttpResponse("",status=403)
+        else: return HttpResponse("",status=401)
 
 class CommentVideo(View):
     def get(self,request,video_id):
@@ -133,7 +131,7 @@ class CommentVideo(View):
         if request.user.is_authenticated:
             comment = request.POST.get('comment')
             new_comment = models.CommentVideo(author=request.user,instance_id=video_id,content=comment)
-            tasks.post_comment.delay(video_id,request.user.id,comment)
+            new_comment.save()
             return render(request,'comment.html',context={'comment':new_comment})
         return render(request,'alerts/error.html',context={'desc' : 'Невозможно добавить комментарий'})
     def delete(self,request,comment_id):

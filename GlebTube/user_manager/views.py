@@ -59,18 +59,11 @@ class Logout(views.View):
 class Profile(views.View):
     def get(self,request,user):
         user = get_object_or_404(User,id=user)
-        context = {'user': user}
-        return render(request,'profile/profile.html',context=context)
-class ProfileMenu(views.View):
-    def get(self,request,user):
-        user = get_object_or_404(User,id=user)
         isOwner = request.user == user
-        
         stars_count = UserVideoRelation.objects.all().filter(grade=1,video__in = Video.objects.filter(author__id=user.id)).count()
         subscribers_count = models.Subscription.objects.all().filter(author__id = user.id,active=True).count()
-
-        context = {'isOwner':isOwner,'stars_count':stars_count,'subscribers_count':subscribers_count}
-        return render(request,'profile/profile_menu.html',context=context)
+        context = {'isOwner':isOwner,'user': user,'stars_count':stars_count,'subscribers_count':subscribers_count}
+        return render(request,'profile/profile.html',context=context)
 
 class ProfileEdit(views.View):
     def get(self,request):

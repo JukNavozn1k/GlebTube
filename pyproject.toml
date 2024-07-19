@@ -15,6 +15,7 @@ django-debug-toolbar = "^4.4.5"
 psycopg2-binary = "^2.9.9"
 celery = {extras = ["redis"], version = "^5.4.0"}
 flower = "^2.0.1"
+gunicorn = "^22.0.0"
 
 
 [build-system]
