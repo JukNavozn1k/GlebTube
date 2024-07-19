@@ -8,7 +8,6 @@
     <div class="container">
       <div class="text-center py-5">
         <img src="{{user.additional.avatar| parse_avatar}}" width="120" height="120" alt class="ui-w-100 rounded-circle">
-  
         <div class="col-md-8 col-lg-6 col-xl-5 p-0 mx-auto">
           <h4 class="font-weight-bold my-4">{{user.username}}</h4>
   
@@ -19,12 +18,8 @@
             
           </div>
 
-          <div class="profile_menu"
-          hx-get="/profile_action/{{user.id}}/fetch_menu"
-          hx-swap="innerHTML"
-          hx-trigger="load"
-          >
-            {% include 'spinners/loading_spinner.html' %}
+          <div class="profile_menu">
+            {% include 'profile/profile_menu.html' %}
         </div>
         </div>
         <br>
