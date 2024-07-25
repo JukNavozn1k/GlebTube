@@ -118,13 +118,11 @@ class Subscribe(views.View):
 
 class History(views.View):
       # return's all watched wideo in -watched order
-      def get(self,request):
-          if request.user.is_authenticated:
-            videos = models.WatchHistory.objects.filter(viewer__id=request.user.id).select_related('video').order_by('-id')
+      def get(self,request,user):
+            videos = models.WatchHistory.objects.filter(viewer__id=user).select_related('video').order_by('-id')
             videos = [v.video for v in videos]
             context = {'videos':videos,'title':'История'}
-            return render(request,'main.html',context=context)
-          else: return redirect('/login')
+            return render(request,'video_list.html',context=context)
       def delete(self,request):
           if request.user.is_authenticated:
             tasks.clear_history.delay(request.user.id)

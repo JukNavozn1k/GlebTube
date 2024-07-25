@@ -32,6 +32,9 @@
       <li class="nav-item">
         <a class="nav-link py-4" href="" hx-get="/profile_action/{{user.id}}/liked_videos" hx-target=".user_content"><i class="bi bi-star-fill"> Понравилось</i></a>
       </li>    
+      <li class="nav-item">
+        <a class="nav-link py-4" href="" hx-get="{% url 'history' user.id %}" hx-target=".user_content"><i class="bi bi-clock-history"> История</i></a>
+      </li>    
     </ul>
 
   </div>
