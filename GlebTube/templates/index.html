@@ -20,17 +20,15 @@
 
   <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-2 mb-4 border-bottom">
     <div class="col-md-3 mb-2 mb-md-0">
-      <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
-        <!-- <h5>GlebTube</h5> -->
-      </a>
+      
     </div>
 
     <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
       <li><a href="/" class="nav-link px-2"><i class="bi bi-house"> Главная</i></a></li>
      
-      <li><a href="/my_videos" class="nav-link px-2"><i class="bi bi-camera-reels"> Мои видео</i></a></li>
-      <li><a href="/history" class="nav-link px-2"><i class="bi bi-clock-history"> История</i></a></li>
-      <li><a href="/upload" class="nav-link px-2"><i class="bi bi-plus-circle"> Новое видео</i></a></li>
+      <li><a href="{% url 'my_videos' %}" class="nav-link px-2"><i class="bi bi-camera-reels"> Мои видео</i></a></li>
+      <li><a href="{% url 'history' %}" class="nav-link px-2"><i class="bi bi-clock-history"> История</i></a></li>
+      <li><a href="{% url 'upload' %}" class="nav-link px-2"><i class="bi bi-plus-circle"> Новое видео</i></a></li>
     </ul>
 
     <div class="col-md-3">
