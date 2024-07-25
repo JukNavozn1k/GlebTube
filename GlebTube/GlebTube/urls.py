@@ -22,8 +22,6 @@ from django.conf.urls.static import static
 from debug_toolbar.toolbar import debug_toolbar_urls
 from .settings import DEBUG
 
-from django.conf.urls import (handler400, handler403, handler404, handler500)
-
 from . import views
 
 urlpatterns = [
@@ -39,5 +37,3 @@ if DEBUG:
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
     urlpatterns += debug_toolbar_urls()
 
-handler404 = 'GlebTube.views.handler404'
-handler500 = 'GlebTube.views.handler500'

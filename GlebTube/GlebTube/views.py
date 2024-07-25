@@ -7,9 +7,3 @@ def home(request):
   context = {'videos': videos, 'title':'Главная'}
   return render(request,'main.html',context=context)
 
-
-def handler404(request, *args, **argv):
-  return render(request,'base_error.html',context={'error_code':'404'})
-
-def handler500(request, *args, **argv):
-  return render(request,'base_error.html',context={'error_code':'500'})
