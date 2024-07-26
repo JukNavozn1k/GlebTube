@@ -6,7 +6,7 @@
               hx-get="{% url 'search' %}"
               hx-swap="innerHTML"
               hx-target="#video_list"
-              hx-trigger="click"
+              hx-trigger="load, click"
               hx-include="#search_input"
               hx-vars="search_query:document.getElementById('search_input').value" 
               >
