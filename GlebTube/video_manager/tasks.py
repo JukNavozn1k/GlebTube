@@ -2,7 +2,7 @@ from celery import shared_task
 
 @shared_task
 def refresh_history(video_id,viewer_id):
-    from user_manager.models import WatchHistory
+    from profiles.models import WatchHistory
     new_watch = WatchHistory(video_id=video_id,viewer_id=viewer_id)
     new_watch.save()
 
