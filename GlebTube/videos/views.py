@@ -27,8 +27,7 @@ def search_my_videos(request):
 
 def my_videos(request):
     if not request.user.is_authenticated: return redirect(reverse('signIn'))
-    videos = Video.objects.filter(author=request.user)
-    context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
+    context = {'author_buttons':True,'title':'Мои видео'}
     return render(request,'main.html',context=context)
 
 def rm_video_modal(request,video_id):
