@@ -28,6 +28,7 @@ urlpatterns = [
     path('',views.home),
     path('admin/', admin.site.urls),
     path('auths/',include('auths.urls')),
+    path('profiles/',include('profiles.urls')),
     path('',include('user_manager.urls')),
     path('',include('video_manager.urls')),
     path('', include('social_django.urls', namespace='social')),
