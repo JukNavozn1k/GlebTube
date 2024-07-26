@@ -1,6 +1,6 @@
 {% extends 'index.html' %}
 
-{% block title %} {{video.caption}} - GlebTube  {% endblock %}
+{% block title %} {{video.caption}} {% endblock %}
 
 {%block content %}
 
@@ -13,10 +13,6 @@
 <!--Styles-->
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 <link rel="stylesheet" a href="{% static '/css/enchanced_player.css' %}"> 
-
-<link rel="stylesheet" a href="{% static '/css/md_style.css' %}"> 
-
-
 
 <div class="container mt-5">
   <div class="card mb-3 border-0">
@@ -65,6 +61,5 @@ hx-swap="innerHTML">
 
 
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-
 <script src="{% static '/js/comment_video.js' %}"></script>
 {% endblock %}
