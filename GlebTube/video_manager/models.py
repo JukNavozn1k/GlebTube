@@ -18,7 +18,7 @@ class Video(models.Model):
     )
 
     id = models.BigAutoField(primary_key=True)
-    caption = models.CharField(max_length=64,null = False,verbose_name="Название")
+    caption = models.CharField(max_length=64,null = False,verbose_name="Название",db_index=True)
     description = models.TextField(max_length=1024,verbose_name="Описание",blank=True,null=True)
 
     thumbnail = models.ImageField(upload_to="thumbnails",null=True,blank=True,verbose_name='Превью')
