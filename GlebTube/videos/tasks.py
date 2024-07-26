@@ -6,6 +6,13 @@ def remove_video(video_id,author_id):
     Video.objects.filter(id=video_id,author_id=author_id).delete()
 
 @shared_task
+def refresh_rates(video_id):
+    from .models import Video,UserVideoRelation
+    video = Video.objects.get(id=video_id)
+    video.stars_count = UserVideoRelation.objects.filter(grade=1,video__id=video_id).count()
+    video.save()
+
+@shared_task
 def video_encode(duration,video_id):
     import subprocess
     import os

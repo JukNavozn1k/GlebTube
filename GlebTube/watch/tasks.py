@@ -15,13 +15,6 @@ def refresh_views(video_id):
     video.save()
 
 @shared_task
-def refresh_rates(video_id):
-    from videos.models import Video,UserVideoRelation
-    video = Video.objects.get(id=video_id)
-    video.stars_count = UserVideoRelation.objects.filter(grade=1,video__id=video_id).count()
-    video.save()
-
-@shared_task
 def remove_comment(comment_id,author_id):
     from videos.models import CommentVideo
     CommentVideo.objects.filter(id=comment_id,author__id = author_id).delete()
