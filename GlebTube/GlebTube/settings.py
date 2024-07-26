@@ -188,3 +188,4 @@ CACHE_ALL_VIDEO_QUERYSET_TIMEOUT = 60*60*5
 
 
 DEFAULT_AVATAR_URL = 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png'
+DEFAULT_THUMBNAIL_URL = 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png'
