@@ -9,7 +9,7 @@
                     <div class="d-flex flex-column justify-content-start ml-2 mx-3"><span 
                       onclick="location.href='{% url 'user_profile' comment.author_id %}';" style="cursor:pointer;"
                       class="d-block font-weight-bold name"><strong>{{comment.author}}</strong></span>
-                      <span class="date"><i>{{comment.date_uploaded|date:"m.d.Y"}}</i></span></div>
+                      <span class="date"><i>Дата публикации: {{comment.date_uploaded|date:"m.d.Y"}}</i></span></div>
                 </div>
                 <div class="mt-2">
                     <div class="md_content">
