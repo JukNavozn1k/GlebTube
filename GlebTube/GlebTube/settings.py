@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "debug_toolbar",
+    'debug_toolbar',
     'social_django',
     'auths',
     'user_manager',
@@ -152,18 +152,18 @@ SOCIAL_AUTH_GITHUB_SECRET = '1104a98ea90a5f86d2b5a90086d16be350ed62e6'
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 # Social auth
 
+if DEBUG:
+    INTERNAL_IPS = [
+        # ...
+        "127.0.0.1",
+        # ...
+    ]
 
-INTERNAL_IPS = [
-    # ...
-    "127.0.0.1",
-    # ...
-]
-
-def showToolbar(request):
-    return True
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': showToolbar,
-}
+    def showToolbar(request):
+        return True
+    DEBUG_TOOLBAR_CONFIG = {
+        'SHOW_TOOLBAR_CALLBACK': showToolbar,
+    }
 
 CELERY_BROKER_URL= 'redis://redis:6379/0'
 # CELERY_RESULT_BACKEND=' redis://redis:6379/0'
