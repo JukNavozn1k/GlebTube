@@ -43,8 +43,8 @@ class Subscription(models.Model):
             Allows you to register subscriptions. 
             Unsubscription is performed by deleting records
       '''
-      subscriber = models.ForeignKey(User,on_delete=models.CASCADE,related_name='subscriber',verbose_name='Подписчик')
-      author = models.ForeignKey(User,on_delete=models.CASCADE,related_name='author',verbose_name='Автор')
+      subscriber = models.ForeignKey(User,on_delete=models.CASCADE,related_name='subscriptions',verbose_name='Подписчик')
+      author = models.ForeignKey(User,on_delete=models.CASCADE,related_name='subscribers',verbose_name='Автор')
       active = models.BooleanField(verbose_name='Подписка активна',default=False)
       class Meta:
             constraints = [
