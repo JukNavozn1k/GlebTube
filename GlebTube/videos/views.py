@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 
 
-
+from . import tasks
 
 
 def my_videos(request):
@@ -23,6 +23,11 @@ def my_videos(request):
 def rm_video_modal(request,video_id):
     return render(request,'modals/rm_video_modal_confirm.html',context={'video_id':video_id})
 
+def delete_video(request,video_id):
+        if request.user.is_authenticated :
+                tasks.remove_video.delay(video_id,request.user.id)
+                return HttpResponse("",status=200)
+        else: return HttpResponse("",status=401)
 
 
 class UploadVideo(View):

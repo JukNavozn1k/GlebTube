@@ -23,6 +23,7 @@
   {% include 'video/video_loading_load.html' %}
     
   </div>
+
 <div class="post float-right" data-post-id="{{video.id}}">
 <div class = "rate_container float-right"
 hx-get="{% url 'rate_video' video.id %}" hx-swap="innerHTML" hx-trigger="revealed">

@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'auths',
     'profiles',
     'videos',
-    'video_manager',
+    'watch',
 ]
 
 MIDDLEWARE = [
