@@ -67,10 +67,9 @@ class UserVideoRelation(models.Model):
 
     
 class CommentVideo(models.Model):
-    instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",db_index=True)
-    
-    author = models.ForeignKey(User,on_delete=models.CASCADE)
-    content = models.TextField(null=False)
+    instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='comments')
+    author = models.ForeignKey(User,on_delete=models.CASCADE,related_name='user_comments')
+    content = models.TextField(null=False,blank=False,verbose_name='Контент')
     date_uploaded = models.DateTimeField(default=timezone.now)
     class Meta:
          verbose_name = 'Комментарий-Видео'
