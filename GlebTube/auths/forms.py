@@ -1,8 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
 
-from . models import UserAdditional
-
 class AuthForm(forms.ModelForm):    
     class Meta:
         model = User
@@ -30,20 +28,3 @@ class AuthForm(forms.ModelForm):
             'password' : 'Хороший пароль – всегда комбинированный. В нем используются символы, буквы и цифры разного регистра. Длина пароля – желательно не менее 8 символов, а лучше не менее 12. Избегайте смысловых паролей: не используйте распространенные фразы или слова.',
             
         }
-
-class UserAdditionalForm(forms.ModelForm):    
-    class Meta:
-        model = UserAdditional
-        fields = ('profile_description','avatar',)
-        
-        widgets = {
-            
-            'profile_description' : forms.Textarea(attrs={'class' : 'form-control','placeholder':'Ахуительное описание...'}),
-            'avatar' : forms.FileInput(attrs={'class' : 'form-control form-control-sm'}),
-           
-        }
-        labels = {
-            'profile_description' : 'Описание профиля',
-            'avatar' : 'Аватар',
-        }
-       

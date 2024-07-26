@@ -18,7 +18,7 @@ class Video(models.Model):
     )
 
     id = models.BigAutoField(primary_key=True)
-    caption = models.CharField(max_length=64,null = False,verbose_name="Название")
+    caption = models.CharField(max_length=64,null = False,verbose_name="Название",db_index=True)
     description = models.TextField(max_length=1024,verbose_name="Описание",blank=True,null=True)
 
     thumbnail = models.ImageField(upload_to="thumbnails",null=True,blank=True,verbose_name='Превью')
@@ -36,7 +36,7 @@ class Video(models.Model):
     stars_count = models.PositiveBigIntegerField(default=0,verbose_name='Количество звёзд')
 
     date_uploaded = models.DateTimeField(default=timezone.now,verbose_name="Дата публикации")
-    author = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name="Автор")
+    author = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name="Автор",related_name='user_videos')
 
     
     class Meta: 
@@ -51,7 +51,7 @@ class UserVideoRelation(models.Model):
    
     user = models.ForeignKey(User,on_delete=models.CASCADE,verbose_name="Зритель")
     grade = models.BooleanField(default=0,choices=CHOICES,verbose_name="Оценка")
-    video = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='rates')
+    video = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='video_rates')
     def __str__(self) -> str:
         return f'{self.id} : {self.user} -> {self.CHOICES[self.grade][1]}'
     class Meta:
@@ -64,19 +64,15 @@ class UserVideoRelation(models.Model):
         tasks.refresh_rates.delay(self.video.id)
         super().save(*args,**kwargs)
 
-# Comment models
-class Comment(models.Model):
-    instance = models.Field()
-    author = models.ForeignKey(User,on_delete=models.CASCADE)
-    content = models.TextField(null=False)
+
+    
+class CommentVideo(models.Model):
+    instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='video_comments')
+    author = models.ForeignKey(User,on_delete=models.CASCADE,related_name='user_comments')
+    content = models.TextField(null=False,blank=False,verbose_name='Контент')
     date_uploaded = models.DateTimeField(default=timezone.now)
-    class Meta:
-        # unique_together = ['instance', 'author'] user can send many comments to one video/comment
-        abstract = True
-    def __str__(self) -> str:
-        return f'{self.id} : {self.author} -> {self.instance}'
-class CommentVideo(Comment):
-    instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",db_index=True)
     class Meta:
          verbose_name = 'Комментарий-Видео'
          verbose_name_plural = 'Коментарии-Видео'
+    def __str__(self) -> str:
+        return f'{self.id} : {self.author} -> {self.instance}'

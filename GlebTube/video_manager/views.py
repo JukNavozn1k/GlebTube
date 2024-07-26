@@ -1,3 +1,5 @@
+import os 
+
 from django.shortcuts import render,redirect
 from django.http import FileResponse, HttpResponse
 
@@ -11,16 +13,9 @@ from .models import Video
 from . import tasks
 
 from django.db.models import Prefetch
-
 from django.contrib.auth.models import User
 
-import os 
-from django.shortcuts import render
 from django.urls import reverse
-from django.http import FileResponse, HttpResponse
-from django.shortcuts import get_object_or_404
-from .models import Video
-
 
 
 def serve_hls_playlist(request, video_id):
@@ -53,11 +48,6 @@ def serve_hls_segment(request, video_id, segment_name):
         return HttpResponse("Video or HLS segment not found", status=404)
 
 
-
-
-
-
-
 class UploadVideo(View):
     def get(self,request):
         if not request.user.is_authenticated:
@@ -67,7 +57,6 @@ class UploadVideo(View):
         if not request.user.is_authenticated: return HttpResponse("",status=401)
 
         form = forms.UploadForm(request.POST,request.FILES)
-      
         if form.is_valid():
             video  = form.save()
             video.author = request.user
@@ -126,13 +115,14 @@ class CommentVideo(View):
         comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').prefetch_related(
            users_with_additional)
         context = {'comments':comments}
-        return render(request,'comment_list.html',context=context)
+        return render(request,'comments/comment_list.html',context=context)
     def post(self,request,video_id):
-        if request.user.is_authenticated:
-            comment = request.POST.get('comment')
+        comment = request.POST.get('comment')
+        if request.user.is_authenticated and len(comment) > 0:
+            
             new_comment = models.CommentVideo(author=request.user,instance_id=video_id,content=comment)
             new_comment.save()
-            return render(request,'comment.html',context={'comment':new_comment})
+            return render(request,'comments/comment.html',context={'comment':new_comment})
         return render(request,'alerts/error.html',context={'desc' : 'Невозможно добавить комментарий'})
     def delete(self,request,comment_id):
                 if not request.user.is_authenticated: return render(request,'alerts/error.html',context={'desc' : 'Невозможно удалить комментарий'})
