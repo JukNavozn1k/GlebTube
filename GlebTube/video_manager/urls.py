@@ -3,8 +3,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-  path('upload/',views.UploadVideo.as_view(),name='upload'),
-  path('edit/video/<int:video_id>',views.EditVideo.as_view(),name='edit_video'),
+  
   
   path('video/<int:video_id>',views.VideoView.as_view(),name='video'),
   

@@ -6,7 +6,7 @@ from . import forms
 from . import models
 from . import tasks
 
-from video_manager.models import Video,UserVideoRelation
+from videos.models import Video,UserVideoRelation
 
 
 from django.contrib.auth.models import User

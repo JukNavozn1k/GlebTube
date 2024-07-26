@@ -4,7 +4,7 @@ from django.db import models
 from django.db import models
 
 from django.contrib.auth.models import User
-from video_manager.models import Video
+from videos.models import Video
 
 from django.core.exceptions import ValidationError
 
