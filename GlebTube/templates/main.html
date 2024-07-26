@@ -12,7 +12,7 @@
       <div class="form input-group">
         <input type="text" id="search_input" class="form-control form-input" placeholder="Летс плей по майнкрафту">
         <span class="input-group-text btn btn-primary"
-              hx-get="/search/"
+              hx-get="{% url 'search' %}"
               hx-swap="innerHTML"
               hx-target="#video_list"
               hx-trigger="click"
