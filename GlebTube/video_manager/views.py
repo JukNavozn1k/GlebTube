@@ -48,11 +48,6 @@ def serve_hls_segment(request, video_id, segment_name):
         return HttpResponse("Video or HLS segment not found", status=404)
 
 
-
-
-
-
-
 class UploadVideo(View):
     def get(self,request):
         if not request.user.is_authenticated:
@@ -62,7 +57,6 @@ class UploadVideo(View):
         if not request.user.is_authenticated: return HttpResponse("",status=401)
 
         form = forms.UploadForm(request.POST,request.FILES)
-      
         if form.is_valid():
             video  = form.save()
             video.author = request.user
