@@ -1,18 +1,9 @@
 from celery import shared_task
 
 @shared_task
-def refresh_history(video_id,viewer_id):
-    from profiles.models import WatchHistory
-    new_watch = WatchHistory(video_id=video_id,viewer_id=viewer_id)
-    new_watch.save()
-
-@shared_task
-def refresh_views(video_id):
+def remove_video(video_id,author_id):
     from .models import Video
-    from django.db.models import F
-    video = Video.objects.get(id=video_id)
-    video.views = F('views') + 1
-    video.save()
+    Video.objects.filter(id=video_id,author_id=author_id).delete()
 
 @shared_task
 def refresh_rates(video_id):
@@ -20,24 +11,6 @@ def refresh_rates(video_id):
     video = Video.objects.get(id=video_id)
     video.stars_count = UserVideoRelation.objects.filter(grade=1,video__id=video_id).count()
     video.save()
-
-@shared_task
-def remove_comment(comment_id,author_id):
-    from .models import CommentVideo
-    CommentVideo.objects.filter(id=comment_id,author__id = author_id).delete()
-
-@shared_task
-def update_video_rate(video_id,author_id):
-    from .models import UserVideoRelation
-    user_video_relation = UserVideoRelation.objects.get(video_id=video_id, user_id=author_id)
-    user_video_relation.grade = not user_video_relation.grade
-    user_video_relation.save()
-    refresh_rates.delay(video_id)
-
-@shared_task
-def remove_video(video_id,author_id):
-    from .models import Video
-    Video.objects.filter(id=video_id,author_id=author_id).delete()
 
 @shared_task
 def video_encode(duration,video_id):
