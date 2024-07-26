@@ -42,7 +42,7 @@ hx-get="{% url 'rate_video' video.id %}" hx-swap="innerHTML" hx-trigger="reveale
         <img class="rounded-circle mx-3" src="{{user.additional.avatar | parse_avatar}}" width="50" height="50">
         <textarea class="form-control ml-1 shadow-none textarea" id="comment" placeholder="Введите комментарий"></textarea>
     </div>
-    <div class="mt-2 text-right">
+    <div class="mt-2 float-end">
         <button type="button" id="clearButton" class="btn btn-outline-primary btn-sm shadow-none"><i class="bi bi-trash"></i></button>
         <button hx-post="{% url 'add_comment' video.id %}" hx-vars="comment:document.getElementById('comment').value" 
          hx-target=".comment_list"
@@ -51,8 +51,8 @@ hx-get="{% url 'rate_video' video.id %}" hx-swap="innerHTML" hx-trigger="reveale
          class="btn btn-primary btn-sm shadow-none  " id="sendButton" type="button"><i class="bi bi-send"> Отправить</i></button>
     </div>
 </div>
-
-<div class="comment_list"
+<br>
+<div class="comment_list mt-4"
 hx-get="{% url 'fetch_comments' video.id %}"
 hx-trigger="revealed"
 hx-swap="innerHTML">
