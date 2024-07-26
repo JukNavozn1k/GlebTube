@@ -16,7 +16,9 @@ from . import tasks
 def search_videos(request):
     
     print(request.GET)
-    return HttpResponse(str(request.GET))
+    videos = Video.objects.filter(caption__icontains=request.GET['search_query'])
+    context={'videos':videos}
+    return render(request,'video/video_list.html',context=context)
 
 def my_videos(request):
         if not request.user.is_authenticated: return redirect(reverse('signIn'))
