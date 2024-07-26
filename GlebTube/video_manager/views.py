@@ -117,8 +117,9 @@ class CommentVideo(View):
         context = {'comments':comments}
         return render(request,'comments/comment_list.html',context=context)
     def post(self,request,video_id):
-        if request.user.is_authenticated:
-            comment = request.POST.get('comment')
+        comment = request.POST.get('comment')
+        if request.user.is_authenticated and len(comment) > 0:
+            
             new_comment = models.CommentVideo(author=request.user,instance_id=video_id,content=comment)
             new_comment.save()
             return render(request,'comments/comment.html',context={'comment':new_comment})
