@@ -121,13 +121,13 @@ class CommentVideo(View):
         comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').prefetch_related(
            users_with_additional)
         context = {'comments':comments}
-        return render(request,'comment_list.html',context=context)
+        return render(request,'comments/comment_list.html',context=context)
     def post(self,request,video_id):
         if request.user.is_authenticated:
             comment = request.POST.get('comment')
             new_comment = models.CommentVideo(author=request.user,instance_id=video_id,content=comment)
             new_comment.save()
-            return render(request,'comment.html',context={'comment':new_comment})
+            return render(request,'comments/comment.html',context={'comment':new_comment})
         return render(request,'alerts/error.html',context={'desc' : 'Невозможно добавить комментарий'})
     def delete(self,request,comment_id):
                 if not request.user.is_authenticated: return render(request,'alerts/error.html',context={'desc' : 'Невозможно удалить комментарий'})
