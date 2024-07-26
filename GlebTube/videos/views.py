@@ -14,24 +14,31 @@ from django.shortcuts import get_object_or_404
 from . import tasks
 
 def search_videos(request):
-    
-    print(request.GET)
-    return HttpResponse(str(request.GET))
+
+    videos = Video.objects.filter(caption__icontains=request.GET['search_query'])
+    context={'videos':videos}
+    return render(request,'video/video_list.html',context=context)
+
+def search_my_videos(request):
+    if not request.user.is_authenticated: return redirect(reverse('signIn'))
+    videos = Video.objects.filter(caption__icontains=request.GET['search_query'],author=request.user)
+    context={'videos':videos,'author_buttons':True}
+    return render(request,'video/video_list.html',context=context)
 
 def my_videos(request):
-        if not request.user.is_authenticated: return redirect(reverse('signIn'))
-        videos = Video.objects.filter(author=request.user)
-        context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
-        return render(request,'main.html',context=context)
+    if not request.user.is_authenticated: return redirect(reverse('signIn'))
+    videos = Video.objects.filter(author=request.user)
+    context = {'videos': videos,'author_buttons':True,'title':'Мои видео'}
+    return render(request,'main.html',context=context)
 
 def rm_video_modal(request,video_id):
     return render(request,'modals/rm_video_modal_confirm.html',context={'video_id':video_id})
 
 def delete_video(request,video_id):
-        if request.user.is_authenticated :
-                tasks.remove_video.delay(video_id,request.user.id)
-                return HttpResponse("",status=200)
-        else: return HttpResponse("",status=401)
+    if request.user.is_authenticated :
+            tasks.remove_video.delay(video_id,request.user.id)
+            return HttpResponse("",status=200)
+    else: return HttpResponse("",status=401)
 
 
 class UploadVideo(View):
