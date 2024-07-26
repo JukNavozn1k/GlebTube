@@ -22,6 +22,7 @@ def remove_comment(comment_id,author_id):
 @shared_task
 def update_video_rate(video_id,author_id):
     from videos.models import UserVideoRelation
+    from videos.tasks import refresh_rates
     user_video_relation = UserVideoRelation.objects.get(video_id=video_id, user_id=author_id)
     user_video_relation.grade = not user_video_relation.grade
     user_video_relation.save()
