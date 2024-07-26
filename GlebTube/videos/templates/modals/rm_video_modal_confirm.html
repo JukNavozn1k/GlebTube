@@ -8,7 +8,7 @@
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-danger"
-    hx-delete="/video/{{video_id}}"
+    hx-delete="{% url 'delete_video' video_id %}"
     hx-swap="outerHTML"
     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
     hx-target=".video_{{video_id}}"

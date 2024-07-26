@@ -1,5 +1,5 @@
 <div class="video_wrapper"
-hx-get="/fetch/video/{{video.id}}"
+hx-get="{% url 'fetch_video' video.id %}"
     hx-trigger="every 5000ms"
     hx-swap="outerHTML"
 >
