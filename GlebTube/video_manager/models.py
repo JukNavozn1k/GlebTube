@@ -64,19 +64,16 @@ class UserVideoRelation(models.Model):
         tasks.refresh_rates.delay(self.video.id)
         super().save(*args,**kwargs)
 
-# Comment models
-class Comment(models.Model):
-    instance = models.Field()
+
+    
+class CommentVideo(models.Model):
+    instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",db_index=True)
+    
     author = models.ForeignKey(User,on_delete=models.CASCADE)
     content = models.TextField(null=False)
     date_uploaded = models.DateTimeField(default=timezone.now)
     class Meta:
-        # unique_together = ['instance', 'author'] user can send many comments to one video/comment
-        abstract = True
-    def __str__(self) -> str:
-        return f'{self.id} : {self.author} -> {self.instance}'
-class CommentVideo(Comment):
-    instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",db_index=True)
-    class Meta:
          verbose_name = 'Комментарий-Видео'
          verbose_name_plural = 'Коментарии-Видео'
+    def __str__(self) -> str:
+        return f'{self.id} : {self.author} -> {self.instance}'
