@@ -1,6 +1,6 @@
 
 <button type="button" 
-hx-put="/profile_action/{{user.id}}/subscribe" 
+hx-put="{% url 'subscribe' user.id %}" 
 hx-swap="outerHTML"
 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'  
 class="btn btn-danger btn-sm">

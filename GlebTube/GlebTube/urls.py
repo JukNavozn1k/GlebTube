@@ -19,16 +19,16 @@ from django.urls import path,include
 
 from django.conf import settings
 from django.conf.urls.static import static
-from debug_toolbar.toolbar import debug_toolbar_urls
-from .settings import DEBUG
 
-from django.conf.urls import (handler400, handler403, handler404, handler500)
+from .settings import DEBUG
 
 from . import views
 
 urlpatterns = [
     path('',views.home),
     path('admin/', admin.site.urls),
+    path('auths/',include('auths.urls')),
+    path('profiles/',include('profiles.urls')),
     path('',include('user_manager.urls')),
     path('',include('video_manager.urls')),
     path('', include('social_django.urls', namespace='social')),
@@ -36,8 +36,7 @@ urlpatterns = [
 ] 
 
 if DEBUG:
+    from debug_toolbar.toolbar import debug_toolbar_urls
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
     urlpatterns += debug_toolbar_urls()
 
-handler404 = 'GlebTube.views.handler404'
-handler500 = 'GlebTube.views.handler500'
