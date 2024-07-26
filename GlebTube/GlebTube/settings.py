@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'social_django',
     'auths',
     'profiles',
-    'user_manager',
+    'videos',
     'video_manager',
 ]
 
@@ -62,7 +62,9 @@ ROOT_URLCONF = 'GlebTube.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['GlebTube/user_manager/templates','GlebTube/video_manager/templates','templates/', 'GlebTube/auths/templates','GlebTube/profiles/templates'],
+        'DIRS': ['GlebTube/user_manager/templates','GlebTube/video_manager/templates','templates/', 'GlebTube/auths/templates','GlebTube/profiles/templates'
+                 ,'GlebTube/videos/templates'
+                 ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

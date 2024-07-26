@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from video_manager import models
+from videos import models
 
 
 def home(request):

@@ -29,7 +29,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auths/',include('auths.urls')),
     path('profiles/',include('profiles.urls')),
-    path('',include('user_manager.urls')),
+    path('videos/',include('videos.urls')),
     path('',include('video_manager.urls')),
     path('', include('social_django.urls', namespace='social')),
     path('accounts/profile/', views.home),

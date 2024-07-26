@@ -1,5 +1,5 @@
 <button type="button" class="btn btn-warning btn-sm shadow-none"
-  hx-put="/rate_video/{{video.id}}/"
+  hx-put="{% url 'rate_video' video.id %}"
   hx-swap="outerHTML"
   hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
   hx-trigger="click"
