@@ -13,6 +13,10 @@ from django.shortcuts import get_object_or_404
 
 from . import tasks
 
+def search_videos(request):
+    
+    print(request.GET)
+    return HttpResponse(str(request.GET))
 
 def my_videos(request):
         if not request.user.is_authenticated: return redirect(reverse('signIn'))
