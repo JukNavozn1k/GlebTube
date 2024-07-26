@@ -27,10 +27,10 @@ from . import views
 urlpatterns = [
     path('',views.home),
     path('admin/', admin.site.urls),
-    path('auths/',include('auths.urls')),
-    path('profiles/',include('profiles.urls')),
-    path('videos/',include('videos.urls')),
-    path('',include('video_manager.urls')),
+    path('',include('auths.urls')),
+    path('',include('profiles.urls')),
+    path('',include('videos.urls')),
+    path('',include('watch.urls')),
     path('', include('social_django.urls', namespace='social')),
     path('accounts/profile/', views.home),
 ] 
