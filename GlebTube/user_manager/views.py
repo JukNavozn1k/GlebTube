@@ -84,14 +84,14 @@ class UserVideos(views.View):
     # Returns query of user videos    
     def get(self,request,user):
             queryset = Video.objects.filter(author__id = user)
-            return render(request,'video_list.html', context={'videos': queryset})
+            return render(request,'video/video_list.html', context={'videos': queryset})
 # Same as UserVideos   
 class UserLiked(views.View):
     # Returns query of user liked videos    
     def get(self,request,user):
             queryset = UserVideoRelation.objects.all().filter(grade=1,user__id=user).select_related('video')
             queryset = [q.video for q in queryset]
-            return render(request,'video_list.html',context={'videos': queryset})
+            return render(request,'video/video_list.html',context={'videos': queryset})
 
 
 class Subscribe(views.View):
@@ -122,7 +122,7 @@ class History(views.View):
             videos = models.WatchHistory.objects.filter(viewer__id=user).select_related('video').order_by('-id')
             videos = [v.video for v in videos]
             context = {'videos':videos,'title':'История'}
-            return render(request,'video_list.html',context=context)
+            return render(request,'video/video_list.html',context=context)
       def delete(self,request):
           if request.user.is_authenticated:
             tasks.clear_history.delay(request.user.id)

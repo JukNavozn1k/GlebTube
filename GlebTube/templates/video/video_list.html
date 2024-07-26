@@ -3,9 +3,9 @@
     {% for video in videos %}
   
     {% if  author_buttons == True %}
-    {% include 'video_edit_card.html' %}
+    {% include 'video/video_edit_card.html' %}
     {% else %}
-    {%include 'video_card.html' %}
+    {%include 'video/video_card.html' %}
     {% endif %}
     {% endfor %}
     {% if not videos %}
