@@ -1,3 +1,5 @@
+import os 
+
 from django.shortcuts import render,redirect
 from django.http import FileResponse, HttpResponse
 
@@ -11,16 +13,9 @@ from .models import Video
 from . import tasks
 
 from django.db.models import Prefetch
-
 from django.contrib.auth.models import User
 
-import os 
-from django.shortcuts import render
 from django.urls import reverse
-from django.http import FileResponse, HttpResponse
-from django.shortcuts import get_object_or_404
-from .models import Video
-
 
 
 def serve_hls_playlist(request, video_id):
