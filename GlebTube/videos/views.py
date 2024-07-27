@@ -15,13 +15,13 @@ from . import tasks
 
 def search_videos(request):
 
-    videos = Video.objects.filter(caption__icontains=request.GET['search_query'])
+    videos = Video.objects.filter(caption__icontains=request.GET['search_query']).order_by('-stars_count','-id')
     context={'videos':videos}
     return render(request,'video/video_list.html',context=context)
 
 def search_my_videos(request):
     if not request.user.is_authenticated: return redirect(reverse('signIn'))
-    videos = Video.objects.filter(caption__icontains=request.GET['search_query'],author=request.user)
+    videos = Video.objects.filter(caption__icontains=request.GET['search_query'],author=request.user).order_by('-stars_count','-id')
     context={'videos':videos,'author_buttons':True}
     return render(request,'video/video_list.html',context=context)
 
