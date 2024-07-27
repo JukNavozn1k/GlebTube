@@ -18,28 +18,14 @@ from django.urls import reverse
 
 
 
-
-
-class VideoPlayer(View):
-    def get(self,request,video_id):
-        video = get_object_or_404(models.Video,id=video_id)
-        if video.status == 'Completed':
-            hls_playlist_url = reverse('serve_hls_playlist', args=[video.id])
-            context = {'video':video,'hls_url': hls_playlist_url} 
-            return render(request,'video/video_loaded.html',context=context)
-        else: 
-            context = {'video':video} 
-            return render(request,'video/video_loading_delay.html',context=context)
-            
-
-
 class VideoView(View):
     def get(self,request,video_id):
         video = get_object_or_404(models.Video,id=video_id)
         if request.user.is_authenticated: 
             tasks.refresh_history.delay(video.id,request.user.id)
-
-        context = {'video':video} 
+            
+        hls_playlist_url = reverse('serve_hls_playlist', args=[video.id])
+        context = {'video':video,'hls_url': hls_playlist_url} 
         tasks.refresh_views.delay(video_id)
         return render(request,'watch.html',context=context)
     

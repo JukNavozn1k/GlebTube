@@ -10,6 +10,8 @@ from django.urls import reverse
 
 from django.shortcuts import get_object_or_404
 
+from django.core.cache import cache
+from . import settings
 
 def serve_hls_playlist(request, video_id):
     try:
@@ -31,8 +33,14 @@ def serve_hls_playlist(request, video_id):
 
 def serve_hls_segment(request, video_id, segment_name):
     try:
-        video = get_object_or_404(models.Video, pk=video_id)
-        hls_directory = os.path.join(os.path.dirname(video.video.path), 'hls_output')
+        KEY = settings.CACHE_HLS_PATH(video_id)
+        CACHE = cache.get(KEY)
+        if CACHE:
+            hls_directory = CACHE
+        else:
+            video = get_object_or_404(models.Video, pk=video_id)
+            hls_directory = os.path.join(os.path.dirname(video.video.path), 'hls_output')
+            cache.set(KEY,hls_directory,timeout=settings.CACHE_HLS_TIMEOUT)
         segment_path = os.path.join(hls_directory, segment_name)
 
         # Serve the HLS segment as a binary file response

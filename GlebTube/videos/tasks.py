@@ -8,9 +8,14 @@ def remove_video(video_id,author_id):
 @shared_task
 def refresh_rates(video_id):
     from .models import Video,UserVideoRelation
+    from profiles.tasks import refresh_user_stats
     video = Video.objects.get(id=video_id)
     video.stars_count = UserVideoRelation.objects.filter(grade=1,video__id=video_id).count()
     video.save()
+    # refresh_total_rates.delay(video.author_id)
+    refresh_user_stats.delay(video.author_id)
+
+
 
 @shared_task
 def video_encode(duration,video_id):

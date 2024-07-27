@@ -14,6 +14,7 @@ def refresh_views(video_id):
     video.views = F('views') + 1
     video.save()
 
+
 @shared_task
 def remove_comment(comment_id,author_id):
     from videos.models import CommentVideo
@@ -27,4 +28,7 @@ def update_video_rate(video_id,author_id):
     user_video_relation.grade = not user_video_relation.grade
     user_video_relation.save()
     refresh_rates.delay(video_id)
+
+
+
 

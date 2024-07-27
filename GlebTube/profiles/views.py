@@ -10,6 +10,7 @@ from videos.models import Video,UserVideoRelation
 
 
 from django.contrib.auth.models import User
+from .models import UserAdditional
 
 from django.shortcuts import get_object_or_404
 
@@ -18,10 +19,11 @@ from django.shortcuts import get_object_or_404
 class Profile(views.View):
     def get(self,request,user):
         user = get_object_or_404(User,id=user)
-        isOwner = request.user == user
-        stars_count = UserVideoRelation.objects.all().filter(grade=1,video__in = Video.objects.filter(author__id=user.id)).count()
-        subscribers_count = models.Subscription.objects.all().filter(author__id = user.id,active=True).count()
-        context = {'isOwner':isOwner,'user': user,'stars_count':stars_count,'subscribers_count':subscribers_count}
+        additonal,created = UserAdditional.objects.get_or_create(user_id=user.id)
+        isOwner = request.user.id == user.id
+        stars_count = additonal.stars_count
+        subscribers_count = additonal.subs_count
+        context = {'isOwner':isOwner,'user': user,'stars_count':stars_count,'subscribers_count':subscribers_count,'additional':additonal}
         return render(request,'profile/profile.html',context=context)
 
 class ProfileEdit(views.View):

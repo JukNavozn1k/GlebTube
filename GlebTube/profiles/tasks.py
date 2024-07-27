@@ -11,3 +11,16 @@ def update_subscription(user_id,author_id):
     sub = Subscription.objects.get(subscriber_id=user_id,author_id=author_id)
     sub.active = not sub.active
     sub.save()
+    refresh_user_stats.delay(author_id)
+    
+    
+@shared_task
+def refresh_user_stats(author_id):
+    from videos.models import UserVideoRelation
+    from .models import UserAdditional,Subscription
+    stars_count =  UserVideoRelation.objects.filter(video__author_id=author_id,grade=1).count()
+    additonal, created = UserAdditional.objects.get_or_create(user_id=author_id)
+    additonal.stars_count=stars_count 
+    additonal.subs_count = Subscription.objects.filter(author_id=author_id,active=True).count()
+    additonal.save()
+    
