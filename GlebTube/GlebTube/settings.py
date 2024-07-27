@@ -190,4 +190,4 @@ CACHE_HLS_PATH = lambda video_id: f'CACHE_HLS_PATH:{video_id}'
 
 
 DEFAULT_AVATAR_URL = 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png'
-DEFAULT_THUMBNAIL_URL = 'https://st2.depositphotos.com/3643473/6206/i/950/depositphotos_62068027-stock-photo-person-and-question-mark.jpg'
+DEFAULT_THUMBNAIL_URL = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQztLRnAWYw2TSTe-eQpoMj3PM3qlfHddTKXA&usqp=CAU'
