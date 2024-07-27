@@ -27,8 +27,6 @@ class UserAdditional(models.Model):
       profile_description = models.TextField(max_length=1024,verbose_name='Описание',blank=True,null=True)
       avatar = models.ImageField(upload_to='user_avatars',verbose_name='Аватар',null=True,blank=True)
 
-      stars_count = models.PositiveBigIntegerField(default=0,verbose_name='Количество звёзд')
-      subscribers_count = models.PositiveBigIntegerField(default=0,verbose_name='Количество подписчкиков')
       class Meta: 
           verbose_name = 'Дополнение к пользователю'
           verbose_name_plural = 'Дополнения к пользователям'

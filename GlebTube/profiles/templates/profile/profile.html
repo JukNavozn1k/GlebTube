@@ -4,7 +4,7 @@
 {% block content %}
 {% load user_filters %}
 {% csrf_token %}
-<div class="bg-white">
+<div>
     <div class="container">
       <div class="text-center py-5">
         <img src="{{user.additional.avatar| parse_avatar}}" width="120" height="120" alt class="ui-w-100 rounded-circle">
