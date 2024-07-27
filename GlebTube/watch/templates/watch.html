@@ -21,7 +21,7 @@
     <video preload="none" id="player" autoplay controls crossorigin playsinline controls></video>
     {% else %}
     {% include 'spinners/loading_spinner.html' %}
-    <p class="text-muted text-center">Видео загружается</p>
+    <p class="text-muted text-center">Видео загружается...</p>
     {% endif %}
     <div class="card-body">
       <h5 class="card-title text-uppercase font-weight-bold">{{video.caption}}</h5>
