@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
+
     'social_django',
     'auths',
     'profiles',
@@ -183,8 +184,9 @@ CACHES = {
 }
 
 # Cache keys
-CACHE_ALL_VIDEO_QUERYSET = 'alL_videos_queryset'
-CACHE_ALL_VIDEO_QUERYSET_TIMEOUT = 60*60*5
+CACHE_HLS_TIMEOUT = 60*60
+CACHE_HLS_PATH = lambda video_id: f'CACHE_HLS_PATH:{video_id}'
+    
 
 
 DEFAULT_AVATAR_URL = 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png'

@@ -24,9 +24,12 @@ class UserAdditional(models.Model):
             without modifying the standard User class
       '''
       user = models.OneToOneField(User,unique=True,on_delete=models.CASCADE,verbose_name='Пользователь',related_name='additional')
-      profile_description = models.TextField(max_length=1024,verbose_name='Описание',blank=True,null=True)
+      profile_description = models.TextField(max_length=1024,verbose_name='Описание',blank=True,null=True,default='')
       avatar = models.ImageField(upload_to='user_avatars',verbose_name='Аватар',null=True,blank=True)
 
+      stars_count = models.PositiveBigIntegerField(default=0, verbose_name='Количество звёзд')
+      subs_count = models.PositiveBigIntegerField(default=0, verbose_name='Количество подписчиков')
+      
       class Meta: 
           verbose_name = 'Дополнение к пользователю'
           verbose_name_plural = 'Дополнения к пользователям'
