@@ -3,7 +3,9 @@ from celery import shared_task
 @shared_task
 def remove_video(video_id,author_id):
     from .models import Video
+    from profiles.tasks import refresh_user_stats
     Video.objects.filter(id=video_id,author_id=author_id).delete()
+    refresh_user_stats.delay(author_id)
 
 @shared_task
 def refresh_rates(video_id):
