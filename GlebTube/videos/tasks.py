@@ -20,7 +20,9 @@ def refresh_total_rates(author_id):
     from django.db.models import F
     from profiles.models import UserAdditional
     stars_count =  UserVideoRelation.objects.filter(video__author_id=author_id,grade=1).count()
-    UserAdditional.objects.filter(user_id=author_id).update(stars_count=stars_count)
+    additonal, created = UserAdditional.objects.get_or_create(user_id=author_id)
+    additonal.stars_count=stars_count 
+    additonal.save()
     
 
 @shared_task
