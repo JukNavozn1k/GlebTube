@@ -38,10 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "debug_toolbar",
+    'debug_toolbar',
+
     'social_django',
-    'user_manager',
-    'video_manager',
+    'auths',
+    'profiles',
+    'videos',
+    'watch',
 ]
 
 MIDDLEWARE = [
@@ -60,7 +63,9 @@ ROOT_URLCONF = 'GlebTube.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['GlebTube/user_manager/templates','GlebTube/video_manager/templates','templates/'],
+        'DIRS': ['templates/', 'GlebTube/auths/templates','GlebTube/profiles/templates'
+                 ,'GlebTube/videos/templates'
+                 ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -139,6 +144,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Social auth
+
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.github.GithubOAuth2',
     'django.contrib.auth.backends.ModelBackend',
@@ -147,20 +153,21 @@ AUTHENTICATION_BACKENDS = (
 SOCIAL_AUTH_GITHUB_KEY = 'Ov23liI30oR2fKgOtORj'
 SOCIAL_AUTH_GITHUB_SECRET = '1104a98ea90a5f86d2b5a90086d16be350ed62e6'
 
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
 # Social auth
 
+if DEBUG:
+    INTERNAL_IPS = [
+        # ...
+        "127.0.0.1",
+        # ...
+    ]
 
-INTERNAL_IPS = [
-    # ...
-    "127.0.0.1",
-    # ...
-]
-
-def showToolbar(request):
-    return True
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': showToolbar,
-}
+    def showToolbar(request):
+        return True
+    DEBUG_TOOLBAR_CONFIG = {
+        'SHOW_TOOLBAR_CALLBACK': showToolbar,
+    }
 
 CELERY_BROKER_URL= 'redis://redis:6379/0'
 # CELERY_RESULT_BACKEND=' redis://redis:6379/0'
@@ -177,8 +184,10 @@ CACHES = {
 }
 
 # Cache keys
-CACHE_ALL_VIDEO_QUERYSET = 'alL_videos_queryset'
-CACHE_ALL_VIDEO_QUERYSET_TIMEOUT = 60*60*5
+CACHE_HLS_TIMEOUT = 60*60
+CACHE_HLS_PATH = lambda video_id: f'CACHE_HLS_PATH:{video_id}'
+    
 
 
 DEFAULT_AVATAR_URL = 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png'
+DEFAULT_THUMBNAIL_URL = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQztLRnAWYw2TSTe-eQpoMj3PM3qlfHddTKXA&usqp=CAU'

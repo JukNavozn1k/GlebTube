@@ -1,43 +1,31 @@
-"""
-URL configuration for GlebTube project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path,include
 
 from django.conf import settings
 from django.conf.urls.static import static
-from debug_toolbar.toolbar import debug_toolbar_urls
-from .settings import DEBUG
 
-from django.conf.urls import (handler400, handler403, handler404, handler500)
+from .settings import DEBUG
 
 from . import views
 
 urlpatterns = [
     path('',views.home),
     path('admin/', admin.site.urls),
-    path('',include('user_manager.urls')),
-    path('',include('video_manager.urls')),
+    
+    path('',include('auths.urls')),
+    path('',include('profiles.urls')),
+    path('',include('videos.urls')),
+    path('',include('watch.urls')),
+    
     path('', include('social_django.urls', namespace='social')),
     path('accounts/profile/', views.home),
+    
+    path('serve_hls_playlist/<int:video_id>/', views.serve_hls_playlist, name='serve_hls_playlist'),
+    path('serve_hls_segment/<int:video_id>/<str:segment_name>/',views.serve_hls_segment, name='serve_hls_segment'),
 ] 
 
 if DEBUG:
+    from debug_toolbar.toolbar import debug_toolbar_urls
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
     urlpatterns += debug_toolbar_urls()
 
-handler404 = 'GlebTube.views.handler404'
-handler500 = 'GlebTube.views.handler500'
