@@ -20,7 +20,7 @@ from django.urls import reverse
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from .models import Video
-
+from rest_framework.views import View
 
 
 def serve_hls_playlist(request, video_id):
@@ -163,4 +163,6 @@ class RateVideoView(View):
             tasks.update_video_rate.delay(video_id,user.id)
             return self.get_response_data(request,{'video':video},not rate_video.grade)
         return HttpResponse("", status=401)
-   
+
+class VideoViewSet(View):
+    se
