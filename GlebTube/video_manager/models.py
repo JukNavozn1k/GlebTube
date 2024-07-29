@@ -5,6 +5,8 @@ from django.utils import timezone
 
 from django.contrib.auth.models import User
 from . import tasks
+
+
 class Video(models.Model):
 
     PENDING = 'Pending'
@@ -23,7 +25,7 @@ class Video(models.Model):
 
     thumbnail = models.ImageField(upload_to="thumbnails",null=True,blank=True,verbose_name='Превью')
     video = models.FileField(upload_to='videos',null=True,
-    validators=[FileExtensionValidator(allowed_extensions=['mp4'])],verbose_name="Видео")
+        validators=[FileExtensionValidator(allowed_extensions=['mp4'])],verbose_name="Видео")
     
     
     duration = models.CharField(max_length=20, blank=True,null=True,verbose_name='Длительность')
