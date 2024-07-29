@@ -1,0 +1,37 @@
+{% extends 'index.html' %}
+
+{% block content %}
+{% load static %}
+{% csrf_token %}
+
+
+<div class="row height d-flex justify-content-center align-items-center">
+
+{% if author_buttons %}
+{% include 'search_bars/search_my_videos.html'%}
+{% else %}
+{% include 'search_bars/search.html'%}
+{% endif %}
+<div id ="modal">
+  <div class="modal fade" id="gt_modal" tabindex="-1" aria-labelledby="gt_modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+          <div id="modal_container">
+        </div>
+      </div>
+    </div>
+</div>
+</div>
+
+<div class="album py-5">
+    <div class="container">
+      <h3>GlebTube
+        {% if title %} - {{title}} {% endif %}
+      </h3>
+      <div id="video_list">
+      {% include 'spinners/loading_spinner.html' %}
+      </div>
+    </div>
+  </div>
+  
+{% endblock %}
