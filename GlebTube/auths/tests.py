@@ -1,4 +1,6 @@
-from django.test import TestCase
+from django.test import TestCase,Client
+from django.urls import reverse
+
 from . import forms
 from django.contrib.auth.models import User
 
@@ -37,3 +39,6 @@ class TestAuth(TestCase):
         self.assertEqual(form3.is_valid(),False)
         self.assertEqual(form4.is_valid(),False)
         self.assertEqual(form5.is_valid(),True)
+        
+    def test_SignIn_view(self):
+       ...
