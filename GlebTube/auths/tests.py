@@ -2,7 +2,7 @@ from django.test import TestCase
 from . import forms
 from django.contrib.auth.models import User
 
-class TestLogin(TestCase):
+class TestAuth(TestCase):
     def test_form(self):
         usr1 = {
             'username' : 'user',
