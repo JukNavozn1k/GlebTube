@@ -9,7 +9,7 @@ class AuthForm(forms.ModelForm):
         widgets = {
             
             'username' : forms.TextInput(attrs={'class' : 'form-control','placeholder':'World destroyer 2009'}),
-            'email' : forms.TextInput(attrs={'class' : 'form-control','placeholder':'example@example.com'}),
+            'email' : forms.EmailInput(attrs={'class' : 'form-control','placeholder':'example@example.com'}),
             'password' : forms.PasswordInput(attrs={'class' : 'form-control','placeholder':'qwerty123'}),
             'first_name' : forms.TextInput(attrs={'class' : 'form-control','placeholder':'Иван'}),
             'last_name' : forms.TextInput(attrs={'class' : 'form-control','placeholder':'Иванов'})
