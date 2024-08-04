@@ -25,7 +25,6 @@ SECRET_KEY = 'django-insecure-^m%r)j6**wur*086uizv(@1*m4pm5sxv89fe!e5v3@)p09y2e^
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
@@ -38,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'debug_toolbar',
+    
 
     'social_django',
     'auths',
@@ -55,7 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    
 ]
 
 ROOT_URLCONF = 'GlebTube.urls'
@@ -162,12 +161,13 @@ if DEBUG:
         "127.0.0.1",
         # ...
     ]
-
-    def showToolbar(request):
-        return True
+    INSTALLED_APPS.append('debug_toolbar')
+    MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
     DEBUG_TOOLBAR_CONFIG = {
-        'SHOW_TOOLBAR_CALLBACK': showToolbar,
+        'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+        'IS_RUNNING_TESTS': False
     }
+    # DEBUG_TOOLBAR_CONFIG['IS_RUNNING_TESTS'] = False
 
 CELERY_BROKER_URL= 'redis://redis:6379/0'
 # CELERY_RESULT_BACKEND=' redis://redis:6379/0'
