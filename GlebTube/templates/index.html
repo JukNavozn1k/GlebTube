@@ -62,7 +62,7 @@ rel="stylesheet"
 
       {% if not request.user.is_authenticated %}
       <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='{% url 'signIn' %}';"><i class="bi bi-box-arrow-in-right"> Вход</i></button>
-      <button type="button" class="btn btn-primary" onclick="location.href='{% url 'signUp' %}';"><i class="bi bi-sign-intersection-fill"> Регистрация</i></button>
+      {% comment %} <button type="button" class="btn btn-primary" onclick="location.href='{% url 'signUp' %}';"><i class="bi bi-sign-intersection-fill"> Регистрация</i></button> {% endcomment %}
       {% else %}
 
       
@@ -108,9 +108,7 @@ rel="stylesheet"
           </li>
         </ul>
       </div>
-      
-      {% comment %} <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='{% url 'user_profile' request.user.id %}';"><i class="bi bi-person-circle"> Профиль</i></button> {% endcomment %}
-      {% comment %} <button type="button" class="btn btn-danger" onclick="location.href='{% url 'signOut' %}';"><i class="bi bi-box-arrow-left"> Выход</i></button> {% endcomment %}
+     
       {% endif %}
     </div>
   </header>
