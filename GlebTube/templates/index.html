@@ -2,6 +2,7 @@
 <html data-mdb-theme="light">
 <head >
   {% load static %}
+  {% load user_filters %}
   <link rel="icon" type="image/x-icon" href="{% static 'logo.png' %}">
   <title>{% block title %}
     {% if title %}
@@ -54,12 +55,49 @@ rel="stylesheet"
     </ul>
 
     <div class="col-md-3">
+
       {% if not request.user.is_authenticated %}
       <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='{% url 'signIn' %}';"><i class="bi bi-box-arrow-in-right"> Вход</i></button>
       <button type="button" class="btn btn-primary" onclick="location.href='{% url 'signUp' %}';"><i class="bi bi-sign-intersection-fill"> Регистрация</i></button>
       {% else %}
-      <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='{% url 'user_profile' request.user.id %}';"><i class="bi bi-person-circle"> Профиль</i></button>
-      <button type="button" class="btn btn-danger" onclick="location.href='{% url 'signOut' %}';"><i class="bi bi-box-arrow-left"> Выход</i></button>
+
+      
+
+      <div class="container-fluid">
+        <ul class="navbar-nav">
+          <!-- Avatar -->
+          <li class="nav-item dropdown">
+            <a
+              data-mdb-dropdown-init
+              class="nav-link dropdown-toggle d-flex align-items-center"
+              href="#"
+              id="navbarDropdownMenuLink"
+              role="button"
+              aria-expanded="false"
+            >
+              <img
+                src="{{request.user.additional.avatar|parse_avatar}}"
+                class="rounded-circle"
+                height="35"
+                width="35"
+                loading="lazy"
+              />
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <li>
+                <a class="dropdown-item" href="{% url 'user_profile' request.user.id %}">Профиль</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'signOut' %}">Выход</a>
+              </li>
+              
+            </ul>
+          </li>
+        </ul>
+      </div>
+      
+      {% comment %} <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='{% url 'user_profile' request.user.id %}';"><i class="bi bi-person-circle"> Профиль</i></button> {% endcomment %}
+      {% comment %} <button type="button" class="btn btn-danger" onclick="location.href='{% url 'signOut' %}';"><i class="bi bi-box-arrow-left"> Выход</i></button> {% endcomment %}
       {% endif %}
     </div>
   </header>
@@ -68,7 +106,14 @@ rel="stylesheet"
       {% block content %} {% endblock %}
     </div>
     <script src="{% static 'js/theme_switcher.js' %}"><script>
-    
+      
+      <script>
+
+        // Initialization for ES Users
+import { Dropdown, Ripple, initMDB } from "mdb-ui-kit";
+
+initMDB({ Dropdown, Ripple });
+      </script>
       <script
   type="text/javascript"
   src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.umd.min.js"

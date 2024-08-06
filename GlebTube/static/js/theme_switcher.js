@@ -19,3 +19,5 @@ function setTheme (mode = 'auto') {
   document.querySelectorAll('.mode-switch .btn').forEach(e => e.addEventListener('click', () => setTheme(e.id)));
   window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => setTheme());
   
+
+  
