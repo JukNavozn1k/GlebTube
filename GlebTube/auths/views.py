@@ -7,7 +7,8 @@ from django.contrib.auth.models import User
 # User auth
 class Login(views.View):
     def get(self,request):
-        if request.user.is_authenticated: return redirect('/')
+        if request.user.is_authenticated: 
+            return redirect('/')
         return render(request, 'login.html',context={'form':forms.AuthForm()})
     def post(self,request):
         if request.user.is_authenticated: return redirect('/')
