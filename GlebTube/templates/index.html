@@ -35,14 +35,23 @@ rel="stylesheet"
       <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" class="me-2" height="40" width="40" loading="lazy">
       <strong>GlebTube</strong>
     </a>
+
+
+  {% if author_buttons %}
+  {% include 'search_bars/search_my_videos.html'%}
+  {% else %}
+  {% include 'search_bars/search.html'%}
+  {% endif %}
+
+
     <div class="mode-switch">
-      <button title="Use dark mode" id="dark" class="btn btn-sm btn-default text-secondary rounded-5 ">
+      <button title="Тёмная тема" id="dark" class="btn btn-sm btn-default text-secondary rounded-5 ">
           <i class="bi bi-moon"></i>
       </button>
-      <button title="Use light mode" id="light" class="btn btn-sm btn-default text-secondary rounded-5">
+      <button title="Светлая тема" id="light" class="btn btn-sm btn-default text-secondary rounded-5">
           <i class="bi bi-sun"></i>
       </button>
-      <button title="Use system preferred mode" id="system" class="btn btn-sm btn-default text-secondary rounded-5">
+      <button title="Системная тема" id="system" class="btn btn-sm btn-default text-secondary rounded-5">
           <i class="bi bi-display"></i>
       </button>
   </div>
