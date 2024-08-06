@@ -17,6 +17,7 @@
                   </div>
 
                   
+                  {% if request.user.is_authenticated %} 
 
                   {% if comment.author == request.user %}
                   <button type="button" class="btn btn-outline-danger btn-sm shadow-none float-end mx-2"
@@ -28,8 +29,11 @@
                     <i class="bi bi-trash"></i>
                   </button>
                   {% endif %}
+                  <div class="rate_fetcher"> 
+                    {% include 'rate_comments/unrate_btn.html' %}
+                  </div>
 
-                  <button type="button" class="btn btn-warning btn-sm shadow-none float-end"><i class="bi bi-star"></i></button>
+                  {% endif %}
                 </div>    
             </div>    
         </div>

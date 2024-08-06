@@ -1,0 +1,6 @@
+<button type="button" class="btn btn-outline-danger btn-sm shadow-none float-end"
+                    hx-post="/rate_comment/{{comment.id}}"
+                    hx-swap="outerHTML"
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    hx-trigger="click"
+                    ><i class="bi bi-star"></i></button>
