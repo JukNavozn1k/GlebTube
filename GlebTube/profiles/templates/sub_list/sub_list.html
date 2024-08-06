@@ -1,0 +1,28 @@
+
+{% extends 'index.html' %}
+{% load user_filters %}
+{%block content %}
+    {% for sub in queryset %}  
+        <div class="d-flex justify-content-center row">
+            <div class="col"> <!--<div class="col-md-8"> -->
+                <div class="d-flex flex-column comment-section">
+                    <div class="p-2">
+                        <div class="d-flex flex-row user-info">
+                            <img class="rounded-circle" src="{{sub.author.additional.avatar | parse_avatar }}" width="50" height="50"
+                            onclick="location.href='{% url 'user_profile' sub.author.id %}';" style="cursor:pointer;">
+                            <div class="d-flex flex-column justify-content-start ml-2 mx-3">
+                                <span onclick="location.href='{% url 'user_profile' sub.author.id %}';" style="cursor:pointer;"
+                                class="d-block font-weight-bold name">
+                                    <strong>{{sub.author}}</strong>
+                                </span>
+                                <span class="date">
+                                    <i>Подписчиков: {{sub.author.additional.subs_count}}</i>
+                                </span>
+                            </div>
+                        </div>  
+                    </div>    
+                </div>
+            </div>
+        </div>
+    {% endfor %} 
+{% endblock %}
