@@ -15,7 +15,7 @@
 <link rel="stylesheet" a href="{% static '/css/enchanced_player.css' %}"> 
 
 <div class="container mt-5">
-  <div class="card mb-3 border-0">
+  <div class="shadow-0 mb-3 border-0">
   
     {% if video.status == 'Completed' %}
     <video preload="none" id="player" autoplay controls crossorigin playsinline controls></video>
@@ -56,7 +56,7 @@ hx-get="{% url 'rate_video' video.id %}" hx-swap="innerHTML" hx-trigger="reveale
   <div class="p-2">
     <div class="d-flex flex-row align-items-start">
         <img class="rounded-circle mx-3" src="{{user.additional.avatar | parse_avatar}}" width="50" height="50">
-        <textarea class="form-control ml-1 shadow-none textarea" id="comment" placeholder="Введите комментарий"></textarea>
+        <textarea class="form-control ml-1 textarea" id="comment" placeholder="Введите комментарий"></textarea>
     </div>
     <div class="mt-2 float-end">
         <button type="button" id="clearButton" class="btn btn-outline-primary btn-sm shadow-none"><i class="bi bi-trash"></i></button>
