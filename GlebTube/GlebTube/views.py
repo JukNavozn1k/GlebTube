@@ -49,6 +49,8 @@ def serve_hls_segment(request, video_id, segment_name):
         return HttpResponse("Video or HLS segment not found", status=404)
 
 def home(request):
-  context = {'title':'Главная'}
+  videos = models.Video.objects.all().order_by('-stars_count','-id')
+  print(request.GET) 
+  context= {'title' : 'Главная','videos':videos}
   return render(request,'main.html',context=context)
 
