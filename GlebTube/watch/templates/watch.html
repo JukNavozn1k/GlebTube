@@ -33,7 +33,10 @@
         <i class="bi bi-star-fill"> Количество Звёзд: {{video.stars_count}} </i>
         <i class="bi bi-binoculars-fill"> Количество просмотров: {{video.views}} </i></p>
       <p class="card-text"><i class="bi bi-clock-fill"> Дата выхода: {{video.date_uploaded|date:"m.d.Y"}}</i></p>
-      <p class="card-text"><i class="bi bi-person-circle">  Автор:  <a href="{% url 'user_profile' video.author_id %}">{{video.author}} </i></a></p>
+      <p class="card-text" onclick="location.href='{% url 'user_profile' video.author_id %}';" style="cursor:pointer;">
+        <img class="rounded-circle mx-3" src="{{video.author.additional.avatar | parse_avatar}}" width="35" height="35">
+         <strong> {{video.author.username}} </strong>
+      </p>
     </div>
 
   </div>
