@@ -30,10 +30,11 @@ rel="stylesheet"
 
 
   <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-2 mb-4 border-bottom">
-    <div class="col-md-3 mb-2 mb-md-0">
-
-    </div>
-
+   
+    <a class="navbar-brand mx-4" href="/">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" class="me-2" height="40" width="40" loading="lazy">
+      <strong>GlebTube</strong>
+    </a>
     <div class="mode-switch">
       <button title="Use dark mode" id="dark" class="btn btn-sm btn-default text-secondary rounded-5 ">
           <i class="bi bi-moon"></i>
@@ -46,13 +47,7 @@ rel="stylesheet"
       </button>
   </div>
 
-    <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-      <li><a href="/" class="nav-link px-2"><i class="bi bi-house"> Главная</i></a></li>
-     
-      <li><a href="{% url 'my_videos' %}" class="nav-link px-2"><i class="bi bi-camera-reels"> Мои видео</i></a></li>
-     
-      <li><a href="{% url 'upload' %}" class="nav-link px-2"><i class="bi bi-plus-circle"> Новое видео</i></a></li>
-    </ul>
+   
 
     <div class="col-md-3">
 
@@ -87,9 +82,18 @@ rel="stylesheet"
               <li>
                 <a class="dropdown-item" href="{% url 'user_profile' request.user.id %}">Профиль</a>
               </li>
+
+              <li>
+                <a class="dropdown-item" href="{% url 'my_videos' %}">Мои видео</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'upload' %}">Новое видео</a>
+              </li>
               <li>
                 <a class="dropdown-item" href="{% url 'signOut' %}">Выход</a>
               </li>
+
+              
               
             </ul>
           </li>
