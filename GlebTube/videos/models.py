@@ -82,7 +82,7 @@ class UserCommentRelation(models.Model):
 
     CHOICES = [(0, 'Без оценки'), (1, 'С оценкой')]
    
-    user = models.ForeignKey(User,on_delete=models.CASCADE,verbose_name="Пользователь")
+    user = models.ForeignKey(User,on_delete=models.CASCADE,verbose_name="Пользователь",related_name='user_comments_rates')
     grade = models.BooleanField(default=0,choices=CHOICES,verbose_name="Оценка")
     comment = models.ForeignKey(CommentVideo,on_delete=models.CASCADE,verbose_name="Комментарий",related_name='comment_rates')
     def __str__(self) -> str:
