@@ -59,12 +59,12 @@ hx-get="{% url 'rate_video' video.id %}" hx-swap="innerHTML" hx-trigger="reveale
         <textarea class="form-control ml-1 textarea" id="comment" placeholder="Введите комментарий"></textarea>
     </div>
     <div class="mt-2 float-end">
-        <button type="button" id="clearButton" class="btn btn-outline-primary btn-sm shadow-none"><i class="bi bi-trash"></i></button>
+        <button type="button" id="clearButton" class="btn btn-outline-primary btn-floating"><i class="bi bi-trash"></i></button>
         <button hx-post="{% url 'add_comment' video.id %}" hx-vars="comment:document.getElementById('comment').value" 
          hx-target=".comment_list"
          hx-swap="afterbegin"
          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-         class="btn btn-primary btn-sm shadow-none  " id="sendButton" type="button"><i class="bi bi-send"> Отправить</i></button>
+         class="btn btn-primary  btn-rounded" id="sendButton" type="button"><i class="bi bi-send"> Отправить</i></button>
     </div>
 </div>
 <br>
