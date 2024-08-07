@@ -1,18 +1,8 @@
 <div class="row height d-flex justify-content-center align-items-center">
-    <div class="col-xl-7 col-md-9 col-sm-10 col-11">
-      <div class="form input-group">
-        <input type="text" id="search_input" class="form-control form-input" placeholder="Летс плей по майнкрафту">
-        <span class="btn btn-primary"
-              hx-get="{% url 'search_my_videos' %}"
-              hx-swap="innerHTML"
-              hx-target="#video_list"
-              hx-trigger="load, click"
-              hx-include="#search_input"
-              hx-vars="search_query:document.getElementById('search_input').value" 
-              >
-              
-          <i class="bi bi-search"></i> Найти
-        </span>
-      </div>
-    </div>
-  </div>
+    <form class="form input-group" action="{% url 'search_my_videos' %}" method="get">
+      <input type="text" id="search_input" name="search_query" class="form-control form-input" placeholder="Введите запрос">
+      <button type="submit" class="btn btn-primary">
+        <i class="bi bi-search"></i>
+      </button>
+    </form>
+</div>

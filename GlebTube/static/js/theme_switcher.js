@@ -11,12 +11,12 @@ function setTheme (mode = 'auto') {
     }
   
     document.documentElement.setAttribute('data-mdb-theme', useSystem ? (sysMode ? 'light' : 'dark') : modeChosen);
-    document.querySelectorAll('.mode-switch .btn').forEach(e => e.classList.remove('text-body'));
-    document.getElementById(modeChosen).classList.add('text-body');
+    // document.querySelectorAll('.mode-switch .dropdown-item').forEach(e => e.classList.remove('text-body'));
+    // document.getElementById(modeChosen).classList.add('text-body');
   }
   
   setTheme();
-  document.querySelectorAll('.mode-switch .btn').forEach(e => e.addEventListener('click', () => setTheme(e.id)));
+  document.querySelectorAll('.mode-switch .dropdown-item').forEach(e => e.addEventListener('click', () => setTheme(e.id)));
   window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => setTheme());
   
 

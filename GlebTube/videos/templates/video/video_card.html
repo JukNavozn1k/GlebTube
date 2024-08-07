@@ -1,6 +1,6 @@
 
 {% load video_filters %}
-<div class="rounded-9 hover-shadow col-xl-4 col-lg-5 col-md-6 col-12 p-3 video_{{video.id}}">
+<div class="rounded-9 hover-shadow col-xl-4 col-lg-5 col-md-6 col-12 p-3" id="video-card-{{video.id}}">
             
     <div class="bg-image hover-zoom card shadow-sm border-1" onclick="location.href='{% url 'video' video.id %}'" style="cursor: pointer;" title="{{video.caption}}">
       
