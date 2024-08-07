@@ -31,7 +31,7 @@ def my_videos(request):
     return render(request,'main.html',context=context)
 
 def rm_video_modal(request,video_id):
-    return render(request,'modals/rm_video_modal_confirm.html',context={'video_id':video_id})
+    return render(request,'rm_video_modal_confirm.html',context={'video_id':video_id})
 
 def delete_video(request,video_id):
     if request.user.is_authenticated :
