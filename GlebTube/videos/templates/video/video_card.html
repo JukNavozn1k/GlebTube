@@ -7,9 +7,7 @@
       <img class="bd-placeholder-img card-img-top rounded" src="{{video.thumbnail | parse_thumbnail}}" width="100%" height="200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
       <div class="card-body">
         
-      {% block edit_block %}
-
-      {% endblock %}
+      
         
         <strong><p class="card-text text-uppercase font-weight-bold text-truncate overflow-hidden">{{video.caption}}</p></strong>
         <div class="d-flex justify-content-between align-items-center">
@@ -17,6 +15,9 @@
             <small class="text-body"><i class="bi bi-clock-fill"></i> Дата выхода:  {{video.date_uploaded|date:"m.d.Y" }}</small>
             <small class="text-body">  <i class="bi bi-binoculars-fill"></i> Количество просмотров:  {{video.views}}</small>
             <small class="text-body">  <i class="bi bi-star-fill"></i> Количество звёзд:  {{video.stars_count}} </small>
+            {% block edit_block %}
+
+      {% endblock %}
           </div>
         </div>
       </div>
