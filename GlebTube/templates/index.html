@@ -44,7 +44,7 @@ rel="stylesheet"
   {% endif %}
 
 
-     <div class="mode-switch">
+     {% comment %} <div class="mode-switch">
       <button title="Тёмная тема" id="dark" class="btn btn-sm btn-default text-secondary rounded-5 ">
           <i class="bi bi-moon"></i>
       </button>
@@ -54,7 +54,7 @@ rel="stylesheet"
       <button title="Системная тема" id="system" class="btn btn-sm btn-default text-secondary rounded-5">
           <i class="bi bi-display"></i>
       </button>
-  </div> 
+  </div>  {% endcomment %}
 
    
 
@@ -98,9 +98,27 @@ rel="stylesheet"
               <li>
                 <a class="dropdown-item" href="{% url 'upload' %}"><i class="bi bi-file-earmark-plus"></i> Новое видео</a>
               </li>
+
+              <li><hr class="dropdown-divider" /></li>
+              <div class="mode-switch"> 
+              <li>
+                <a class="dropdown-item" id="system" href="#"><i class="bi bi-display"></i> Системная тема</a>
+              </li>
+
+              <li>
+                <a class="dropdown-item" id="dark" href="#"><i class="bi bi-moon-fill"></i> Тёмная тема</a>
+              </li>
+
+              <li>
+                <a class="dropdown-item" id="light" href="#"><i class="bi bi-brightness-high"></i> Светлая тема</a>
+              </li>
+
+            </div>
+              <li><hr class="dropdown-divider" /></li>
               <li>
                 <a class="dropdown-item" href="{% url 'signOut' %}"><i class="bi bi-box-arrow-left"></i> Выход</a>
               </li>
+
 
               
               
