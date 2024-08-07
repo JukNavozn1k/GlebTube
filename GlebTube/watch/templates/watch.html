@@ -30,9 +30,9 @@
       <p class="card-text">{{video.description}}</p>
     </div>
       <p class="card-text">
-        <i class="bi bi-star-fill"> Количество Звёзд: {{video.stars_count}} </i>
-        <i class="bi bi-binoculars-fill"> Количество просмотров: {{video.views}} </i></p>
-      <p class="card-text"><i class="bi bi-clock-fill"> Дата выхода: {{video.date_uploaded|date:"m.d.Y"}}</i></p>
+        <i class="bi bi-star-fill"></i> Количество Звёзд: {{video.stars_count}}
+        <i class="bi bi-binoculars-fill"></i> Количество просмотров: {{video.views}}</p>
+      <p class="card-text"><i class="bi bi-clock-fill"></i> Дата выхода: {{video.date_uploaded|date:"m.d.Y"}}</p>
       <p class="card-text" onclick="location.href='{% url 'user_profile' video.author_id %}';" style="cursor:pointer;">
         <img class="rounded-circle mx-3" src="{{video.author.additional.avatar | parse_avatar}}" width="35" height="35">
          <strong> {{video.author.username}} </strong>
@@ -51,7 +51,7 @@ hx-get="{% url 'rate_video' video.id %}" hx-swap="innerHTML" hx-trigger="reveale
 
 <!-- COMMENT(s) -->
 </div class="comment_form">
-  <h3 id="comments_count"><i class="bi bi-chat-dots-fill">  Комментарии</i></h3>
+  <h3 id="comments_count"><i class="bi bi-chat-dots-fill"></i> Комментарии</h3>
   
   <div class="p-2">
     <div class="d-flex flex-row align-items-start">

@@ -79,9 +79,19 @@
               />
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+
+
+              {% if request.user.is_staff %}
+              <li>
+                <a class="dropdown-item" href="/admin/"><i class="bi bi-person-lock"></i> Админка</a>
+              </li>
+              {% endif %}
+
+
               <li>
                 <a class="dropdown-item" href="{% url 'user_profile' request.user.id %}"><i class="bi bi-person"></i> Профиль</a>
               </li>
+              <li><hr class="dropdown-divider" /></li>
 
               <li>
                 <a class="dropdown-item" href="{% url 'my_videos' %}"><i class="bi bi-camera-reels"></i> Мои видео</a>
@@ -106,9 +116,12 @@
 
             </div>
               <li><hr class="dropdown-divider" /></li>
+
               <li>
                 <a class="dropdown-item" href="{% url 'signOut' %}"><i class="bi bi-box-arrow-left"></i> Выход</a>
               </li>
+
+              
 
 
               
@@ -123,6 +136,10 @@
   </header>
 
   
+
+
+
+
     <div class ="content"> 
       {% block content %} {% endblock %}
     </div>

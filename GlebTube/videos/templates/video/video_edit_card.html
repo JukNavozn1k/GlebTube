@@ -8,9 +8,10 @@
     </button>
 <button type="button" 
     onclick="event.stopPropagation();"
-    hx-delete="{% url 'delete_video' video.id %}" 
-    hx-swap="outerHTML"
-    hx-target="#video-card-{{video.id}}"
+    data-mdb-modal-init data-mdb-target="#rm_video_modal"
+    hx-get="{% url 'delete_video_modal' video.id %}" 
+    hx-swap="innerHTML"
+    hx-target="#rm_video_modal_wrapper"
     hx-headers='{"X-CSRFToken": "{{ csrf_token}}"}'
     class="btn btn-sm btn-danger delete-button" >
     <i class="bi bi-trash"> Удалить</i>
