@@ -1,7 +1,7 @@
 {% load user_filters %}
 <div class="d-flex justify-content-center row">
     <div class="col"> <!--<div class="col-md-8"> -->
-        <div class="d-flex flex-column comment-section">
+        <div class="d-flex flex-column comment-section" style="word-wrap: break-word;">
             <div class="p-2">
                 <div class="d-flex flex-row user-info"><img class="rounded-circle" src="{{comment.author.additional.avatar | parse_avatar }}" width="50" height="50"
                   onclick="location.href='{% url 'user_profile' comment.author_id %}';" style="cursor:pointer;"
@@ -29,10 +29,7 @@
                     <i class="bi bi-trash"></i>
                   </button>
                   {% endif %}
-                  <div class="rate_fetcher"> 
-                    {% include 'rate_comments/unrate_btn.html' %}
-                  </div>
-
+              
                   {% endif %}
                 </div>    
             </div>    
