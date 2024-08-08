@@ -9,7 +9,7 @@ from . import tasks
 from videos.models import Video,UserVideoRelation
 
 
-from django.contrib.auth.models import User
+from auths.models import User
 from .models import UserAdditional
 
 from django.shortcuts import get_object_or_404
