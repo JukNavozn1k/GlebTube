@@ -8,7 +8,6 @@ from .settings import DEBUG
 
 from . import views
 
-import api.urls as api
 
 urlpatterns = [
     path('',views.home),
@@ -24,7 +23,7 @@ urlpatterns = [
     
     path('serve_hls_playlist/<int:video_id>/', views.serve_hls_playlist, name='serve_hls_playlist'),
     path('serve_hls_segment/<int:video_id>/<str:segment_name>/',views.serve_hls_segment, name='serve_hls_segment'),
-    #path('api/', include(api.urlpatterns))
+    path('api/', include('api.urls'))
 ] 
 
 if DEBUG:
