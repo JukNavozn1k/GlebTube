@@ -16,7 +16,15 @@ from django.contrib.auth.models import User
 
 from django.urls import reverse
 
-
+class DownloadVideo(View):
+    def get(self,request,video_id):
+        video = get_object_or_404(models.Video, id=video_id)
+        file_path = video.video.path
+        file_name = os.path.basename(video.video.name)  # Get the file name directly
+        if os.path.exists(file_path):
+            return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=file_name)
+        else:
+            return HttpResponse("File does not exist",status=404)
 
 class VideoView(View):
     def get(self,request,video_id):
