@@ -7,21 +7,16 @@
 
 <div class="row height d-flex justify-content-center align-items-center">
 
-{% if author_buttons %}
-{% include 'search_bars/search_my_videos.html'%}
-{% else %}
-{% include 'search_bars/search.html'%}
-{% endif %}
-<div id ="modal">
-  <div class="modal fade" id="gt_modal" tabindex="-1" aria-labelledby="gt_modalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-          <div id="modal_container">
+
+    <!-- Modal -->
+    <div class="modal top fade" id="rm_video_modal" tabindex="-1" aria-labelledby="rm_video_modal_label" aria-hidden="true" data-mdb-backdrop="true" data-mdb-keyboard="true">
+      <div class="modal-dialog   modal-dialog-centered">
+        <div class="modal-content" id="rm_video_modal_wrapper">
+          
         </div>
       </div>
     </div>
-</div>
-</div>
+    
 
 <div class="album py-5">
     <div class="container">
@@ -29,7 +24,7 @@
         {% if title %} - {{title}} {% endif %}
       </h3>
       <div id="video_list">
-      {% include 'spinners/loading_spinner.html' %}
+      {% include 'video/video_list.html' %}
       </div>
     </div>
   </div>

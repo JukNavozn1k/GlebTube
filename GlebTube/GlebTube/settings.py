@@ -25,7 +25,6 @@ SECRET_KEY = 'django-insecure-^m%r)j6**wur*086uizv(@1*m4pm5sxv89fe!e5v3@)p09y2e^
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
@@ -38,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'debug_toolbar',
+    
 
     'social_django',
     'auths',
@@ -56,7 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    
 ]
 
 ROOT_URLCONF = 'GlebTube.urls'
@@ -115,6 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'auths.User'
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -163,12 +163,13 @@ if DEBUG:
         "127.0.0.1",
         # ...
     ]
-
-    def showToolbar(request):
-        return True
+    INSTALLED_APPS.append('debug_toolbar')
+    MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
     DEBUG_TOOLBAR_CONFIG = {
-        'SHOW_TOOLBAR_CALLBACK': showToolbar,
+        'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+        'IS_RUNNING_TESTS': False
     }
+    # DEBUG_TOOLBAR_CONFIG['IS_RUNNING_TESTS'] = False
 
 CELERY_BROKER_URL= 'redis://redis:6379/0'
 # CELERY_RESULT_BACKEND=' redis://redis:6379/0'
@@ -189,6 +190,6 @@ CACHE_HLS_TIMEOUT = 60*60
 CACHE_HLS_PATH = lambda video_id: f'CACHE_HLS_PATH:{video_id}'
     
 
-
-DEFAULT_AVATAR_URL = 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png'
+# 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png' david star 
+DEFAULT_AVATAR_URL = 'https://img.freepik.com/premium-vector/bearded-jew-hat-sunglasses-hasidic-icon-vector-illustration_340607-9.jpg'
 DEFAULT_THUMBNAIL_URL = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQztLRnAWYw2TSTe-eQpoMj3PM3qlfHddTKXA&usqp=CAU'

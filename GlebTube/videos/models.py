@@ -3,7 +3,7 @@ from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.utils import timezone
 
-from django.contrib.auth.models import User
+from auths.models import User
 from . import tasks
 
 
@@ -72,9 +72,12 @@ class CommentVideo(models.Model):
     instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='video_comments')
     author = models.ForeignKey(User,on_delete=models.CASCADE,related_name='user_comments')
     content = models.TextField(null=False,blank=False,verbose_name='Контент')
+    
+    
     date_uploaded = models.DateTimeField(default=timezone.now)
     class Meta:
          verbose_name = 'Комментарий-Видео'
          verbose_name_plural = 'Коментарии-Видео'
     def __str__(self) -> str:
         return f'{self.id} : {self.author} -> {self.instance}'
+    
