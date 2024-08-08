@@ -17,9 +17,10 @@ def update_subscription(user_id,author_id):
 @shared_task
 def refresh_user_stats(author_id):
     from videos.models import UserVideoRelation
-    from .models import UserAdditional,Subscription
+    from .models import Subscription
+    from auths.models import User
     stars_count =  UserVideoRelation.objects.filter(video__author_id=author_id,grade=1).count()
-    additonal, created = UserAdditional.objects.get_or_create(user_id=author_id)
+    additonal, created = User.objects.get_or_create(id=author_id)
     additonal.stars_count=stars_count 
     additonal.subs_count = Subscription.objects.filter(author_id=author_id,active=True).count()
     additonal.save()
