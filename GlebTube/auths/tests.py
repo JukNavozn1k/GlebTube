@@ -2,7 +2,6 @@ from django.test import TestCase,Client
 from django.urls import reverse
 
 from . import forms
-from django.contrib.auth.models import User
 
 class TestAuth(TestCase):
     def test_form(self):

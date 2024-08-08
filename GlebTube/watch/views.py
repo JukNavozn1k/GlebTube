@@ -12,7 +12,7 @@ from videos import models
 from . import tasks
 
 from django.db.models import Prefetch
-from django.contrib.auth.models import User
+from auths.models import User
 
 from django.urls import reverse
 

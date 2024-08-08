@@ -3,7 +3,7 @@ from django import views
 from django.contrib.auth import authenticate,login,logout
 
 from . import forms
-from django.contrib.auth.models import User
+from .models import User
 # User auth
 class Login(views.View):
     def get(self,request):
