@@ -6,7 +6,7 @@ from . import forms
 from .models import Video,UserVideoRelation
 
 
-from django.contrib.auth.models import User
+from auths.models import User
 
 from django.shortcuts import get_object_or_404
 
@@ -14,24 +14,24 @@ from django.shortcuts import get_object_or_404
 from . import tasks
 
 def search_videos(request):
-
     videos = Video.objects.filter(caption__icontains=request.GET['search_query']).order_by('-stars_count','-id')
     context={'videos':videos}
-    return render(request,'video/video_list.html',context=context)
+    return render(request,'main.html',context=context)
 
 def search_my_videos(request):
     if not request.user.is_authenticated: return redirect(reverse('signIn'))
     videos = Video.objects.filter(caption__icontains=request.GET['search_query'],author=request.user).order_by('-stars_count','-id')
     context={'videos':videos,'author_buttons':True}
-    return render(request,'video/video_list.html',context=context)
+    return render(request,'main.html',context=context)
 
 def my_videos(request):
     if not request.user.is_authenticated: return redirect(reverse('signIn'))
-    context = {'author_buttons':True,'title':'Мои видео'}
+    videos = Video.objects.filter(author_id=request.user.id)
+    context = {'author_buttons':True,'title':'Мои видео','videos': videos}
     return render(request,'main.html',context=context)
 
 def rm_video_modal(request,video_id):
-    return render(request,'modals/rm_video_modal_confirm.html',context={'video_id':video_id})
+    return render(request,'rm_video_modal_confirm.html',context={'video_id':video_id})
 
 def delete_video(request,video_id):
     if request.user.is_authenticated :

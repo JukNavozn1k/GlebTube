@@ -11,7 +11,7 @@ from . import views
 
 urlpatterns = [
     path('',views.home),
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls,name='admin_panel_url'),
     
     path('',include('auths.urls')),
     path('',include('profiles.urls')),
@@ -28,6 +28,6 @@ urlpatterns = [
 
 if DEBUG:
     from debug_toolbar.toolbar import debug_toolbar_urls
-    urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+    
     urlpatterns += debug_toolbar_urls()
-
+    urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

@@ -12,11 +12,19 @@ from videos import models
 from . import tasks
 
 from django.db.models import Prefetch
-from django.contrib.auth.models import User
+from auths.models import User
 
 from django.urls import reverse
 
-
+class DownloadVideo(View):
+    def get(self,request,video_id):
+        video = get_object_or_404(models.Video, id=video_id)
+        file_path = video.video.path
+        file_name = os.path.basename(video.video.name)  # Get the file name directly
+        if os.path.exists(file_path):
+            return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=file_name)
+        else:
+            return HttpResponse("File does not exist",status=404)
 
 class VideoView(View):
     def get(self,request,video_id):
@@ -32,9 +40,8 @@ class VideoView(View):
 
 class CommentVideo(View):
     def get(self,request,video_id):
-        users_with_additional =  Prefetch('author',User.objects.all().select_related('additional'))
-        comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').prefetch_related(
-           users_with_additional)
+       
+        comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').select_related('author')
         context = {'comments':comments}
         return render(request,'comments/comment_list.html',context=context)
     def post(self,request,video_id):

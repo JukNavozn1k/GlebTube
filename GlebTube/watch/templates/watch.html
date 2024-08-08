@@ -15,7 +15,7 @@
 <link rel="stylesheet" a href="{% static '/css/enchanced_player.css' %}"> 
 
 <div class="container mt-5">
-  <div class="card mb-3 border-0">
+  <div class="shadow-0 mb-3 border-0">
   
     {% if video.status == 'Completed' %}
     <video preload="none" id="player" autoplay controls crossorigin playsinline controls></video>
@@ -30,38 +30,41 @@
       <p class="card-text">{{video.description}}</p>
     </div>
       <p class="card-text">
-        <i class="bi bi-star-fill"> Количество Звёзд: {{video.stars_count}} </i>
-        <i class="bi bi-binoculars-fill"> Количество просмотров: {{video.views}} </i></p>
-      <p class="card-text"><i class="bi bi-clock-fill"> Дата выхода: {{video.date_uploaded|date:"m.d.Y"}}</i></p>
-      <p class="card-text"><i class="bi bi-person-circle">  Автор:  <a href="{% url 'user_profile' video.author_id %}">{{video.author}} </i></a></p>
+        <i class="bi bi-star-fill"></i> Количество Звёзд: {{video.stars_count}}
+        <i class="bi bi-binoculars-fill"></i> Количество просмотров: {{video.views}}</p>
+      <p class="card-text"><i class="bi bi-clock-fill"></i> Дата выхода: {{video.date_uploaded|date:"m.d.Y"}}</p>
+      <p class="card-text" onclick="location.href='{% url 'user_profile' video.author_id %}';" style="cursor:pointer;">
+        <img class="rounded-circle mx-3" src="{{video.author.avatar | parse_avatar}}" width="35" height="35">
+         <strong> {{video.author.username}} </strong>
+      </p>
     </div>
 
   </div>
 
 <div class="post float-right" data-post-id="{{video.id}}">
+
 <div class = "rate_container float-right"
 hx-get="{% url 'rate_video' video.id %}" hx-swap="innerHTML" hx-trigger="revealed">
-
 {% include 'spinners/loading_spinner_htmx.html' %}
 </div>
-
+<a type="button" class="btn btn-link float-end btn-rounded mx-2" data-mdb-ripple-init data-mdb-ripple-color="dark" href="{% url 'download_video' video.id %}"><i class="bi bi-download"></i> Скачать </a>
 
 <!-- COMMENT(s) -->
 </div class="comment_form">
-  <h3 id="comments_count"><i class="bi bi-chat-dots-fill">  Комментарии</i></h3>
+  <h3 id="comments_count">Комментарии</h3>
   
   <div class="p-2">
     <div class="d-flex flex-row align-items-start">
-        <img class="rounded-circle mx-3" src="{{user.additional.avatar | parse_avatar}}" width="50" height="50">
-        <textarea class="form-control ml-1 shadow-none textarea" id="comment" placeholder="Введите комментарий"></textarea>
+        <img class="rounded-circle mx-3" src="{{user.avatar | parse_avatar}}" width="50" height="50">
+        <textarea class="form-control ml-1 textarea" id="comment" placeholder="Введите комментарий"></textarea>
     </div>
     <div class="mt-2 float-end">
-        <button type="button" id="clearButton" class="btn btn-outline-primary btn-sm shadow-none"><i class="bi bi-trash"></i></button>
+        <button type="button" id="clearButton" class="btn btn-outline-primary btn-floating"><i class="bi bi-trash"></i></button>
         <button hx-post="{% url 'add_comment' video.id %}" hx-vars="comment:document.getElementById('comment').value" 
          hx-target=".comment_list"
          hx-swap="afterbegin"
          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-         class="btn btn-primary btn-sm shadow-none  " id="sendButton" type="button"><i class="bi bi-send"> Отправить</i></button>
+         class="btn btn-primary  btn-rounded" id="sendButton" type="button"><i class="bi bi-send"></i> Отправить</button>
     </div>
 </div>
 <br>
