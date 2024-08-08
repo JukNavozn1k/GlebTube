@@ -7,10 +7,7 @@ from . import models
 from . import tasks
 
 from videos.models import Video,UserVideoRelation
-
-
 from auths.models import User
-from .models import UserAdditional
 
 from django.shortcuts import get_object_or_404
 
@@ -19,21 +16,21 @@ from django.shortcuts import get_object_or_404
 class Profile(views.View):
     def get(self,request,user):
         user = get_object_or_404(User,id=user)
-        additonal,created = UserAdditional.objects.get_or_create(user_id=user.id)
+        
         isOwner = request.user.id == user.id
-        stars_count = additonal.stars_count
-        subscribers_count = additonal.subs_count
-        context = {'isOwner':isOwner,'user': user,'stars_count':stars_count,'subscribers_count':subscribers_count,'additional':additonal}
+        stars_count = user.stars_count
+        subscribers_count = user.subs_count
+        context = {'isOwner':isOwner,'user': user,'stars_count':stars_count,'subscribers_count':subscribers_count}
         return render(request,'profile/profile.html',context=context)
 
 class ProfileEdit(views.View):
     def get(self,request):
-        instance,created = models.UserAdditional.objects.get_or_create(user=request.user)
+        instance,created = User.objects.get_or_create(user=request.user)
         form = forms.UserAdditionalForm(instance=instance)
         return render(request,'gt_form.html',context={'form':form,'title': 'Редактировать профиль'})
     def post(self,request):
         if not request.user.is_authenticated: return HttpResponse("",status=401)
-        instance,created = models.UserAdditional.objects.get_or_create(user=request.user)
+        instance,created = User.objects.get_or_create(user=request.user)
         form = forms.UserAdditionalForm(request.POST,request.FILES,instance=instance)
         if form.is_valid():
             form.save()

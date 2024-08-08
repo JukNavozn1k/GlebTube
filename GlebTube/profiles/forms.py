@@ -1,11 +1,11 @@
 from django import forms
 
-from .models import UserAdditional
+from auths.models import User
 
 
 class UserAdditionalForm(forms.ModelForm):    
     class Meta:
-        model = UserAdditional
+        model = User
         fields = ('profile_description','avatar',)
         
         widgets = {
