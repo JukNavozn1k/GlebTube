@@ -9,7 +9,7 @@
         
       
         
-        <strong><p class="card-text text-uppercase font-weight-bold text-truncate overflow-hidden">{{video.caption}}</p></strong>
+        <strong><p class="card-text text-uppercase font-weight-bold text-truncate overflow-hidden" data-mdb-tooltip-init title="{{video.caption}}">{{video.caption}}</p></strong>
         <div class="d-flex justify-content-between align-items-center">
           <div class="btn-group shadow-0">
             <small class="text-body"><i class="bi bi-clock-fill"></i> Дата выхода:  {{video.date_uploaded|date:"m.d.Y" }}</small>
