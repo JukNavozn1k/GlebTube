@@ -6,7 +6,7 @@ from auths.models import User
 class UserAdditionalForm(forms.ModelForm):    
     class Meta:
         model = User
-        fields = ('profile_description','avatar',)
+        fields = ('profile_description','avatar')
         
         widgets = {
             

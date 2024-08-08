@@ -25,12 +25,14 @@ class Profile(views.View):
 
 class ProfileEdit(views.View):
     def get(self,request):
-        instance,created = User.objects.get_or_create(user=request.user)
-        form = forms.UserAdditionalForm(instance=instance)
+        if not request.user.is_authenticated: return redirect(reversed('signIn'))
+        
+        form = forms.UserAdditionalForm(instance=request.user)
         return render(request,'gt_form.html',context={'form':form,'title': 'Редактировать профиль'})
     def post(self,request):
-        if not request.user.is_authenticated: return HttpResponse("",status=401)
-        instance,created = User.objects.get_or_create(user=request.user)
+        if not request.user.is_authenticated: return redirect(reversed('signIn'))
+        instance = request.user
+        
         form = forms.UserAdditionalForm(request.POST,request.FILES,instance=instance)
         if form.is_valid():
             form.save()
