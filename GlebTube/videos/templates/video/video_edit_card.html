@@ -31,21 +31,5 @@
   </div>
 
 
-{% comment %} <div class = "mt-1 float-right">
-<button type="button" class="btn btn-sm btn-warning" onclick="event.stopPropagation();location.href='{% url 'edit_video' video.id %}';">
-    <i class="bi bi-pencil-square"> Изменить</i>
-    </button>
-<button type="button" 
-    onclick="event.stopPropagation();"
-    data-mdb-modal-init data-mdb-target="#rm_video_modal"
-    hx-get="{% url 'delete_video_modal' video.id %}" 
-    hx-swap="innerHTML"
-    hx-target="#rm_video_modal_wrapper"
-    hx-headers='{"X-CSRFToken": "{{ csrf_token}}"}'
-    class="btn btn-sm btn-danger delete-button" >
-    <i class="bi bi-trash"> Удалить</i>
-</button>
-</div> {% endcomment %}
-
 
 {% endblock %}
