@@ -3,7 +3,7 @@
     <div class="col"> <!--<div class="col-md-8"> -->
         <div class="d-flex flex-column comment-section" style="word-wrap: break-word;">
             <div class="p-2">
-                <div class="d-flex flex-row user-info"><img class="rounded-circle" src="{{comment.author.additional.avatar | parse_avatar }}" width="50" height="50"
+                <div class="d-flex flex-row user-info"><img class="rounded-circle" src="{{comment.author.avatar | parse_avatar }}" width="50" height="50"
                   onclick="location.href='{% url 'user_profile' comment.author_id %}';" style="cursor:pointer;"
                   >
                     <div class="d-flex flex-column justify-content-start ml-2 mx-3"><span 

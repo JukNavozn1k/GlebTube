@@ -34,7 +34,7 @@
         <i class="bi bi-binoculars-fill"></i> Количество просмотров: {{video.views}}</p>
       <p class="card-text"><i class="bi bi-clock-fill"></i> Дата выхода: {{video.date_uploaded|date:"m.d.Y"}}</p>
       <p class="card-text" onclick="location.href='{% url 'user_profile' video.author_id %}';" style="cursor:pointer;">
-        <img class="rounded-circle mx-3" src="{{video.author.additional.avatar | parse_avatar}}" width="35" height="35">
+        <img class="rounded-circle mx-3" src="{{video.author.avatar | parse_avatar}}" width="35" height="35">
          <strong> {{video.author.username}} </strong>
       </p>
     </div>
@@ -55,7 +55,7 @@ hx-get="{% url 'rate_video' video.id %}" hx-swap="innerHTML" hx-trigger="reveale
   
   <div class="p-2">
     <div class="d-flex flex-row align-items-start">
-        <img class="rounded-circle mx-3" src="{{user.additional.avatar | parse_avatar}}" width="50" height="50">
+        <img class="rounded-circle mx-3" src="{{user.avatar | parse_avatar}}" width="50" height="50">
         <textarea class="form-control ml-1 textarea" id="comment" placeholder="Введите комментарий"></textarea>
     </div>
     <div class="mt-2 float-end">
