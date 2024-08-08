@@ -42,12 +42,12 @@
   </div>
 
 <div class="post float-right" data-post-id="{{video.id}}">
+
 <div class = "rate_container float-right"
 hx-get="{% url 'rate_video' video.id %}" hx-swap="innerHTML" hx-trigger="revealed">
-
 {% include 'spinners/loading_spinner_htmx.html' %}
 </div>
-
+<a type="button" class="btn btn-link float-end btn-rounded mx-2" data-mdb-ripple-init data-mdb-ripple-color="dark" href="{% url 'download_video' video.id %}"><i class="bi bi-download"></i> Скачать </a>
 
 <!-- COMMENT(s) -->
 </div class="comment_form">
