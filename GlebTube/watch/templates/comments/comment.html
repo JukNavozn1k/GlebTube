@@ -20,7 +20,7 @@
                   {% if request.user.is_authenticated %} 
 
                   {% if comment.author == request.user %}
-                  <button type="button" class="btn btn-outline-danger btn-sm shadow-none float-end mx-2"
+                  <button type="button" class="btn btn-outline-danger btn-floating float-end mx-2"
                     hx-delete="/rm_comment/{{comment.id}}" 
                     hx-target="closest div.d-flex.justify-content-center.row" 
                     hx-swap="outerHTML"
