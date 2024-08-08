@@ -24,7 +24,7 @@
 
   <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-2 mb-4 border-bottom">
    
-    <a class="navbar-brand mx-4" href="/">
+    <a class="navbar-brand mx-4" data-mdb-tooltip-init title="Перейти на главную" href="/">
       <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" class="me-2" height="40" width="40" loading="lazy">
       <strong>GlebTube</strong>
     </a>
@@ -55,7 +55,7 @@
               role="button"
               aria-expanded="false"
             >
-              <img
+              <img 
                 src="{{request.user.avatar|parse_avatar}}"
                 class="rounded-circle"
                 height="35"
