@@ -2,7 +2,36 @@
 
 
 {% block edit_block %}
-<div class = "mt-1 float-right">
+
+
+<div class="dropdown" onclick="event.stopPropagation()">
+    <button
+      class="btn btn-link btn-floating btn-lg"
+      type="button"
+      id="dropdownMenuButton"
+      data-mdb-dropdown-init
+      data-mdb-ripple-init
+      aria-expanded="false"
+    >
+    <i class="bi bi-three-dots-vertical"></i>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <li><a class="dropdown-item" href="{% url 'edit_video' video.id %}"><i class="bi bi-pencil-square"></i> Редактировать</a></li>
+      <li><a class="dropdown-item" href="#"
+        data-mdb-modal-init data-mdb-target="#rm_video_modal"
+        hx-get="{% url 'delete_video_modal' video.id %}" 
+        hx-swap="innerHTML"
+        hx-target="#rm_video_modal_wrapper"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token}}"}'
+            
+        
+        
+        > <i class="bi bi-trash"></i> Удалить</a></li>
+    </ul>
+  </div>
+
+
+{% comment %} <div class = "mt-1 float-right">
 <button type="button" class="btn btn-sm btn-warning" onclick="event.stopPropagation();location.href='{% url 'edit_video' video.id %}';">
     <i class="bi bi-pencil-square"> Изменить</i>
     </button>
@@ -16,7 +45,7 @@
     class="btn btn-sm btn-danger delete-button" >
     <i class="bi bi-trash"> Удалить</i>
 </button>
-</div>
+</div> {% endcomment %}
 
 
 {% endblock %}

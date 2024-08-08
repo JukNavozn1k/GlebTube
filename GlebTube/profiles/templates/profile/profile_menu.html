@@ -1,15 +1,15 @@
 <span class="profile_buttons">
     {% if isOwner %}
-    <a type="button" class="btn btn-warning btn-sm" href="{% url 'edit_profile' %}">
-      <i class="bi bi-pencil-square">  Редактировать профиль</i>
+    <a type="button" class="mx-1 my-1 btn btn-warning btn-rounded" href="{% url 'edit_profile' %}">
+      <i class="bi bi-pencil-square"></i> Изменить профиль
     </a>
     <button type="button" 
     hx-delete="{% url 'delete_history' %}" 
     hx-swap="innerHTML"
     hx-target=".alert_container"
     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'         
-    class="btn btn-danger btn-sm">
-    <i class="bi bi-trash">  Очистить историю</i>
+    class=" mx-1 my-1 btn btn-danger btn-rounded">
+    <i class="bi bi-trash"></i> Очистить историю
     </button>
     {% else %}
     <!--SUB/UNSUB BUTTONS-->
@@ -23,12 +23,12 @@
   <div>
     <div class="d-inline-block text-dark">
       
-      <span class="text-muted"><i class="bi bi-star-fill"> Всего звёзд: <strong>{{stars_count}}</strong></i></span>
+      <span class="text-muted"><i class="bi bi-star-fill"></i> Всего звёзд: <strong>{{stars_count}}</strong></span>
       
     </div>
     
     <div class="d-inline-block text-dark ml-3">
-      <span class="text-muted"><i class="bi bi-people"> Всего подписчиков: <strong>{{subscribers_count}}</strong></i> </span>
+      <span class="text-muted"><i class="bi bi-people"></i> Всего подписчиков: <strong>{{subscribers_count}}</strong> </span>
       
     </div>
   </div>
