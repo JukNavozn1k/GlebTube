@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'profiles',
     'videos',
     'watch',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
