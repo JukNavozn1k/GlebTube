@@ -8,3 +8,8 @@ initMDB({ Dropdown, Ripple });
 import { Tab, initMDB } from "mdb-ui-kit";
 
 initMDB({ Tab });
+
+
+import { Collapse, initMDB } from 'mdb-ui-kit';
+
+initMDB({ Collapse });
