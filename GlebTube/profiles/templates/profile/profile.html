@@ -40,7 +40,7 @@
       aria-controls="ex2-tabs-1"
       aria-selected="true"
       hx-get="{% url 'user_videos' user.id %}" hx-trigger="load" hx-swap="innerHTML" hx-target="#ex2-tabs-1"
-      ><i class="bi bi-camera-reels-fill"></i> Видео</a
+      ><i class="fas fa-circle-play"></i> Видео</a
     >
   </li>
   <li class="nav-item" role="presentation">
@@ -53,7 +53,7 @@
       aria-controls="ex2-tabs-2"
       aria-selected="false"
       hx-get="{% url 'user_liked' user.id %}" hx-trigger="click once" hx-swap="innerHTML" hx-target="#ex2-tabs-2"
-      ><i class="bi bi-star-fill"></i> Понравилось</a
+      ><i class="fas fa-star-of-david"></i> Понравилось</a
     >
   </li>
   <li class="nav-item" role="presentation">
@@ -66,7 +66,7 @@
       aria-controls="ex2-tabs-3"
       aria-selected="false"
       hx-get="{% url 'history' user.id %}" hx-trigger="click once" hx-swap="innerHTML" hx-target="#ex2-tabs-3"
-      ><i class="bi bi-hourglass-split"></i> История</a
+      ><i class="fas fa-clock-rotate-left"></i> История</a
     >
   </li>
 </ul>
