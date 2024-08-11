@@ -85,4 +85,7 @@ class RateVideoView(View):
             tasks.update_video_rate.delay(video_id,user.id)
             return self.get_response_data(request,{'video':video},not rate_video.grade)
         return HttpResponse("", status=401)
-   
+
+class RateCommentView(View):
+    def post(self,request,comment_id):
+        return HttpResponse("")
