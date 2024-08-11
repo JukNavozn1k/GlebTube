@@ -28,10 +28,8 @@
                   </button>
                   {% endif %}
 
-                  {{comment.user_rated}}
-                  <button type="button" class="btn btn-primary btn-floating float-end">
-                    <i class="bi bi-star"></i>
-                  </button>
+                  <!-- {{comment.user_rated}} -->
+                  {% include 'rate_comment/unrate_btn.html' %}
               
                   {% endif %}
                 </div>    
