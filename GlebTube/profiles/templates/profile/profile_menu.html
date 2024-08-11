@@ -1,7 +1,7 @@
 <span class="profile_buttons">
     {% if isOwner %}
     <a type="button" class="mx-1 my-1 btn btn-warning btn-rounded" href="{% url 'edit_profile' %}">
-      <i class="bi bi-pencil-square"></i> Изменить профиль
+      <i class="fas fa-pen"></i> Изменить профиль
     </a>
     <button type="button" 
     hx-delete="{% url 'delete_history' %}" 
@@ -9,7 +9,7 @@
     hx-target=".alert_container"
     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'         
     class=" mx-1 my-1 btn btn-danger btn-rounded">
-    <i class="bi bi-trash"></i> Очистить историю
+    <i class="fas fa-trash"></i> Очистить историю
     </button>
     {% else %}
     <!--SUB/UNSUB BUTTONS-->
@@ -23,12 +23,12 @@
   <div>
     <div class="d-inline-block text-dark">
       
-      <span class="text-muted"><i class="bi bi-star-fill"></i> Всего звёзд: <strong>{{stars_count}}</strong></span>
+      <span class="text-muted"><i class="fas fa-star-of-david"></i> Всего звёзд: <strong>{{stars_count}}</strong></span>
       
     </div>
     
     <div class="d-inline-block text-dark ml-3">
-      <span class="text-muted"><i class="bi bi-people"></i> Всего подписчиков: <strong>{{subscribers_count}}</strong> </span>
+      <span class="text-muted"><i class="fas fa-user-group"></i> Всего подписчиков: <strong>{{subscribers_count}}</strong> </span>
       
     </div>
   </div>

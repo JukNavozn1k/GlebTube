@@ -12,7 +12,7 @@ from videos import models
 from . import tasks
 
 
-from django.db.models import Case,When,Q,F,OuterRef,Exists
+from django.db.models import Case,When,Count,OuterRef,Exists
 
 from django.urls import reverse
 
@@ -40,8 +40,8 @@ class VideoView(View):
 
 class CommentVideo(View):
     def get(self,request,video_id):
-        comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').select_related('author').only(
-            'author__username','author__avatar','content','date_uploaded')
+        comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').prefetch_related('author').only(
+            'author__username','author__avatar','content','date_uploaded').annotate(stars_count=Count(Case(When(comment_rates__grade=1,then=1))))
         if request.user.is_authenticated:
             subquery = models.UserCommentRelation.objects.filter(comment_id=OuterRef('pk'), grade=1,user=request.user)
             
