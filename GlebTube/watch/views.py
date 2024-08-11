@@ -40,17 +40,13 @@ class VideoView(View):
 
 class CommentVideo(View):
     def get(self,request,video_id):
+        comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').select_related('author')
         if request.user.is_authenticated:
-            
-       
-            comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').select_related('author').annotate(
-                user_rated=Case(When(Q(comment_rates__grade = True) and Q(comment_rates__user = request.user),then=True),default=False))
-            context = {'comments':comments}
-            return render(request,'comments/comment_list.html',context=context)
-        else: 
-            comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').select_related('author')
-            context = {'comments':comments}
-            return render(request,'comments/comment_list.html',context=context)
+            comments = comments.annotate(
+            user_rated=Case(When(Q(comment_rates__grade = 1,comment_rates__user = request.user),then=True),default=False))
+        context = {'comments':comments}
+        return render(request,'comments/comment_list.html',context=context)
+        
             
     def post(self,request,video_id):
         comment = request.POST.get('comment')
