@@ -40,8 +40,8 @@ class VideoView(View):
 
 class CommentVideo(View):
     def get(self,request,video_id):
-       
-        comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').prefetch_related('author')
+        
+        comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').prefetch_related('author','comment_rates')
         context = {'comments':comments}
         return render(request,'comments/comment_list.html',context=context)
     def post(self,request,video_id):
