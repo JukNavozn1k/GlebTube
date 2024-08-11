@@ -1,3 +1,7 @@
-<button type="button" class="btn btn-primary btn-floating float-end">
+<button type="button" class="btn btn-primary btn-floating float-end"
+hx-post="{% url 'rate_comment' comment.id %}"
+hx-swap="outerHTML"
+hx-headers='{"X-CSRFToken": "{{csrf_token}}"}'
+>
     <i class="bi bi-star"></i>
   </button>

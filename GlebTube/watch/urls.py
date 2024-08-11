@@ -14,6 +14,7 @@ urlpatterns = [
   path('download_video/<int:video_id>', views.DownloadVideo.as_view(), name='download_video'),
   
   path('rate_video/<int:video_id>/',views.RateVideoView.as_view(),name='rate_video'),
+  path('rate_comment/<int:comment_id>/',views.RateCommentView.as_view(),name='rate_comment'),
 
   
 ] 
