@@ -23,11 +23,38 @@
     {% include 'spinners/loading_spinner.html' %}
     <p class="text-muted text-center">Видео загружается...</p>
     {% endif %}
-    <div class="card-body">
+    <div class="card-body" style="word-wrap: break-word;">
       <h5 class="card-title text-uppercase font-weight-bold">{{video.caption}}</h5>
-      <h6 class="card-subtitle mb-2 text-muted">Описание</h6>
+
+      <div class="accordion accordion-flush" id="descAccording">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingOne">
+            <button
+              data-mdb-collapse-init
+              class="accordion-button collapsed"
+              type="button"
+              data-mdb-toggle="collapse"
+              data-mdb-target="#flush-collapseOne"
+              aria-expanded="false"
+              aria-controls="flush-collapseOne"
+            >
+              <h6 class="card-subtitle mb-2 text-muted"> Описание </h6>
+            </button>
+          </h2>
+          <div
+            id="flush-collapseOne"
+            class="accordion-collapse collapse"
+            aria-labelledby="flush-headingOne"
+            data-mdb-parent="#descAccording"
+          >
+            <div class="accordion-body">
+              {{video.description}}
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="md_content">
-      <p class="card-text">{{video.description}}</p>
     </div>
       <p class="card-text">
         <i class="bi bi-star-fill"></i> Количество Звёзд: {{video.stars_count}}
