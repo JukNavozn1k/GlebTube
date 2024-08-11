@@ -19,18 +19,17 @@
                   
                   {% if request.user.is_authenticated %} 
                   {% if comment.author == request.user %}
-                  <button type="button" class="btn btn-outline-danger btn-floating float-end mx-2"
+                  <button type="button" class="btn btn-danger btn-floating float-end mx-2"
                     hx-delete="/rm_comment/{{comment.id}}" 
                     hx-target="closest div.d-flex.justify-content-center.row" 
                     hx-swap="outerHTML"
-                    hx-headers='{"X-CSRFToken": "{{csrf_token}}"}'
-                  >
+                    hx-headers='{"X-CSRFToken": "{{csrf_token}}"}'>
                     <i class="bi bi-trash"></i>
                   </button>
                   {% endif %}
-
                   <button type="button" class="btn btn-primary btn-floating float-end">
                     <i class="bi bi-star"></i>
+                    
                   </button>
               
                   {% endif %}
