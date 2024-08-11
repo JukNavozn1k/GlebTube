@@ -17,7 +17,9 @@ def refresh_views(video_id):
 
 @shared_task
 def remove_comment(comment_id,author_id):
-    from videos.models import CommentVideo
+    from videos.models import CommentVideo,UserCommentRelation
+    
+    UserCommentRelation.objects.filter(user_id=author_id,comment_id=comment_id).delete()
     CommentVideo.objects.filter(id=comment_id,author__id = author_id).delete()
 
 @shared_task
