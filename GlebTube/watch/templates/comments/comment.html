@@ -28,8 +28,7 @@
                   </button>
                   {% endif %}
 
-            
-                  {% if comment.user_rated %}
+                  {% if comment.user_rated == 1 %}
                   {% include 'rate_comment/unrate_btn.html' %}
                   {% else %}
                   {% include 'rate_comment/rate_btn.html' %}

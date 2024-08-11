@@ -12,7 +12,7 @@ from videos import models
 from . import tasks
 
 
-from django.db.models import Case,When,Q
+from django.db.models import Case,When,Q,F,OuterRef,Exists
 
 from django.urls import reverse
 
@@ -43,8 +43,9 @@ class CommentVideo(View):
         comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').select_related('author').only(
             'author__username','author__avatar','content','date_uploaded')
         if request.user.is_authenticated:
-            comments = comments.annotate(
-            user_rated=Case(When(Q(comment_rates__grade = 1,comment_rates__user = request.user),then=True),default=False))
+            subquery = models.UserCommentRelation.objects.filter(comment_id=OuterRef('pk'), grade=1,user=request.user)
+            
+            comments = comments.annotate(user_rated=Exists(subquery))
         context = {'comments':comments}
         return render(request,'comments/comment_list.html',context=context)
         
