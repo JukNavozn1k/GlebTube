@@ -11,8 +11,8 @@ from videos import models
 
 from . import tasks
 
-from django.db.models import Prefetch
-from auths.models import User
+
+from django.db.models import Case,When,Q
 
 from django.urls import reverse
 
@@ -40,10 +40,15 @@ class VideoView(View):
 
 class CommentVideo(View):
     def get(self,request,video_id):
-       
-        comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').select_related('author')
+        comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').select_related('author').only(
+            'author__username','author__avatar','content','date_uploaded')
+        if request.user.is_authenticated:
+            comments = comments.annotate(
+            user_rated=Case(When(Q(comment_rates__grade = 1,comment_rates__user = request.user),then=True),default=False))
         context = {'comments':comments}
         return render(request,'comments/comment_list.html',context=context)
+        
+            
     def post(self,request,video_id):
         comment = request.POST.get('comment')
         if request.user.is_authenticated and len(comment) > 0:
@@ -81,4 +86,18 @@ class RateVideoView(View):
             tasks.update_video_rate.delay(video_id,user.id)
             return self.get_response_data(request,{'video':video},not rate_video.grade)
         return HttpResponse("", status=401)
-   
+
+class RateCommentView(View):
+    def post(self,request,comment_id):
+        if request.user.is_authenticated:
+            rate,created = models.UserCommentRelation.objects.get_or_create(comment_id=comment_id,user=request.user)
+            if rate.grade == 1: 
+                rate.grade = 0
+                rate.save()
+                return render(request,'rate_comment/rate_btn.html',context={'comment_id' : comment_id})
+            else:
+                rate.grade = 1
+                rate.save()
+                return render(request,'rate_comment/unrate_btn.html',context={'comment_id' : comment_id})
+                
+        return HttpResponse("",status=401)
