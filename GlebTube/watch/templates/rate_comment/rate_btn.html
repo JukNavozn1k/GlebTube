@@ -1,5 +1,9 @@
 <button type="button" class="btn btn-primary btn-floating float-end"
+{% if comment %}
 hx-post="{% url 'rate_comment' comment.id %}"
+{% else %}
+hx-post="{% url 'rate_comment' comment_id %}"
+{% endif %}
 hx-swap="outerHTML"
 hx-headers='{"X-CSRFToken": "{{csrf_token}}"}'
 >
