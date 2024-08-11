@@ -79,3 +79,17 @@ class CommentVideo(models.Model):
     def __str__(self) -> str:
         return f'{self.id} : {self.author} -> {self.instance}'
     
+class UserCommentRelation(models.Model):
+    CHOICES = [(0, 'Без оценки'), (1, 'С оценкой')]
+   
+    user = models.ForeignKey(User,on_delete=models.CASCADE,verbose_name="Пользователь")
+    grade = models.BooleanField(default=0,choices=CHOICES,verbose_name="Оценка")
+    comment = models.ForeignKey(CommentVideo,on_delete=models.CASCADE,verbose_name="Комментарий",related_name='comment_rates')
+    def __str__(self) -> str:
+        return f'{self.id} : {self.user} -> {self.CHOICES[self.grade][1]}'
+    class Meta:
+        verbose_name = 'Пользователь-комментарий'
+        verbose_name_plural = 'Пользователи-комментарии'
+
+        unique_together = ['comment', 'user']
+    
