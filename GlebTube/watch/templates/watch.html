@@ -73,9 +73,25 @@
 <div class = "rate_container float-right"
 hx-get="{% url 'rate_video' video.id %}" hx-swap="innerHTML" hx-trigger="revealed">
 {% include 'spinners/loading_spinner_htmx.html' %}
-</div>
-<a type="button" class="btn btn-link float-end btn-rounded mx-2" data-mdb-ripple-init data-mdb-ripple-color="dark" href="{% url 'download_video' video.id %}"><i class="fas fa-download"></i> Скачать </a>
 
+</div>
+<div class="dropdown dropup" onclick="event.stopPropagation()">
+  <button
+    class="btn btn-link btn-floating float-end"
+    type="button"
+    id="dropdownMenuButton"
+    data-mdb-dropdown-init
+    data-mdb-ripple-init
+    aria-expanded="false"
+  >
+  <i class="fas fa-ellipsis-vertical"></i>
+  </button>
+  {% include "video/video_options_list.html" %}
+</div>
+
+{% comment %}
+<a type="button" class="btn btn-link float-end btn-rounded mx-2" data-mdb-ripple-init data-mdb-ripple-color="dark" href="{% url 'download_video' video.id %}"><i class="fas fa-download"></i> Скачать </a>
+{% endcomment %}
 <!-- COMMENT(s) -->
 </div class="comment_form">
   <h3 id="comments_count">Комментарии</h3>
