@@ -1,0 +1,17 @@
+{% load user_filters %}
+<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+  {% if request.user == video.author %}
+  <li><a class="dropdown-item" href="{% url 'edit_video' video.id %}"><i class="fas fa-pen"></i> Редактировать</a></li>
+  <li><a class="dropdown-item" href="#"
+    data-mdb-modal-init data-mdb-target="#rm_video_modal"
+    hx-get="{% url 'delete_video_modal' video.id %}" 
+    hx-swap="innerHTML"
+    hx-target="#rm_video_modal_wrapper"
+    hx-headers='{"X-CSRFToken": "{{ csrf_token}}"}'
+    > <i class="fas fa-trash"></i> Удалить</a></li>
+  {% endif %}
+    <li><a class="dropdown-item" href="{% url 'download_video' video.id %}"><i class="fas fa-download"></i> Скачать</a></li>
+  
+
+
+</ul>
