@@ -94,7 +94,7 @@ class History(views.View):
 class SubList(views.View):
     def get(self, request, user_id):
         user = get_object_or_404(User, id=user_id)
-        queryset = user.subscriptions.select_related('author__additional').filter(active=True)
+        queryset = user.subscriptions.select_related('author').filter(active=True)
         context = {'queryset': queryset}
         print(queryset)
         return render(request, 'sub_list/sub_list.html', context = context)
