@@ -69,10 +69,21 @@
         <i class="fas fa-star-of-david"></i>   Количество Звёзд: {{video.stars_count}}
         <i class="fas fa-eye"></i> Количество просмотров: {{video.views}}</p>
       <p class="card-text"><i class="fas fa-clock"></i> Дата выхода: {{video.date_uploaded|date:"m.d.Y"}}</p>
-      <p class="card-text" onclick="location.href='{% url 'user_profile' video.author_id %}';" style="cursor:pointer;">
-        <img class="rounded-circle mx-3" src="{{video.author.avatar | parse_avatar}}" width="35" height="35">
-         <strong> {{video.author.username}} </strong>
+      <p class="card-text" style="width:30rem">
+        <span class="d-inline-block">  
+          <img class="rounded-circle mx-3" src="{{video.author.avatar | parse_avatar}}" width="35" height="35"
+          onclick="location.href='{% url 'user_profile' video.author_id %}';" style="cursor:pointer;">
+          <strong onclick="location.href='{% url 'user_profile' video.author_id %}';" style="cursor:pointer;"> 
+            {{video.author.username}} 
+          </strong>
+          {% if video.author.id != request.user.id %}
+          <i class = "rate_container mx-3"
+            hx-get="{% url 'subscribe' video.author.id %}" hx-swap="innerHTML" hx-trigger="revealed">
+          </i>
+          {% endif %}
+        </span>
       </p>
+      
     </div>
 
   </div>
