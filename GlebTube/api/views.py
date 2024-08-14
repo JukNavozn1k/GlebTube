@@ -7,11 +7,16 @@ from auths.models import User
 from api.serializers import *
 # Create your views here.
 
+from . import permissions
+
 from django.db.models import Prefetch,Count,Case,When
 
-class UserApiView(mixins.RetrieveModelMixin,mixins.ListModelMixin,GenericViewSet):
+class UserApiView(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    
+    permission_classes = [permissions.EditUserPermission]
+    
     
 
 class CommentsApiView(mixins.RetrieveModelMixin,mixins.ListModelMixin,GenericViewSet):
