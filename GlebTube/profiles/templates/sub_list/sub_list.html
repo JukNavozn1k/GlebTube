@@ -1,0 +1,18 @@
+
+{% extends 'index.html' %}
+{% load user_filters %}
+{%block content %}
+    {% for sub in queryset %} 
+        <div class="card" style="max-width: 60rem; min-width: 30rem; margin:0 auto">
+            <div class="card-body" onclick="location.href='{% url 'user_profile' sub.author.id %}';" style="cursor:pointer;">
+                <img class="rounded-circle" src="{{sub.author.avatar | parse_avatar }}" width="50" height="50">
+                <h5 class="card-title mb-0"> {{sub.author}} </h5>
+                    <h6 class="card-subtitle mb-2 text-muted"> Подписчиков: {{sub.author.subs_count}} </h6>
+                <span>
+                    <p class="card-text"> {{sub.author.profile_description}}</p>
+                </span>
+            </div>
+        </div>
+        <h1></h1>   
+    {% endfor %}
+{% endblock %}
