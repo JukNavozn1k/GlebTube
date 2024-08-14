@@ -11,7 +11,7 @@ from . import permissions
 
 from django.db.models import Count,Case,When
 
-class UserApiView(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.DestroyModelMixin, mixins.UpdateModelMixin,GenericViewSet):
+class UserApiView(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     
@@ -40,6 +40,7 @@ class VideoApiView(ModelViewSet):
     permission_classes = [permissions.EditContentPermission]
     
     filter_backends = [SearchFilter,OrderingFilter]
+    
     search_fields = ['caption']
     ordering_fields = ['stars_count','views']
     
