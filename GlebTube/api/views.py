@@ -20,7 +20,7 @@ class CommentsApiView(mixins.RetrieveModelMixin,mixins.ListModelMixin,GenericVie
     
 
 
-class VideoApiView(mixins.RetrieveModelMixin,mixins.ListModelMixin,GenericViewSet):
+class VideoApiView(ModelViewSet):
 
     queryset = Video.objects.all().select_related('author').prefetch_related('video_comments__author')
     serializer_class = VideoApiSerializer

@@ -16,15 +16,17 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = video_models.CommentVideo
         fields = "__all__"
+        read_only_fields = ['author', 'instance','DAT']
 
 
 
 class VideoApiSerializer(serializers.ModelSerializer):
     
-    author = UserSerializer()
-    video_comments = CommentSerializer(many=True)
+    author = UserSerializer(read_only=True)
+    video_comments = CommentSerializer(many=True,read_only=True)
     class Meta:
         model = video_models.Video
         fields = '__all__'
+        read_only_fields = ['hls', 'duration', 'status', 'is_running', 'views', 'stars_count', 'date_uploaded']
 
 
