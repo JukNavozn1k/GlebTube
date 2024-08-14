@@ -4,7 +4,8 @@ from rest_framework import mixins
 from videos.models import Video,CommentVideo
 from auths.models import User
 from api.serializers import *
-# Create your views here.
+
+from rest_framework.filters import SearchFilter,OrderingFilter
 
 from . import permissions
 
@@ -16,6 +17,8 @@ class UserApiView(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.Destr
     
     permission_classes = [permissions.EditUserPermission]
     
+    filter_backends = [SearchFilter]
+    search_fields = ['username']
     
 
 class CommentsApiView(ModelViewSet):
@@ -35,6 +38,10 @@ class VideoApiView(ModelViewSet):
     serializer_class = VideoApiSerializer
     
     permission_classes = [permissions.EditContentPermission]
+    
+    filter_backends = [SearchFilter,OrderingFilter]
+    search_fields = ['caption']
+    ordering_fields = ['stars_count','views']
     
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
