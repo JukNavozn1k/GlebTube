@@ -13,11 +13,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
-    stars_count = serializers.IntegerField(default=0)
+    stars_count = serializers.IntegerField(default=0,read_only=True)
     class Meta:
         model = video_models.CommentVideo
         fields = "__all__"
-        read_only_fields = ['author', 'instance','DAT']
+        read_only_fields = ['author','date_uploaded']
 
 
 
