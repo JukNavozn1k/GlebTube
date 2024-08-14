@@ -7,11 +7,5 @@
     <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">
       Ну нахуй
     </button>
-    <button type="button" class="btn btn-danger" data-mdb-dismiss="modal"
-    hx-delete="{% url 'delete_video' video_id %}"
-    hx-swap="outerHTML"
-    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-    hx-target="#video-card-{{video_id}}"
-    
-    >Похуй</button>
+    <button type="button" class="btn btn-danger" data-mdb-dismiss="modal">Похуй</button>
   </div>
