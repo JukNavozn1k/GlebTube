@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import render,redirect,HttpResponse
 from django import views
+from django.urls import reverse
 
 from . import forms
 from . import models
@@ -78,13 +79,30 @@ class Subscribe(views.View):
 
 class History(views.View):
       # return's all watched wideo in -watched order
-      def get(self,request,user):
-            videos = models.WatchHistory.objects.filter(viewer__id=user).select_related('video').order_by('-id')
-            videos = [v.video for v in videos]
-            context = {'videos':videos,'title':'История'}
-            return render(request,'video/video_list.html',context=context)
-      def delete(self,request):
-          if request.user.is_authenticated:
+    def get(self,request,user):
+        videos = models.WatchHistory.objects.filter(viewer__id=user).select_related('video').order_by('-id')
+        videos = [v.video for v in videos]
+        context = {'videos':videos,'title':'История'}
+        return render(request,'video/video_list.html',context=context)
+    def delete(self,request):
+        if request.user.is_authenticated:
             tasks.clear_history.delay(request.user.id)
             return render(request,'alerts/success.html',context={'desc': 'История очищена'})
-          else: return render(request,'alerts/error.html',context={'desc': 'История не очищена'})
+        else: 
+            return render(request,'alerts/error.html',context={'desc': 'История не очищена'})
+
+class SubList(views.View):
+    def get(self, request, user_id):
+        user = get_object_or_404(User, id=user_id)
+        queryset = user.subscriptions.select_related('author').filter(active=True)
+        context = {'queryset': queryset}
+        print(queryset)
+        return render(request, 'sub_list/sub_list.html', context = context)
+        
+def MySubList(request):
+    if request.method == 'GET':
+        user_id = request.user.id
+        if user_id:
+            return redirect(f'{user_id}/sub_list')
+        else:
+            return redirect(reverse('signIn'))
