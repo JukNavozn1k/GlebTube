@@ -18,11 +18,17 @@ class CommentsApiView(mixins.RetrieveModelMixin,mixins.ListModelMixin,GenericVie
     queryset = CommentVideo.objects.all().prefetch_related('author').annotate(stars_count=Count(Case(When(comment_rates__grade = 1,then=1))))
     serializer_class = CommentSerializer
     
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+    
 
 
 class VideoApiView(ModelViewSet):
 
     queryset = Video.objects.all().select_related('author').prefetch_related('video_comments__author')
     serializer_class = VideoApiSerializer
+    
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
     
 
