@@ -9,7 +9,9 @@ from rest_framework.filters import SearchFilter,OrderingFilter
 
 from . import permissions
 
-from django.db.models import Count,Case,When
+from django.db.models import Count,Case,When,Prefetch
+
+from videos.models import CommentVideo
 
 class UserApiView(ModelViewSet):
     queryset = User.objects.all()
@@ -22,7 +24,8 @@ class UserApiView(ModelViewSet):
     
 
 class CommentsApiView(ModelViewSet):
-    queryset = CommentVideo.objects.all().prefetch_related('author').annotate(stars_count=Count(Case(When(comment_rates__grade = 1,then=1))))
+    queryset = CommentVideo.objects.all().prefetch_related('author').annotate(stars_count=Count
+                                    (Case(When(comment_rates__grade = 1,then=1))))
     serializer_class = CommentSerializer
     
     permission_classes = [permissions.EditContentPermission]
@@ -38,8 +41,12 @@ class CommentsApiView(ModelViewSet):
 
 
 class VideoApiView(ModelViewSet):
-
-    queryset = Video.objects.all().select_related('author').prefetch_related('video_comments__author')
+    
+    prefetched_comments = Prefetch('video_comments',
+                                   CommentVideo.objects.all().annotate(stars_count=Count
+                                    (Case(When(comment_rates__grade = 1,then=1)))).prefetch_related('author'))
+    
+    queryset = Video.objects.all().select_related('author').prefetch_related(prefetched_comments)
     serializer_class = VideoApiSerializer
     
     permission_classes = [permissions.EditContentPermission]
