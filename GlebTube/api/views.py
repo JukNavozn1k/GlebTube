@@ -27,6 +27,11 @@ class CommentsApiView(ModelViewSet):
     
     permission_classes = [permissions.EditContentPermission]
     
+    filter_backends = [OrderingFilter]
+    
+
+    ordering_fields = ['stars_count']
+    
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
     
