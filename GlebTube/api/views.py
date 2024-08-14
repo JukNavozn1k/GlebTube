@@ -9,9 +9,9 @@ from rest_framework.filters import SearchFilter,OrderingFilter
 
 from . import permissions
 
-from django.db.models import Count,Case,When,Prefetch
+from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists
 
-from videos.models import CommentVideo
+from videos.models import UserVideoRelation,CommentVideo
 
 class UserApiView(ModelViewSet):
     queryset = User.objects.all()
@@ -55,6 +55,14 @@ class VideoApiView(ModelViewSet):
     
     search_fields = ['caption']
     ordering_fields = ['stars_count','views']
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.user.is_authenticated:
+            subquery = UserVideoRelation.objects.filter(video_id=OuterRef('pk'),user=self.request.user,grade=1)
+            queryset = queryset.annotate(user_rated=Exists(subquery))
+        
+        return queryset
     
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
