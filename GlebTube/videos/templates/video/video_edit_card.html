@@ -1,34 +1,21 @@
 {% extends 'video/video_card.html' %}
 
-
 {% block edit_block %}
 
-
 <div class="dropdown" onclick="event.stopPropagation()">
-    <button
-      class="btn btn-link btn-floating btn-lg"
-      type="button"
-      id="dropdownMenuButton"
-      data-mdb-dropdown-init
-      data-mdb-ripple-init
-      aria-expanded="false"
-    >
-    <i class="fas fa-ellipsis-vertical"></i>
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-      <li><a class="dropdown-item" href="{% url 'edit_video' video.id %}"><i class="fas fa-pen"></i> Редактировать</a></li>
-      <li><a class="dropdown-item" href="#"
-        data-mdb-modal-init data-mdb-target="#rm_video_modal"
-        hx-get="{% url 'delete_video_modal' video.id %}" 
-        hx-swap="innerHTML"
-        hx-target="#rm_video_modal_wrapper"
-        hx-headers='{"X-CSRFToken": "{{ csrf_token}}"}'
-            
-        
-        
-        > <i class="fas fa-trash"></i> Удалить</a></li>
-    </ul>
-  </div>
+  <button
+    class="btn btn-link btn-floating btn-lg"
+    type="button"
+    id="dropdownMenuButton"
+    data-mdb-dropdown-init
+    data-mdb-ripple-init
+    aria-expanded="false"
+  >
+  <i class="fas fa-ellipsis-vertical"></i>
+  </button>
+  {% include "video/video_options_list.html" %}
+</div>
+
 
 
 
