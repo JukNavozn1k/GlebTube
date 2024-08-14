@@ -1,5 +1,6 @@
 
 from rest_framework.viewsets import *
+from rest_framework import mixins
 from videos.models import Video,CommentVideo
 from auths.models import User
 from api.serializers import *
@@ -9,7 +10,7 @@ from . import permissions
 
 from django.db.models import Count,Case,When
 
-class UserApiView(ModelViewSet):
+class UserApiView(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.DestroyModelMixin, mixins.UpdateModelMixin,GenericViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     
