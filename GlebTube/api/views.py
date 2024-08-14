@@ -1,7 +1,5 @@
-from django.shortcuts import render
-from rest_framework.viewsets import *
-from rest_framework import mixins
 
+from rest_framework.viewsets import *
 from videos.models import Video,CommentVideo
 from auths.models import User
 from api.serializers import *
@@ -9,7 +7,7 @@ from api.serializers import *
 
 from . import permissions
 
-from django.db.models import Prefetch,Count,Case,When
+from django.db.models import Count,Case,When
 
 class UserApiView(ModelViewSet):
     queryset = User.objects.all()
@@ -19,9 +17,11 @@ class UserApiView(ModelViewSet):
     
     
 
-class CommentsApiView(mixins.RetrieveModelMixin,mixins.ListModelMixin,GenericViewSet):
+class CommentsApiView(ModelViewSet):
     queryset = CommentVideo.objects.all().prefetch_related('author').annotate(stars_count=Count(Case(When(comment_rates__grade = 1,then=1))))
     serializer_class = CommentSerializer
+    
+    permission_classes = [permissions.EditContentPermission]
     
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -32,6 +32,8 @@ class VideoApiView(ModelViewSet):
 
     queryset = Video.objects.all().select_related('author').prefetch_related('video_comments__author')
     serializer_class = VideoApiSerializer
+    
+    permission_classes = [permissions.EditContentPermission]
     
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
