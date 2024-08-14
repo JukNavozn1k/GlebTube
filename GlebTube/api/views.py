@@ -7,7 +7,7 @@ from auths.models import User
 from api.serializers import *
 # Create your views here.
 
-from django.db.models import Prefetch
+from django.db.models import Prefetch,Count,Case,When
 
 class UserApiView(mixins.RetrieveModelMixin,mixins.ListModelMixin,GenericViewSet):
     queryset = User.objects.all()
@@ -15,7 +15,7 @@ class UserApiView(mixins.RetrieveModelMixin,mixins.ListModelMixin,GenericViewSet
     
 
 class CommentsApiView(mixins.RetrieveModelMixin,mixins.ListModelMixin,GenericViewSet):
-    queryset = CommentVideo.objects.all().prefetch_related('author')
+    queryset = CommentVideo.objects.all().prefetch_related('author').annotate(stars_count=Count(Case(When(comment_rates__grade = 1,then=1))))
     serializer_class = CommentSerializer
     
 
