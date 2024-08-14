@@ -11,7 +11,7 @@ from . import permissions
 
 from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists
 
-from videos.models import UserVideoRelation,CommentVideo
+from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
 
 class UserApiView(ModelViewSet):
     queryset = User.objects.all()
@@ -31,10 +31,13 @@ class CommentsApiView(ModelViewSet):
     permission_classes = [permissions.EditContentPermission]
     
     filter_backends = [OrderingFilter]
-    
-
     ordering_fields = ['stars_count']
-    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.user.is_authenticated:
+            subquery = UserCommentRelation.objects.filter(comment_id=OuterRef('pk'),user=self.request.user,grade=1)
+            queryset = queryset.annotate(user_rated=Exists(subquery))
+        return queryset
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
     
