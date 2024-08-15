@@ -5,10 +5,10 @@ from auths.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True,required=False)
+    # password = serializers.CharField(write_only=True,required=False)
     class Meta:
         model = User
-        fields = ("username","password", "avatar", "profile_description",'stars_count', 'subs_count')
+        fields = ("username", "avatar", "profile_description",'stars_count', 'subs_count')
         read_only_fields = ['stars_count', 'subs_count']
 
 

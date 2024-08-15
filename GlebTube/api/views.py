@@ -8,7 +8,7 @@ from api.serializers import *
 from rest_framework.filters import SearchFilter,OrderingFilter
 
 from . import permissions
-
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists
 
 from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
@@ -17,7 +17,7 @@ class UserApiView(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     
-    permission_classes = [permissions.EditUserPermission]
+    permission_classes = [IsAuthenticatedOrReadOnly,permissions.EditUserPermission]
     
     filter_backends = [SearchFilter]
     search_fields = ['username']
@@ -28,7 +28,7 @@ class CommentsApiView(ModelViewSet):
                                     (Case(When(comment_rates__grade = 1,then=1))))
     serializer_class = CommentSerializer
     
-    permission_classes = [permissions.EditContentPermission]
+    permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     
     filter_backends = [OrderingFilter]
     ordering_fields = ['stars_count']
@@ -45,12 +45,10 @@ class CommentsApiView(ModelViewSet):
 
 class VideoApiView(ModelViewSet):
 
-        
-
     queryset = Video.objects.all().select_related('author') 
     serializer_class = VideoApiSerializer
     
-    permission_classes = [permissions.EditContentPermission]
+    permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     
     filter_backends = [SearchFilter,OrderingFilter]
     
@@ -61,12 +59,12 @@ class VideoApiView(ModelViewSet):
         queryset = super().get_queryset()
         comments = CommentVideo.objects.all()
         if self.request.user.is_authenticated:
+            # user_rated video (false not rated, true rated)
             subquery = UserVideoRelation.objects.filter(video_id=OuterRef('pk'),user=self.request.user,grade=1)
             queryset = queryset.annotate(user_rated=Exists(subquery))
-            
+            # user_rated comment (false not rated, true rated)
             subquery = UserCommentRelation.objects.filter(comment_id=OuterRef('pk'),user=self.request.user,grade=1)
             comments = comments.annotate(user_rated=Exists(subquery))
-            
 
         prefetched_comments = Prefetch('video_comments',
                                    comments.annotate(stars_count=Count
