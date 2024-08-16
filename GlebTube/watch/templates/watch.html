@@ -68,11 +68,11 @@
           <strong onclick="location.href='{% url 'user_profile' video.author_id %}';" style="cursor:pointer;"> 
             {{video.author.username}} 
           </strong>
-          <!-- {% if video.author.id != request.user.id %}
+          {% if video.author.id != request.user.id %}
           <i class = "rate_container mx-3"
-            hx-get="{% url 'subscribe' video.author.id %}" hx-swap="innerHTML" hx-trigger="load">
+            hx-get="{% url 'subscribe_button' video.author.id %}" hx-swap="innerHTML" hx-trigger="load">
           </i>
-          {% endif %} -->
+          {% endif %}
         </span>
       </p>
       
