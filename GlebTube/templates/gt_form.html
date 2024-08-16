@@ -8,12 +8,12 @@
 {% if error_alert %} 
     <div class="form-group">
     <div class="alert alert-danger">
-        <strong>Неудача: </strong> {{error_alert.description}}
+        <i class="fas fa-face-sad-cry"></i>  <strong>Неудача: </strong> {{error_alert.description}}
     </div>
 {% elif success_alert %}
 <div class="form-group">
     <div class="alert alert-success">
-        <strong>Успех: </strong> {{success_alert.description}}
+        <i class="fas fa-face-smile-wink"></i> <strong>Успех: </strong> {{success_alert.description}}
     </div>
 {% endif %}
 
