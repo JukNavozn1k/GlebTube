@@ -57,7 +57,7 @@ class UserLiked(views.View):
             return render(request,'video/video_list.html',context={'videos': queryset})
 
 
-class Subscribe(views.View):
+class SubscribeView(views.View):
     def get_response_data(self,request,context,active):
         if active:
             return render(request,'sub_buttons/unsub.html',context=context)
@@ -95,15 +95,15 @@ class History(views.View):
 
 class SubList(views.View):
     def get(self, request, user_id):
-        
-        
+
         queryset = models.Subscription.objects.filter(active=True,subscriber_id=user_id).select_related('author')
         context = {'queryset': queryset}
         return render(request, 'sub_list/sub_list.html', context = context)
         
-def MySubList(request):
-    if  request.user.is_authenticated:
-        user_id = request.user.id    
-        return redirect(f'{user_id}/sub_list')
-   
-    return redirect(reverse('signIn'))
+        
+class MySubList(views.View):
+    def get(self,request):
+        if request.user.is_authenticated:
+            user_id = request.user.id    
+            return redirect(f'{user_id}/sub_list')
+        return redirect(reverse('signIn'))
