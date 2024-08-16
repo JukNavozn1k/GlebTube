@@ -25,6 +25,7 @@ schema_view = get_schema_view(
 
 smp = SimpleRouter()
 smp.register('video', views.VideoApiView)
+smp.register('user-video-relation', views.UserVideoRelationApiView)
 smp.register('user', views.UserApiView)
 smp.register('comment', views.CommentsApiView)
 

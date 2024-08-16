@@ -26,12 +26,19 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class VideoApiSerializer(serializers.ModelSerializer):
     
-    author = UserSerializer(read_only=True)
-    video_comments = CommentSerializer(many=True,read_only=True)
-    user_rated = serializers.BooleanField(default=False,read_only=True)
+    
     class Meta:
         model = video_models.Video
         fields = '__all__'
         read_only_fields = ['hls', 'duration', 'status', 'is_running', 'views', 'stars_count', 'date_uploaded']
+
+
+
+class UserVideoRelationApiSerializer(serializers.ModelSerializer):
+  
+    class Meta:
+        model = video_models.UserVideoRelation
+        fields = '__all__'
+        read_only_fields = ['user']
 
 

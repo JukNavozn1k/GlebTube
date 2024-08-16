@@ -77,3 +77,12 @@ class VideoApiView(ModelViewSet):
         serializer.save(author=self.request.user)
     
 
+class UserVideoRelationApiView(ModelViewSet):
+    queryset = UserVideoRelation.objects.all()
+    serializer_class = UserVideoRelationApiSerializer
+    
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

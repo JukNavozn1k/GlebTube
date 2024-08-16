@@ -10,6 +10,8 @@ from . import tasks
 from videos.models import Video,UserVideoRelation
 from auths.models import User
 
+
+
 from django.shortcuts import get_object_or_404
 
 
@@ -93,16 +95,15 @@ class History(views.View):
 
 class SubList(views.View):
     def get(self, request, user_id):
-        user = get_object_or_404(User, id=user_id)
-        queryset = user.subscriptions.select_related('author').filter(active=True)
+        
+        
+        queryset = models.Subscription.objects.filter(active=True,subscriber_id=user_id).select_related('author')
         context = {'queryset': queryset}
-        print(queryset)
         return render(request, 'sub_list/sub_list.html', context = context)
         
 def MySubList(request):
-    if request.method == 'GET':
-        user_id = request.user.id
-        if user_id:
-            return redirect(f'{user_id}/sub_list')
-        else:
-            return redirect(reverse('signIn'))
+    if  request.user.is_authenticated:
+        user_id = request.user.id    
+        return redirect(f'{user_id}/sub_list')
+   
+    return redirect(reverse('signIn'))
