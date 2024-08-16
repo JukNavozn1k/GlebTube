@@ -3,13 +3,15 @@ from django.urls import reverse
 from django.views import View
 
 from . import forms
-from .models import Video,UserVideoRelation
+from .models import Video
 
 
 from auths.models import User
 
 from django.shortcuts import get_object_or_404
 
+from django.http import JsonResponse
+from django.shortcuts import redirect
 
 from . import tasks
 
@@ -33,7 +35,9 @@ def my_videos(request):
 def delete_video(request,video_id):
     if request.user.is_authenticated :
             tasks.remove_video.delay(video_id,request.user.id)
-            return HttpResponse("",status=200)
+            response = JsonResponse({'success': True})
+            response['HX-Redirect'] = '/'  # Redirect to the homepage
+            return response
     else: return HttpResponse("",status=401)
 
 
