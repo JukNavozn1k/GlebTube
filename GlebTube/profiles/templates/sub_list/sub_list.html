@@ -5,7 +5,7 @@
     {% if queryset %}
 
     {% for sub in queryset %} 
-        <div class="card" style="max-width: 60rem; min-width: 30rem; margin:0 auto">
+        <div class="card" style="max-width: 60rem; min-width: 30rem; margin:0 auto; border-radius: 32px;">
             <div class="card-body" onclick="location.href='{% url 'user_profile' sub.author.id %}';" style="cursor:pointer;">
                 <img class="rounded-circle" src="{{sub.author.avatar | parse_avatar }}" width="50" height="50">
                 <h5 class="card-title mb-0"> {{sub.author}} </h5>
