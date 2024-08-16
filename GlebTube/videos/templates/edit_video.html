@@ -1,0 +1,35 @@
+{% extends 'gt_form.html' %}
+
+{% block form_additional %}
+
+
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-outline-danger btn-rounded" data-mdb-ripple-init data-mdb-modal-init data-mdb-target="#exampleModal">
+   Удалить
+  </button>
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Удалить видео?</h5>
+          <button type="button" class="btn-close" data-mdb-ripple-init data-mdb-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            Вы в этом уверены? Вы можете потерять свою популярность. 
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-rounded" data-mdb-ripple-init data-mdb-dismiss="modal">Ну нахуй</button>
+          <a type="button" href="/" class="btn btn-danger btn-rounded"
+          hx-delete="{% url 'delete_video' video_id %}" 
+       
+          hx-headers='{"X-CSRFToken": "{{ csrf_token}}"}'
+          
+          data-mdb-ripple-init>Похуй</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
