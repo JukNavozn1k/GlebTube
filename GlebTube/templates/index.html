@@ -73,49 +73,28 @@
 
 
               {% if request.user.is_staff %}
-              <li>
-                <a class="dropdown-item" href="/admin/"><i class="fas fa-user-lock"></i> Админка</a>
-              </li>
+              <li><a class="dropdown-item" href="/admin/"><i class="fas fa-user-lock"></i> Админка</a></li>
               {% endif %}
 
 
-              <li>
-                <a class="dropdown-item" href="{% url 'user_profile' request.user.id %}"><i class="fas fa-user"></i> Профиль</a>
-              </li>
+              <li><a class="dropdown-item" href="{% url 'user_profile' request.user.id %}"><i class="fas fa-user"></i> Профиль</a></li>
               <li><hr class="dropdown-divider" /></li>
 
-              <li>
-                <a class="dropdown-item" href="{% url 'my_sub_list' %}"> <i class="fas fa-rectangle-list"></i> Мои подписки</a>
-              </li>
-
-              <li>
-                <a class="dropdown-item" href="{% url 'my_videos' %}"><i class="fas fa-circle-play"></i> Мои видео</a>
-              </li>
-
-              <li>
-                <a class="dropdown-item" href="{% url 'upload' %}"><i class="fas fa-circle-plus"></i> Новое видео</a>
-              </li>
+              <li><a class="dropdown-item" href="{% url 'my_sub_list' %}"> <i class="fas fa-rectangle-list"></i> Мои подписки</a></li>
+              <li><a class="dropdown-item" href="{% url 'my_videos' %}"><i class="fas fa-circle-play"></i> Мои видео</a></li>
+              <li><a class="dropdown-item" href="{% url 'upload' %}"><i class="fas fa-circle-plus"></i> Новое видео</a></li>
 
               <li><hr class="dropdown-divider" /></li>
               <div class="mode-switch"> 
-              <li>
-                <a class="dropdown-item" id="system" href="#"><i class="fas fa-sliders"></i> Системная тема</a>
-              </li>
 
-              <li>
-                <a class="dropdown-item" id="dark" href="#"><i class="fas fa-moon"></i> Тёмная тема</a>
-              </li>
-
-              <li>
-                <a class="dropdown-item" id="light" href="#"><i class="fas fa-sun"></i> Светлая тема</a>
-              </li>
+              <li><a class="dropdown-item" id="system" href="#"><i class="fas fa-sliders"></i> Системная тема</a></li>
+              <li><a class="dropdown-item" id="dark" href="#"><i class="fas fa-moon"></i> Тёмная тема</a></li>
+              <li><a class="dropdown-item" id="light" href="#"><i class="fas fa-sun"></i> Светлая тема</a></li>
 
             </div>
               <li><hr class="dropdown-divider" /></li>
 
-              <li>
-                <a class="dropdown-item" href="{% url 'signOut' %}"><i class="fas fa-person-running"></i> Выход</a>
-              </li>
+              <li><a class="dropdown-item" href="{% url 'signOut' %}"><i class="fas fa-person-running"></i> Выход</a></li>
 
             </ul>
           </li>
@@ -125,11 +104,6 @@
       {% endif %}
     </div>
   </header>
-
-  
-
-
-
 
     <div class ="content"> 
       {% block content %} {% endblock %}
