@@ -2,6 +2,8 @@
 {% extends 'index.html' %}
 {% load user_filters %}
 {%block content %}
+    {% if queryset %}
+
     {% for sub in queryset %} 
         <div class="card" style="max-width: 60rem; min-width: 30rem; margin:0 auto">
             <div class="card-body" onclick="location.href='{% url 'user_profile' sub.author.id %}';" style="cursor:pointer;">
@@ -15,4 +17,11 @@
         </div>
         <h1></h1>   
     {% endfor %}
+
+   
+
+    {% else %}
+    <h1>Нет активных подписок...</h1>
+    {% endif %}
+    
 {% endblock %}
