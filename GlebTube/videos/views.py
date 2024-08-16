@@ -30,9 +30,6 @@ def my_videos(request):
     context = {'author_buttons':True,'title':'Мои видео','videos': videos}
     return render(request,'main.html',context=context)
 
-def rm_video_modal(request,video_id):
-    return render(request,'rm_video_modal_confirm.html',context={'video_id':video_id})
-
 def delete_video(request,video_id):
     if request.user.is_authenticated :
             tasks.remove_video.delay(video_id,request.user.id)
@@ -61,7 +58,7 @@ class EditVideo(View):
        if not request.user.is_authenticated: return HttpResponse("",status=401)
        video = get_object_or_404(Video,author=request.user,id=video_id)
        form = forms.EditForm(instance=video)
-       return render(request,'gt_form.html',context={'form':form,'title':'Редактировать видео'})
+       return render(request,'edit_video.html',context={'form':form,'title':'Редактировать видео','video_id':video_id})
      
     def post(self,request,video_id):
         if not request.user.is_authenticated: return HttpResponse("",status=401)
@@ -69,5 +66,5 @@ class EditVideo(View):
         form = forms.EditForm(request.POST,request.FILES,instance=video)
         if form.is_valid():
             form.save()
-            return render(request,'gt_form.html',context={'form':forms.EditForm(instance=video),'success_alert':{'description':f'Видео успешно отредактировано.','title':'Редактировать видео'}})
-        else: return render(request,'gt_form.html',context={'form':forms.EditForm(instance=video),'error_alert':{'description':f'{form.errors}','title':'Редактировать видео'}})
+            return render(request,'edit_video.html',context={'form':forms.EditForm(instance=video),'success_alert':{'description':f'Видео успешно отредактировано.','title':'Редактировать видео'}})
+        else: return render(request,'edit_video.html',context={'form':forms.EditForm(instance=video),'error_alert':{'description':f'{form.errors}','title':'Редактировать видео'}})

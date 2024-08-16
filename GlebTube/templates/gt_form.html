@@ -25,6 +25,9 @@
 <form enctype="multipart/form-data" method="POST" action="">
     {% csrf_token %}
     {{ form.as_p }}
+
+    {% block form_additional %}
+    {% endblock %}
     <input type="submit" value="Подтвердить" class="btn btn-outline-primary btn-rounded"/>
     </form>
 
