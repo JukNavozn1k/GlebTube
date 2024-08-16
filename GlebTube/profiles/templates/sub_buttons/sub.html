@@ -1,5 +1,5 @@
 <button type="button" 
-hx-put="{% url 'subscribe' user.id %}" 
+hx-put="{% url 'subscribe_button' user.id %}" 
 hx-swap="outerHTML"
 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'       
 class="btn btn-outline-primary btn-rounded">

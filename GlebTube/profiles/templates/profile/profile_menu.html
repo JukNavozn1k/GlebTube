@@ -13,7 +13,7 @@
     </button>
     {% else %}
     <!--SUB/UNSUB BUTTONS-->
-    <div id="sub_btn_area" hx-get="{% url 'subscribe' 1 %}" hx-trigger="load" hx-swap="innerHTML">
+    <div id="sub_btn_area" hx-get="{% url 'subscribe_button' user.id %}" hx-trigger="load" hx-swap="innerHTML">
     </div>
     <!--SUB/UNSUB BUTTONS-->
     {% endif %}
