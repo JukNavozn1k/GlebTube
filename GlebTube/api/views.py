@@ -13,7 +13,7 @@ from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists
 
 from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
 
-class UserApiView(ModelViewSet):
+class UserApiView(mixins.RetrieveModelMixin,mixins.ListModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,GenericViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     
