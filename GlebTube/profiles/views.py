@@ -57,14 +57,16 @@ class UserLiked(views.View):
             return render(request,'video/video_list.html',context={'videos': queryset})
 
 
-class SubscribeView(views.View):
+class SubscribeButtonView(views.View):
     def get_response_data(self,request,context,active):
         if active:
             return render(request,'sub_buttons/unsub.html',context=context)
         return render(request,'sub_buttons/sub.html',context=context)
 
     def get(self,request,user):
+       
         user = get_object_or_404(User,id=user)
+        
         if request.user.is_authenticated:
             subscription,created = models.Subscription.objects.get_or_create(subscriber = request.user,author=user)
             context = {'user' : user}
