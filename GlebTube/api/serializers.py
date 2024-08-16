@@ -26,7 +26,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class VideoApiSerializer(serializers.ModelSerializer):
     
-    
+    author = UserSerializer(read_only=True)
+    user_rated = serializers.BooleanField(default=False,read_only=True)
     class Meta:
         model = video_models.Video
         fields = '__all__'
