@@ -195,7 +195,7 @@ CACHE_HLS_PATH = lambda video_id: f'CACHE_HLS_PATH:{video_id}'
 DEFAULT_AVATAR_URL = 'https://img.freepik.com/premium-vector/bearded-jew-hat-sunglasses-hasidic-icon-vector-illustration_340607-9.jpg'
 DEFAULT_THUMBNAIL_URL = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQztLRnAWYw2TSTe-eQpoMj3PM3qlfHddTKXA&usqp=CAU'
 
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10
-}
+# REST_FRAMEWORK = {
+#     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+#     'PAGE_SIZE': 10
+# }
