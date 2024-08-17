@@ -105,31 +105,3 @@ class RateCommentView(View):
                 
         return HttpResponse("",status=401)
     
-
-class SubscribeBtnView(View):
-    def get_response_data(self, request, context, subscribed):
-        if subscribed == True: 
-            return render(request,'sub_buttons/unsub.html',context=context)
-        else: 
-            return render(request,'sub_buttons/sub.html',context=context)
-
-    def get(self,request, author_id):
-        if request.user.is_authenticated:
-            author = get_object_or_404(models.User, id=author_id)
-            user = request.user
-            subscription, created = profModels.Subscription.objects.get_or_create(author=author, subscriber=user)
-            context = {'subscription': subscription}
-            return self.get_response_data(request, context, subscription.active)
-        return HttpResponse("", status=401)
-    # processing all actions with video
-    def put(self,request, author_id):
-        if request.user.is_authenticated:
-            author = get_object_or_404(models.User, id=author_id)
-            user = request.user
-            subscription, created = profModels.Subscription.objects.get_or_create(author=author, subscriber=user)
-            context = {'subscription': subscription}
-            # tasks.update_video_rate.delay(video_id,user.id)
-            subscription.active = not subscription.active
-            subscription.save()
-            return self.get_response_data(request, context, subscription.active)
-        return HttpResponse("", status=401)
