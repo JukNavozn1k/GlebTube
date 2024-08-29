@@ -62,7 +62,7 @@ class CommentVideo(View):
             model = settings.ANALYZER_MODEL
             input_sequence = settings.TOKENIZER.texts_to_sequences([comment])
   
-            input_padded = pad_sequences(input_sequence, maxlen=32, padding='post')
+            input_padded = pad_sequences(input_sequence, maxlen=len(comment), padding='post')
 
             prediction = model.predict(input_padded)
             new_comment = models.CommentVideo(author=request.user,instance_id=video_id,content=comment,toxicity=prediction)
