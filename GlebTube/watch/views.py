@@ -18,6 +18,10 @@ from django.db.models import Case,When,Count,OuterRef,Exists
 
 from django.urls import reverse
 
+from django.conf import settings
+
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
 class DownloadVideo(View):
     def get(self,request,video_id):
         video = get_object_or_404(models.Video, id=video_id)
@@ -55,8 +59,13 @@ class CommentVideo(View):
     def post(self,request,video_id):
         comment = request.POST.get('comment')
         if request.user.is_authenticated and len(comment) > 0:
-            
-            new_comment = models.CommentVideo(author=request.user,instance_id=video_id,content=comment)
+            model = settings.ANALYZER_MODEL
+            input_sequence = settings.TOKENIZER.texts_to_sequences([comment])
+  
+            input_padded = pad_sequences(input_sequence, maxlen=len(comment), padding='post')
+
+            prediction = model.predict(input_padded)
+            new_comment = models.CommentVideo(author=request.user,instance_id=video_id,content=comment,toxicity=prediction)
             new_comment.save()
             return render(request,'comments/comment.html',context={'comment':new_comment})
         return render(request,'alerts/error.html',context={'desc' : 'Невозможно добавить комментарий'})

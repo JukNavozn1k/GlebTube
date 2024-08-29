@@ -6,6 +6,11 @@ from django.utils import timezone
 from auths.models import User
 from . import tasks
 
+from django.core.exceptions import ValidationError
+
+def validate_probability(value):
+    if not (0 <= value <= 1):
+        raise ValidationError('Probability must be between 0 and 1')
 
 class Video(models.Model):
 
@@ -73,6 +78,7 @@ class CommentVideo(models.Model):
     author = models.ForeignKey(User,on_delete=models.CASCADE,related_name='user_comments')
     content = models.TextField(null=False,blank=False,verbose_name='Контент')
     
+    toxicity = models.FloatField(default=0,validators=[validate_probability],verbose_name='Токсичность')
     
     date_uploaded = models.DateTimeField(default=timezone.now)
     class Meta:
