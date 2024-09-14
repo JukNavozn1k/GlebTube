@@ -78,8 +78,6 @@ class CommentVideo(models.Model):
     author = models.ForeignKey(User,on_delete=models.CASCADE,related_name='user_comments')
     content = models.TextField(null=False,blank=False,verbose_name='Контент')
     
-    toxicity = models.FloatField(default=0,validators=[validate_probability],verbose_name='Токсичность')
-    
     date_uploaded = models.DateTimeField(default=timezone.now)
     class Meta:
          verbose_name = 'Комментарий-Видео'
