@@ -1,0 +1,41 @@
+{% extends 'comments/base_comment.html' %}
+
+{% block content_area %}
+                    <p class="comment-text">{{comment.content}}</p>
+{% endblock %}
+
+{% block comment_buttons %}
+                  
+{% if request.user.is_authenticated %} 
+{% if comment.author == request.user %}
+
+<button type="button" class="btn btn-danger btn-floating float-end"
+  hx-delete="{% url 'delete_comment' comment.id %}" 
+  hx-target="closest div.d-flex.justify-content-center.row" 
+  hx-swap="outerHTML"
+  hx-headers='{"X-CSRFToken": "{{csrf_token}}"}'
+  data-mdb-tooltip-init title="Удалить комментарий"
+  >
+  <i class="fas fa-trash"></i>
+</button>
+
+{% endif %}
+
+
+<button type="button" 
+        class="btn btn-info float-end btn-floating" 
+        data-mdb-tooltip-init 
+        title="Отменить"
+        data-mdb-ripple-init 
+        data-mdb-ripple-color="dark"
+        hx-get="{% url 'edit_comment' comment.id %}" 
+        hx-target="#comment-{{comment.id}}"
+        hx-trigger="click"
+        hx-swap="outerHTML"
+        >
+  <i class="fas fa-trash"></i>
+  </button>
+
+
+{% endif %}
+{% endblock %}
