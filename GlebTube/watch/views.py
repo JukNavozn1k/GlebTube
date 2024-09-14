@@ -106,3 +106,6 @@ class RateCommentView(View):
                 
         return HttpResponse("",status=401)
     
+class EditCommentView(View):
+    def get(self,request,comment_id):
+        return HttpResponse("Edit Comment form...",status=200)

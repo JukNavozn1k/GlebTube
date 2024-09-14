@@ -16,6 +16,7 @@ urlpatterns = [
   path('rate_video/<int:video_id>/',views.RateVideoView.as_view(),name='rate_video'),
   path('rate_comment/<int:comment_id>/',views.RateCommentView.as_view(),name='rate_comment'),
 
+  path('edit_comment/<int:comment_id>/',views.EditCommentView.as_view(),name='edit_comment'),
 
   
 ] 

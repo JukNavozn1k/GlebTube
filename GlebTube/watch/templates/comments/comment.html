@@ -1,6 +1,6 @@
 {% load user_filters %}
 
-<div class="d-flex justify-content-center row">
+<div class="d-flex justify-content-center row" id="comment-{{comment.id}}">
     <div class="col"> 
         <div class="d-flex flex-column comment-section" style="word-wrap: break-word;">
             <div class="p-2">
@@ -41,9 +41,22 @@
                   {% else %}
                   {% include 'rate_comment/rate_btn.html' %}
                   {% endif %}
-                  <button type="button" class="btn btn-info float-end btn-floating" 
-                  data-mdb-tooltip-init title="Редактировать комментарий"
-                  data-mdb-ripple-init data-mdb-ripple-color="dark"><i class="fas fa-pen"></i></button>
+                  
+                  <button type="button" 
+                          class="btn btn-info float-end btn-floating" 
+                          data-mdb-tooltip-init 
+                          title="Редактировать"
+                          data-mdb-ripple-init 
+                          data-mdb-ripple-color="dark"
+                          hx-get="{% url 'edit_comment' comment.id %}" 
+                          hx-target="#comment-{{comment.id}}"
+                          hx-trigger="click"
+                          hx-swap="outerHTML"
+                          >
+                    <i class="fas fa-trash"></i>
+                    </button>
+
+
                   {% endif %}
                 </div>    
             </div>    
