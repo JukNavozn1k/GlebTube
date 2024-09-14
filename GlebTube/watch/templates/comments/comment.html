@@ -1,6 +1,7 @@
 {% load user_filters %}
+
 <div class="d-flex justify-content-center row">
-    <div class="col"> <!--<div class="col-md-8"> -->
+    <div class="col"> 
         <div class="d-flex flex-column comment-section" style="word-wrap: break-word;">
             <div class="p-2">
                 <div class="d-flex flex-row user-info"><img class="rounded-circle" src="{{comment.author.avatar | parse_avatar }}" width="50" height="50"
@@ -24,10 +25,12 @@
                   {% if comment.author == request.user %}
 
                   <button type="button" class="btn btn-danger btn-floating float-end"
-                    hx-delete="/rm_comment/{{comment.id}}" 
+                    hx-delete="{% url 'delete_comment' comment.id %}" 
                     hx-target="closest div.d-flex.justify-content-center.row" 
                     hx-swap="outerHTML"
-                    hx-headers='{"X-CSRFToken": "{{csrf_token}}"}'>
+                    hx-headers='{"X-CSRFToken": "{{csrf_token}}"}'
+                    data-mdb-tooltip-init title="Удалить комментарий"
+                    >
                     <i class="fas fa-trash"></i>
                   </button>
                   
@@ -38,7 +41,9 @@
                   {% else %}
                   {% include 'rate_comment/rate_btn.html' %}
                   {% endif %}
-                  <button type="button" class="btn btn-info float-end btn-floating" data-mdb-ripple-init data-mdb-ripple-color="dark"><i class="fas fa-pen"></i></button>
+                  <button type="button" class="btn btn-info float-end btn-floating" 
+                  data-mdb-tooltip-init title="Редактировать комментарий"
+                  data-mdb-ripple-init data-mdb-ripple-color="dark"><i class="fas fa-pen"></i></button>
                   {% endif %}
                 </div>    
             </div>    
