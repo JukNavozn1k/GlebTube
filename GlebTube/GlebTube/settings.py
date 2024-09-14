@@ -12,20 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-import pandas as pd
 
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.preprocessing.text import Tokenizer
-
-ANALYZER_MODEL = loaded_model = load_model('keras/analyzer.keras')
-df = pd.read_csv('keras/labeled.csv')
-
-X = df['comment']
-
-maxWordsCount = 10000
-TOKENIZER = Tokenizer(num_words=maxWordsCount, filters='!–"—#$%&amp;()*+,-./:;<=>?@[\\]^_`{|}~\t\n\r«»', lower=True, split=' ', char_level=False)
-TOKENIZER.fit_on_texts(X)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
