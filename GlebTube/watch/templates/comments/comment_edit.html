@@ -1,0 +1,45 @@
+{% extends 'comments/comment_base.html' %}
+
+{% block content_area %}
+
+  <textarea class="form-control" id="comment_textarea-{{comment.id}}" rows="4">{{comment.content}}</textarea>
+{% endblock %}
+
+{% block comment_buttons %}
+                  
+{% if request.user.is_authenticated %} 
+{% if comment.author == request.user %}
+<button type="button" 
+        class="btn btn-danger float-end btn-floating my-1" 
+        data-mdb-tooltip-init 
+        title="Отменить"
+        data-mdb-ripple-init 
+        data-mdb-ripple-color="dark"
+        hx-get="{% url 'fetch_comment' comment.id %}" 
+        hx-target="#comment-{{comment.id}}"
+        hx-trigger="click"
+        hx-swap="outerHTML"
+      
+        >
+        <i class="fas fa-arrow-rotate-left"></i>
+  </button>
+
+
+  <button type="button" 
+        class="btn btn-success float-end btn-floating mx-2 my-1" 
+        data-mdb-tooltip-init 
+        title="Редактировать"
+        data-mdb-ripple-init 
+        hx-vars="comment:document.getElementById('comment_textarea-{{comment.id}}').value" 
+        hx-target="#comment-{{comment.id}}"
+        hx-swap="outerHTML"
+        hx-put="{% url 'edit_comment' comment.id %}"
+        hx-headers='{"X-CSRFToken": "{{csrf_token}}"}'
+        data-mdb-ripple-color="dark">
+        <i class="fas fa-check"></i>
+  </button>
+
+{% endif %}
+{% endif %}
+
+{% endblock %}
