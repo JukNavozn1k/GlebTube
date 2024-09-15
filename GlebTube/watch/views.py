@@ -1,6 +1,7 @@
 import os 
+from django.http import QueryDict
 
-from django.shortcuts import render,redirect
+from django.shortcuts import render
 from django.http import FileResponse, HttpResponse
 
 from django.views import View
@@ -8,8 +9,6 @@ from django.views import View
 from django.shortcuts import get_object_or_404
 
 from videos import models
-
-from profiles import models as profModels
 
 from . import tasks
 
@@ -90,7 +89,6 @@ class ViewComments(View):
             'author__username','author__avatar','content','date_uploaded').annotate(stars_count=Count(Case(When(comment_rates__grade=1,then=1))))
         if request.user.is_authenticated:
             subquery = models.UserCommentRelation.objects.filter(comment_id=OuterRef('pk'), grade=1,user=request.user)
-            
             comments = comments.annotate(user_rated=Exists(subquery))
         context = {'comments':comments}
         return render(request,'comments/comment_list.html',context=context)
@@ -107,21 +105,27 @@ class EditComment(View):
         return render(request,'comments/comment_edit.html', context={'comment': comment})
     
     def put(self,request,comment_id):
-        # comment = request.POST.get(f'comment-{comment.id}')
-        return HttpResponse(f'Content: {request}')
-        # if request.user.is_authenticated and len(comment) > 0:
-        #     updated_comment = get_object_or_404(models.CommentVideo, id=comment_id,author_id=request.user.id)
-        #     updated_comment.content = comment
-        #     return render(request,'comments/comment_view.html',context={'comment':updated_comment})
+        
+        # Comment parsing
+        body = request.body.decode('utf-8')
+        put_data = QueryDict(body)
+        comment = put_data.get('comment')
+        
+        # Updating existing comment with check for validation and permission
+        if request.user.is_authenticated and len(comment) > 0:
+            updated_comment = get_object_or_404(models.CommentVideo, id=comment_id,author_id=request.user.id)
+            updated_comment.content = comment
+            updated_comment.save()
+            return render(request,'comments/comment_view.html',context={'comment':updated_comment})
     
     def post(self,request,video_id):
         comment = request.POST.get('comment')
         if request.user.is_authenticated and len(comment) > 0:
-  
             new_comment = models.CommentVideo(author=request.user,instance_id=video_id,content=comment)
             new_comment.save()
             return render(request,'comments/comment_view.html',context={'comment':new_comment})
         return render(request,'alerts/error.html',context={'desc' : 'Невозможно добавить комментарий'})
+    
     def delete(self,request,comment_id):
                 if not request.user.is_authenticated: return render(request,'alerts/error.html',context={'desc' : 'Невозможно удалить комментарий'})
                 tasks.remove_comment.delay(comment_id,request.user.id)
