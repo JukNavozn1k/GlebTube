@@ -25,9 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-^m%r)j6**wur*086uizv(@1*m4pm5sxv89fe!e5v3@)p09y2e^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-ALLOWED_HOSTS = []
-
+DEBUG = os.environ.get('DEBUG',default=True)
+if not DEBUG: ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS',default='').split()
+else: ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    # 'rest_framework',
-    # 'drf_yasg',
+    'rest_framework',
+    'drf_yasg',
     
     'social_django',
     'auths',
@@ -134,13 +134,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
-
-STATICFILES_DIRS = [BASE_DIR / "static"] 
-
+STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+if DEBUG:    
+    STATICFILES_DIRS = [BASE_DIR / "static"] 
+    MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
