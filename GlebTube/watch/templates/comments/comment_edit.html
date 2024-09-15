@@ -1,41 +1,39 @@
 {% extends 'comments/base_comment.html' %}
 
 {% block content_area %}
-                    <p class="comment-text">{{comment.content}}</p>
+<h1>{{comment.id}}</h1>
 {% endblock %}
 
 {% block comment_buttons %}
                   
 {% if request.user.is_authenticated %} 
 {% if comment.author == request.user %}
-
-<button type="button" class="btn btn-danger btn-floating float-end"
-  hx-delete="{% url 'delete_comment' comment.id %}" 
-  hx-target="closest div.d-flex.justify-content-center.row" 
-  hx-swap="outerHTML"
-  hx-headers='{"X-CSRFToken": "{{csrf_token}}"}'
-  data-mdb-tooltip-init title="Удалить комментарий"
-  >
-  <i class="fas fa-trash"></i>
-</button>
-
-{% endif %}
-
-
 <button type="button" 
-        class="btn btn-info float-end btn-floating" 
+        class="btn btn-danger float-end btn-floating" 
         data-mdb-tooltip-init 
-        title="Отменить"
+        title="Подтвердить"
         data-mdb-ripple-init 
         data-mdb-ripple-color="dark"
-        hx-get="{% url 'edit_comment' comment.id %}" 
+        hx-get="{% url 'fetch_comment' comment.id %}" 
         hx-target="#comment-{{comment.id}}"
         hx-trigger="click"
         hx-swap="outerHTML"
+      
         >
-  <i class="fas fa-trash"></i>
+        <i class="fas fa-arrow-rotate-left"></i>
   </button>
 
 
+  <button type="button" 
+        class="btn btn-success float-end btn-floating mx-2" 
+        data-mdb-tooltip-init 
+        title="Отменить"
+        data-mdb-ripple-init 
+        data-mdb-ripple-color="dark">
+        <i class="fas fa-check"></i>
+  </button>
+
 {% endif %}
+{% endif %}
+
 {% endblock %}

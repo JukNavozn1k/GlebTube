@@ -41,7 +41,7 @@ class VideoView(View):
         return render(request,'watch.html',context=context)
     
 
-class CommentVideo(View):
+class ViewComments(View):
     def get(self,request,video_id):
         comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').prefetch_related('author').only(
             'author__username','author__avatar','content','date_uploaded').annotate(stars_count=Count(Case(When(comment_rates__grade=1,then=1))))
@@ -106,6 +106,12 @@ class RateCommentView(View):
                 
         return HttpResponse("",status=401)
     
-class EditCommentView(View):
+class ViewComment(View):
+     def get(self,request,comment_id):
+        comment = get_object_or_404(models.CommentVideo, id=comment_id)
+        return render(request,'comments/comment_view.html', context={'comment': comment})
+
+class EditComment(View):
     def get(self,request,comment_id):
-        return HttpResponse("Edit Comment form...",status=200)
+        comment = get_object_or_404(models.CommentVideo, id=comment_id)
+        return render(request,'comments/comment_edit.html', context={'comment': comment})
