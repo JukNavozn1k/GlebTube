@@ -12,7 +12,7 @@
 <button type="button" 
         class="btn btn-danger float-end btn-floating my-1" 
         data-mdb-tooltip-init 
-        title="Подтвердить"
+        title="Отменить"
         data-mdb-ripple-init 
         data-mdb-ripple-color="dark"
         hx-get="{% url 'fetch_comment' comment.id %}" 
@@ -28,8 +28,13 @@
   <button type="button" 
         class="btn btn-success float-end btn-floating mx-2 my-1" 
         data-mdb-tooltip-init 
-        title="Отменить"
+        title="Редактировать"
         data-mdb-ripple-init 
+        hx-vars="comment:document.getElementById('comment_textarea-{{comment.id}}').value" 
+        hx-target="#comment-{{comment.id}}"
+        hx-swap="outerHTML"
+        hx-put="{% url 'edit_comment' comment.id %}"
+        hx-headers='{"X-CSRFToken": "{{csrf_token}}"}'
         data-mdb-ripple-color="dark">
         <i class="fas fa-check"></i>
   </button>

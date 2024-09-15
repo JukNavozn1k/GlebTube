@@ -106,6 +106,14 @@ class EditComment(View):
         comment = get_object_or_404(models.CommentVideo, id=comment_id)
         return render(request,'comments/comment_edit.html', context={'comment': comment})
     
+    def put(self,request,comment_id):
+        # comment = request.POST.get(f'comment-{comment.id}')
+        return HttpResponse(f'Content: {request}')
+        # if request.user.is_authenticated and len(comment) > 0:
+        #     updated_comment = get_object_or_404(models.CommentVideo, id=comment_id,author_id=request.user.id)
+        #     updated_comment.content = comment
+        #     return render(request,'comments/comment_view.html',context={'comment':updated_comment})
+    
     def post(self,request,video_id):
         comment = request.POST.get('comment')
         if request.user.is_authenticated and len(comment) > 0:
