@@ -1,0 +1,77 @@
+version: "3.0"
+services:
+  web:
+    build: 
+      context: .
+    env_file:
+      - .env
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_HOST: ${DB_HOST}  # This is the service name defined in docker-compose.yml
+      DB_PORT: ${DB_PORT}
+      DEBUG: ${DEBUG}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+    volumes:
+      - ./:/app
+      - ./media:/app/media
+      - ./static:/app/static
+    depends_on:
+      - db
+    command: > 
+      sh -c "gunicorn --workers 2 --bind 0.0.0.0:8000 GlebTube.wsgi"
+
+  db:
+    image: postgres:16.3-alpine3.20
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      PGPORT : ${DB_PORT}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7.2.5-alpine
+    hostname: redis
+
+  worker:
+    build: 
+      context: .
+    hostname: worker
+    entrypoint: celery
+    command: -A celery_app.app worker --loglevel=info
+    volumes:
+      - ./:/app
+
+    links: 
+      - redis
+    depends_on:
+      - redis
+      - db
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      PGPORT : ${DB_PORT}
+      POSTGRES_PASSWORD: ${DB_PASS}
+  
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./media:/app/media
+      - ./static:/app/static
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
