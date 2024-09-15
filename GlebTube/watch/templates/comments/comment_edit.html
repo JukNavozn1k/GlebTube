@@ -1,7 +1,8 @@
 {% extends 'comments/comment_base.html' %}
 
 {% block content_area %}
-<h1>{{comment.id}}</h1>
+
+  <textarea class="form-control" id="comment_textarea-{{comment.id}}" rows="4">{{comment.content}}</textarea>
 {% endblock %}
 
 {% block comment_buttons %}
@@ -9,7 +10,7 @@
 {% if request.user.is_authenticated %} 
 {% if comment.author == request.user %}
 <button type="button" 
-        class="btn btn-danger float-end btn-floating" 
+        class="btn btn-danger float-end btn-floating my-1" 
         data-mdb-tooltip-init 
         title="Подтвердить"
         data-mdb-ripple-init 
@@ -25,7 +26,7 @@
 
 
   <button type="button" 
-        class="btn btn-success float-end btn-floating mx-2" 
+        class="btn btn-success float-end btn-floating mx-2 my-1" 
         data-mdb-tooltip-init 
         title="Отменить"
         data-mdb-ripple-init 

@@ -111,10 +111,7 @@ hx-get="{% url 'rate_video' video.id %}" hx-swap="innerHTML" hx-trigger="reveale
   <div class="p-2">
     <div class="d-flex flex-row align-items-start">
         <img class="rounded-circle mx-3" src="{{user.avatar | parse_avatar}}" width="50" height="50">
-        <div class="form-outline" data-mdb-input-init>
-          <textarea class="form-control ml-1 textarea" id="comment" rows="2"></textarea>
-          <label class="form-label" for="comment">Введите комментарий</label>
-        </div>
+        <textarea class="form-control ml-1 textarea" placeholder="Введите комментарий" id="comment" rows="2"></textarea>
         
 
         
