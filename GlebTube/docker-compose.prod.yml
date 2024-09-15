@@ -11,6 +11,8 @@ services:
       DB_PASS: ${DB_PASS}
       DB_HOST: ${DB_HOST}  # This is the service name defined in docker-compose.yml
       DB_PORT: ${DB_PORT}
+      DEBUG: ${DEBUG}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
     volumes:
       - ./:/app
       - ./media:/app/media
