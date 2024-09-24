@@ -8,7 +8,7 @@ from api.serializers import *
 from rest_framework.filters import SearchFilter,OrderingFilter
 
 from . import permissions
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly,IsAuthenticated
 from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists
 
 from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
@@ -17,7 +17,7 @@ class UserApiView(mixins.RetrieveModelMixin,mixins.ListModelMixin,mixins.UpdateM
     queryset = User.objects.all()
     serializer_class = UserSerializer
     
-    permission_classes = [IsAuthenticatedOrReadOnly,permissions.EditUserPermission]
+    permission_classes = [IsAuthenticated,permissions.EditUserPermission]
     
     filter_backends = [SearchFilter]
     search_fields = ['username']
