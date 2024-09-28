@@ -12,7 +12,7 @@ class WatchHistory(models.Model):
       '''
           Allows you to record your watch history.
       '''
-      viewer = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name='Зритель')
+      viewer = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name='Зритель',related_name='watch_history')
       video = models.ForeignKey(Video,null=True,on_delete=models.CASCADE,verbose_name='Видео')
       class Meta:
         verbose_name = 'Просмотр'
