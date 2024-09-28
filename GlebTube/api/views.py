@@ -17,7 +17,7 @@ from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists
 from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
 from profiles.models import WatchHistory
 
-class UserView(ModelViewSet):
+class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateModelMixin,GenericViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.UserDetailSerializer
     
