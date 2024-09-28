@@ -13,7 +13,7 @@ router.register('comment', views.CommentView)
 router.register('history', views.WatchHistoryView)
 
 urlpatterns = router.urls + [
-   path('auth/', include('djoser.urls')),
+   # path('auth/', include('djoser.urls')),
    path('auth/', include('djoser.urls.authtoken')),
 
 ]
