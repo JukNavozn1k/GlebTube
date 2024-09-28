@@ -1,14 +1,16 @@
 
 from rest_framework import serializers
 import videos.models as video_models
-from auths.models import User
+import auths.models as auth_models 
+
+
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ("username", "avatar", "profile_description",'stars_count', 'subs_count')
-        read_only_fields = ['stars_count', 'subs_count']
+        model = auth_models.User
+        fields = ("username", "avatar")
+        read_only_fields = []
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -23,7 +25,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 
-class VideoApiSerializer(serializers.ModelSerializer):
+class VideoDetailSerializer(serializers.ModelSerializer):
     
     author = UserSerializer(read_only=True)
     user_rated = serializers.BooleanField(default=False,read_only=True)
@@ -35,13 +37,17 @@ class VideoApiSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['hls', 'duration', 'status', 'is_running', 'views', 'stars_count', 'date_uploaded','video_comments']
 
-
-
-class UserVideoRelationApiSerializer(serializers.ModelSerializer):
-  
+class VideoSerializer(serializers.ModelSerializer):
     class Meta:
-        model = video_models.UserVideoRelation
+        model = video_models.Video
         fields = '__all__'
-        read_only_fields = ['user']
+        read_only_fields = ['hls', 'duration', 'status', 'is_running', 'views', 'stars_count', 'date_uploaded','video_comments']
 
 
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    user_videos = VideoSerializer(many=True,read_only=True)
+    class Meta:
+        model = auth_models.User
+        fields = ("username", "avatar", "profile_description",'stars_count', 'subs_count','user_videos')
+        read_only_fields = ['stars_count', 'subs_count']
