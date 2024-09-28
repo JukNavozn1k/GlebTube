@@ -2,7 +2,7 @@
 from rest_framework import serializers
 import videos.models as video_models
 import auths.models as auth_models 
-
+import profiles.models as profile_models
 
 
 
@@ -44,9 +44,15 @@ class VideoSerializer(serializers.ModelSerializer):
         read_only_fields = ['hls', 'duration', 'status', 'is_running', 'views', 'stars_count', 'date_uploaded','video_comments']
 
 
+class WatchHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = profile_models.WatchHistory
+        fields = '__all__'
+
 
 class UserDetailSerializer(serializers.ModelSerializer):
     user_videos = VideoSerializer(many=True,read_only=True)
+    
     class Meta:
         model = auth_models.User
         fields = ("username", "avatar", "profile_description",'stars_count', 'subs_count','user_videos')
