@@ -17,7 +17,7 @@ class UserView(ModelViewSet):
     queryset = User.objects.all().prefetch_related('user_videos')
     serializer_class = serializers.UserDetailSerializer
     
-    permission_classes = [IsAuthenticated,permissions.EditUserPermission]
+    permission_classes = [IsAuthenticatedOrReadOnly,permissions.EditUserPermission]
     
     filter_backends = [SearchFilter]
     search_fields = ['username']
