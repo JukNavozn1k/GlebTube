@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly,IsAuthenticated
 from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists
 
 from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
+from profiles.models import WatchHistory
 
 class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,GenericViewSet):
     queryset = User.objects.all().prefetch_related('user_videos')
@@ -22,6 +23,15 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
     filter_backends = [SearchFilter]
     search_fields = ['username']
     
+class WatchHistoryView(ModelViewSet):
+    queryset = WatchHistory.objects.all().prefetch_related('viewer','video')
+    serializer_class = serializers.WatchHistorySerializer
+    
+    permission_classes = []
+    
+    filter_backends = [SearchFilter]
+    search_fields = ['viewer__username']
+
 
 class CommentView(ModelViewSet):
     queryset = CommentVideo.objects.all().prefetch_related('author').annotate(stars_count=Count
