@@ -14,7 +14,7 @@ from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists
 from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
 
 class UserView(ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.all().prefetch_related('user_videos')
     serializer_class = serializers.UserDetailSerializer
     
     permission_classes = [IsAuthenticated,permissions.EditUserPermission]
