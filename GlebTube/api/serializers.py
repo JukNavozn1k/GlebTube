@@ -44,14 +44,6 @@ class VideoSerializer(serializers.ModelSerializer):
         read_only_fields = ['hls', 'duration', 'status', 'is_running', 'views', 'stars_count', 'date_uploaded','video_comments']
 
 
-class WatchHistorySerializer(serializers.ModelSerializer):
-    # viewer = UserSerializer(read_only=True)
-    # video = VideoSerializer()   
-    class Meta:
-        model = profile_models.WatchHistory
-        fields = '__all__'
-
-
 class UserDetailSerializer(serializers.ModelSerializer):
     user_videos = VideoSerializer(many=True,read_only=True)
     password = serializers.CharField(required=True,write_only=True)
