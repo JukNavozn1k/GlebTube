@@ -45,6 +45,8 @@ class VideoSerializer(serializers.ModelSerializer):
 
 
 class WatchHistorySerializer(serializers.ModelSerializer):
+    viewer = UserSerializer(read_only=True)
+    video = VideoSerializer()   
     class Meta:
         model = profile_models.WatchHistory
         fields = '__all__'
