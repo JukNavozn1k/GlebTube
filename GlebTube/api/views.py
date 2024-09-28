@@ -13,7 +13,7 @@ from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists
 
 from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
 
-class UserView(ModelViewSet):
+class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,GenericViewSet):
     queryset = User.objects.all().prefetch_related('user_videos')
     serializer_class = serializers.UserDetailSerializer
     
