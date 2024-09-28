@@ -46,9 +46,8 @@ class VideoSerializer(serializers.ModelSerializer):
 
 class UserDetailSerializer(serializers.ModelSerializer):
 
-    password = serializers.CharField(required=True,write_only=True)
-    email = serializers.EmailField(required=False, write_only=True)
+   
     class Meta:
         model = auth_models.User
-        fields = ("id","username", "avatar", "profile_description",'stars_count', 'subs_count','password','email')
+        fields = ("id","username", "avatar", "profile_description",'stars_count', 'subs_count')
         read_only_fields = ['stars_count', 'subs_count','user_videos']
