@@ -40,6 +40,12 @@ class UserView(ModelViewSet):
         response_data = serializers.VideoSerializer(queryset,many=True)
         return Response(response_data.data)
 
+    @action(detail=True,methods=['get'])
+    def user_liked(self,request,pk):
+        queryset = UserVideoRelation.objects.filter(user_id=pk,grade=1).select_related('video')    
+        queryset = [entry.video for entry in queryset]                                                
+        response_data = serializers.VideoSerializer(queryset,many=True)
+        return Response(response_data.data)
 
 class CommentView(ModelViewSet):
     queryset = CommentVideo.objects.all().prefetch_related('author').annotate(stars_count=Count
