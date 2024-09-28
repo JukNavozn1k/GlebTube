@@ -3,7 +3,7 @@ from rest_framework.viewsets import *
 from rest_framework import mixins
 from videos.models import Video,CommentVideo
 from auths.models import User
-from api.serializers import *
+from . import serializers
 
 from rest_framework.filters import SearchFilter,OrderingFilter
 
@@ -13,9 +13,9 @@ from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists
 
 from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
 
-class UserApiView(mixins.RetrieveModelMixin,mixins.ListModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,GenericViewSet):
+class UserView(ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = serializers.UserDetailSerializer
     
     permission_classes = [IsAuthenticated,permissions.EditUserPermission]
     
@@ -23,10 +23,10 @@ class UserApiView(mixins.RetrieveModelMixin,mixins.ListModelMixin,mixins.UpdateM
     search_fields = ['username']
     
 
-class CommentsApiView(ModelViewSet):
+class CommentView(ModelViewSet):
     queryset = CommentVideo.objects.all().prefetch_related('author').annotate(stars_count=Count
                                     (Case(When(comment_rates__grade = 1,then=1))))
-    serializer_class = CommentSerializer
+    serializer_class = serializers.CommentSerializer
     
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     
@@ -43,10 +43,10 @@ class CommentsApiView(ModelViewSet):
     
 
 
-class VideoApiView(ModelViewSet):
+class VideoView(ModelViewSet):
 
     queryset = Video.objects.all().select_related('author') 
-    serializer_class = VideoApiSerializer
+    serializer_class = serializers.VideoDetailSerializer
     
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     
@@ -76,13 +76,3 @@ class VideoApiView(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
     
-
-class UserVideoRelationApiView(ModelViewSet):
-    queryset = UserVideoRelation.objects.all()
-    serializer_class = UserVideoRelationApiSerializer
-    
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    
-    
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)

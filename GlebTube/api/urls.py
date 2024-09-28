@@ -7,10 +7,10 @@ from django.urls import path,include
 
 
 smp = SimpleRouter()
-smp.register('video', views.VideoApiView)
-smp.register('user-video-relation', views.UserVideoRelationApiView)
-smp.register('user', views.UserApiView)
-smp.register('comment', views.CommentsApiView)
+smp.register('video', views.VideoView)
+
+smp.register('user', views.UserView)
+smp.register('comment', views.CommentView)
 
 urlpatterns = smp.urls + [
    path('auth/', include('djoser.urls')),
