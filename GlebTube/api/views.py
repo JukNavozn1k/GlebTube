@@ -3,30 +3,33 @@ from rest_framework.viewsets import *
 from rest_framework import mixins
 from videos.models import Video,CommentVideo
 from auths.models import User
-from api.serializers import *
+from . import serializers
+
+from rest_framework.decorators import action
 
 from rest_framework.filters import SearchFilter,OrderingFilter
 
 from . import permissions
-from rest_framework.permissions import IsAuthenticatedOrReadOnly,IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists
 
 from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
+from profiles.models import WatchHistory
 
-class UserApiView(mixins.RetrieveModelMixin,mixins.ListModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,GenericViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+class UserView(ModelViewSet):
+    queryset = User.objects.all().prefetch_related('user_videos')
+    serializer_class = serializers.UserDetailSerializer
     
-    permission_classes = [IsAuthenticated,permissions.EditUserPermission]
+    permission_classes = [IsAuthenticatedOrReadOnly,permissions.EditUserPermission]
     
     filter_backends = [SearchFilter]
     search_fields = ['username']
     
 
-class CommentsApiView(ModelViewSet):
+class CommentView(ModelViewSet):
     queryset = CommentVideo.objects.all().prefetch_related('author').annotate(stars_count=Count
                                     (Case(When(comment_rates__grade = 1,then=1))))
-    serializer_class = CommentSerializer
+    serializer_class = serializers.CommentSerializer
     
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     
@@ -43,10 +46,10 @@ class CommentsApiView(ModelViewSet):
     
 
 
-class VideoApiView(ModelViewSet):
+class VideoView(ModelViewSet):
 
     queryset = Video.objects.all().select_related('author') 
-    serializer_class = VideoApiSerializer
+    serializer_class = serializers.VideoDetailSerializer
     
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     
@@ -63,8 +66,8 @@ class VideoApiView(ModelViewSet):
             subquery = UserVideoRelation.objects.filter(video_id=OuterRef('pk'),user=self.request.user,grade=1)
             queryset = queryset.annotate(user_rated=Exists(subquery))
             # user_rated comment (false not rated, true rated)
-            # subquery = UserCommentRelation.objects.filter(comment_id=OuterRef('pk'),user=self.request.user,grade=1)
-            # comments = comments.annotate(user_rated=Exists(subquery))
+            subquery = UserCommentRelation.objects.filter(comment_id=OuterRef('pk'),user=self.request.user,grade=1)
+            comments = comments.annotate(user_rated=Exists(subquery))
 
         prefetched_comments = Prefetch('video_comments',
                                    comments.annotate(stars_count=Count
@@ -76,13 +79,3 @@ class VideoApiView(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
     
-
-class UserVideoRelationApiView(ModelViewSet):
-    queryset = UserVideoRelation.objects.all()
-    serializer_class = UserVideoRelationApiSerializer
-    
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    
-    
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
