@@ -5,6 +5,7 @@ from videos.models import Video,CommentVideo
 from auths.models import User
 from . import serializers
 
+from rest_framework.response import Response
 from rest_framework.decorators import action
 
 from rest_framework.filters import SearchFilter,OrderingFilter
@@ -16,8 +17,8 @@ from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists
 from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
 from profiles.models import WatchHistory
 
-class UserView(ModelViewSet):
-    queryset = User.objects.all().prefetch_related('user_videos')
+class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateModelMixin,GenericViewSet):
+    queryset = User.objects.all()
     serializer_class = serializers.UserDetailSerializer
     
     permission_classes = [IsAuthenticatedOrReadOnly,permissions.EditUserPermission]
@@ -25,6 +26,26 @@ class UserView(ModelViewSet):
     filter_backends = [SearchFilter]
     search_fields = ['username']
     
+    @action(detail=True,methods=['get'])
+    def history(self,request,pk):
+        queryset = WatchHistory.objects.filter(viewer_id=pk).select_related('video')    
+        queryset = [entry.video for entry in queryset]                                                
+        response_data = serializers.VideoSerializer(queryset,many=True)
+        return Response(response_data.data)
+
+
+    @action(detail=True,methods=['get'])
+    def user_videos(self,request,pk):
+        queryset = Video.objects.filter(author_id=pk)                                     
+        response_data = serializers.VideoSerializer(queryset,many=True)
+        return Response(response_data.data)
+
+    @action(detail=True,methods=['get'])
+    def user_liked(self,request,pk):
+        queryset = UserVideoRelation.objects.filter(user_id=pk,grade=1).select_related('video')    
+        queryset = [entry.video for entry in queryset]                                                
+        response_data = serializers.VideoSerializer(queryset,many=True)
+        return Response(response_data.data)
 
 class CommentView(ModelViewSet):
     queryset = CommentVideo.objects.all().prefetch_related('author').annotate(stars_count=Count
