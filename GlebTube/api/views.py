@@ -28,7 +28,7 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
     
     @action(detail=True,methods=['get'])
     def history(self,request,pk):
-        queryset = WatchHistory.objects.filter(viewer_id=pk).select_related('video')    
+        queryset = WatchHistory.objects.filter(viewer_id=pk).select_related('video__author')    
         queryset = [entry.video for entry in queryset]                                                
         response_data = serializers.VideoSerializer(queryset,many=True)
         return Response(response_data.data)
@@ -36,13 +36,13 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
 
     @action(detail=True,methods=['get'])
     def user_videos(self,request,pk):
-        queryset = Video.objects.filter(author_id=pk)                                     
+        queryset = Video.objects.filter(author_id=pk).select_related('video__author')                                
         response_data = serializers.VideoSerializer(queryset,many=True)
         return Response(response_data.data)
 
     @action(detail=True,methods=['get'])
     def user_liked(self,request,pk):
-        queryset = UserVideoRelation.objects.filter(user_id=pk,grade=1).select_related('video')    
+        queryset = UserVideoRelation.objects.filter(user_id=pk,grade=1).select_related('video__author')   
         queryset = [entry.video for entry in queryset]                                                
         response_data = serializers.VideoSerializer(queryset,many=True)
         return Response(response_data.data)
