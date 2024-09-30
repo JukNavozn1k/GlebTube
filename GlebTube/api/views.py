@@ -81,21 +81,11 @@ class VideoView(ModelViewSet):
     
     def get_queryset(self):
         queryset = super().get_queryset()
-        comments = CommentVideo.objects.all()
+       
         if self.request.user.is_authenticated:
-            # user_rated video (false not rated, true rated)
             subquery = UserVideoRelation.objects.filter(video_id=OuterRef('pk'),user=self.request.user,grade=1)
             queryset = queryset.annotate(user_rated=Exists(subquery))
-            # user_rated comment (false not rated, true rated)
-            subquery = UserCommentRelation.objects.filter(comment_id=OuterRef('pk'),user=self.request.user,grade=1)
-            comments = comments.annotate(user_rated=Exists(subquery))
-
-        prefetched_comments = Prefetch('video_comments',
-                                   comments.annotate(stars_count=Count
-                                    (Case(When(comment_rates__grade = 1,then=1)))).prefetch_related('author'))
-        
-        
-        return queryset.prefetch_related(prefetched_comments)
+        return queryset
     
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
