@@ -19,7 +19,7 @@ from profiles.models import WatchHistory
 
 class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateModelMixin,GenericViewSet):
     queryset = User.objects.all()
-    serializer_class = serializers.UserDetailSerializer
+    serializer_class = serializers.UserSerializer
     
     permission_classes = [IsAuthenticatedOrReadOnly,permissions.EditUserPermission]
     
@@ -70,7 +70,7 @@ class CommentView(ModelViewSet):
 class VideoView(ModelViewSet):
 
     queryset = Video.objects.all().select_related('author') 
-    serializer_class = serializers.VideoDetailSerializer
+    serializer_class = serializers.VideoSerializer
     
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     
