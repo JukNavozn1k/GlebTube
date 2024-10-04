@@ -37,7 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'daphne',
     'django.contrib.staticfiles',
+    'channels', 
     
     'rest_framework',
     'rest_framework.authtoken',
@@ -82,7 +84,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'GlebTube.wsgi.application'
-
+ASGI_APPLICATION = 'GlebTube.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -171,8 +173,7 @@ if DEBUG:
         'SHOW_TOOLBAR_CALLBACK': lambda request: True,
         'IS_RUNNING_TESTS': False
     }
-    # DEBUG_TOOLBAR_CONFIG['IS_RUNNING_TESTS'] = False
-
+  
 CELERY_BROKER_URL= 'redis://redis:6379/0'
 # CELERY_RESULT_BACKEND=' redis://redis:6379/0'
 # CELERY_ACCEPT_CONTENT=['application/json']
@@ -210,3 +211,12 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
    'AUTH_HEADER_TYPES': ('JWT',),
 }
+
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             "hosts": [('127.0.0.1', 6379)],
+#         },
+#     },
+# }
