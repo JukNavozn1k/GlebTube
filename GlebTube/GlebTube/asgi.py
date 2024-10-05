@@ -18,3 +18,4 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'GlebTube.settings')
 application = ProtocolTypeRouter({
     'http': get_asgi_application()
 })
+
