@@ -29,13 +29,14 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
     
     @action(detail=True,methods=['get'])
     def history(self,request,pk):
-        subquery = UserVideoRelation.objects.filter(user_id=pk,video_id=OuterRef('video_id'), grade=1)
-        queryset = WatchHistory.objects.filter(viewer_id=pk).select_related('video__author').annotate(
-           user_rated=Exists(subquery))   
+        subquery = UserVideoRelation.objects.filter(user_id=pk,video_id=OuterRef('id'), grade=1)
+        prefetched_data = Prefetch('video', Video.objects.all().annotate(user_rated=Exists(subquery)) .select_related('author'))
+     
+        queryset = WatchHistory.objects.filter(viewer_id=pk).prefetch_related(prefetched_data)
         
      
         queryset = [entry.video for entry in queryset]   
-                                                
+                                                    
         response_data = serializers.VideoSerializer(queryset,many=True)
         return Response(response_data.data)
 
