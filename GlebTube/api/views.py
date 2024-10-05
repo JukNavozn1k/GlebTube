@@ -12,8 +12,7 @@ from rest_framework.filters import SearchFilter,OrderingFilter
 
 from . import permissions
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists,Value,Subquery
-from django.db.models import BooleanField
+from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists,Subquery
 
 from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
 from profiles.models import WatchHistory
@@ -33,7 +32,7 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
      
         queryset = WatchHistory.objects.filter(viewer_id=pk)
         if request.user.is_authenticated:
-            subquery = UserVideoRelation.objects.filter(user_id=pk,video_id=OuterRef('id'), grade=1)
+            subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('id'), grade=1)
             prefetched_data = Prefetch('video', Video.objects.all().annotate(user_rated=Exists(subquery)) .select_related('author'))
             queryset = queryset.prefetch_related(prefetched_data)
         else:
