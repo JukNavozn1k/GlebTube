@@ -12,7 +12,7 @@ from rest_framework.filters import SearchFilter,OrderingFilter
 
 from . import permissions
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists
+from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists,Value
 
 from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
 from profiles.models import WatchHistory
@@ -28,15 +28,21 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
     
     @action(detail=True,methods=['get'])
     def history(self,request,pk):
-        queryset = WatchHistory.objects.filter(viewer_id=pk).select_related('video__author')    
-        queryset = [entry.video for entry in queryset]                                                
+        subquery = UserVideoRelation.objects.filter(user_id=pk,video_id=OuterRef('video_id'), grade=1)
+        queryset = WatchHistory.objects.filter(viewer_id=pk).select_related('video__author').annotate(
+           user_rated=Exists(subquery))   
+        
+     
+        queryset = [entry.video for entry in queryset]   
+                                                
         response_data = serializers.VideoSerializer(queryset,many=True)
         return Response(response_data.data)
 
 
     @action(detail=True,methods=['get'])
     def user_videos(self,request,pk):
-        queryset = Video.objects.filter(author_id=pk).select_related('video__author')                                
+        subquery = UserVideoRelation.objects.filter(user_id=pk,video_id=OuterRef('pk'), grade=1)
+        queryset = Video.objects.filter(author_id=pk).select_related('author').annotate(user_rated=Exists(subquery))                            
         response_data = serializers.VideoSerializer(queryset,many=True)
         return Response(response_data.data)
 
@@ -45,6 +51,7 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
         queryset = UserVideoRelation.objects.filter(user_id=pk,grade=1).select_related('video__author')   
         queryset = [entry.video for entry in queryset]                                                
         response_data = serializers.VideoSerializer(queryset,many=True)
+        
         return Response(response_data.data)
 
 class CommentView(ModelViewSet):
