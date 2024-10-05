@@ -12,7 +12,8 @@ from rest_framework.filters import SearchFilter,OrderingFilter
 
 from . import permissions
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists,Value
+from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists,Value,Subquery
+from django.db.models import BooleanField
 
 from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
 from profiles.models import WatchHistory
@@ -48,8 +49,9 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
 
     @action(detail=True,methods=['get'])
     def user_liked(self,request,pk):
-        queryset = UserVideoRelation.objects.filter(user_id=pk,grade=1).select_related('video__author')   
-        queryset = [entry.video for entry in queryset]                                                
+
+        subquery = UserVideoRelation.objects.filter(user_id=pk,grade=1).values('video_id')
+        queryset = Video.objects.filter(id__in=Subquery(subquery)).select_related('author').annotate(user_rated=Value(True,output_field=BooleanField()))                                             
         response_data = serializers.VideoSerializer(queryset,many=True)
         
         return Response(response_data.data)
