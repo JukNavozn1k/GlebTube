@@ -43,16 +43,23 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
 
     @action(detail=True,methods=['get'])
     def user_videos(self,request,pk):
-        subquery = UserVideoRelation.objects.filter(user_id=pk,video_id=OuterRef('pk'), grade=1)
-        queryset = Video.objects.filter(author_id=pk).select_related('author').annotate(user_rated=Exists(subquery))                            
+        
+        queryset = Video.objects.filter(author_id=pk).select_related('author')
+        if request.user.is_authenticated:
+            subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('pk'), grade=1)  
+            queryset = queryset.annotate(user_rated=Exists(subquery))                         
         response_data = serializers.VideoSerializer(queryset,many=True)
         return Response(response_data.data)
 
     @action(detail=True,methods=['get'])
     def user_liked(self,request,pk):
-
+        # List of user liked
         subquery = UserVideoRelation.objects.filter(user_id=pk,grade=1).values('video_id')
-        queryset = Video.objects.filter(id__in=Subquery(subquery)).select_related('author').annotate(user_rated=Value(True,output_field=BooleanField()))                                             
+        queryset = Video.objects.filter(id__in=Subquery(subquery)).select_related('author')
+        # Check if viewer rated
+        if request.user.is_authenticated:
+            subquery = UserVideoRelation.objects.filter(user_id=request.user.id,grade=1)
+            queryset = queryset.annotate(user_rated=Exists(subquery))                                             
         response_data = serializers.VideoSerializer(queryset,many=True)
         
         return Response(response_data.data)
