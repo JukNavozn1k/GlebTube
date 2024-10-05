@@ -204,12 +204,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.TokenAuthentication',
-         # 'rest_framework.authentication.TokenAuthentication',
-         # 'rest_framework.authentication.BasicAuthentication',
     ]
-}
-SIMPLE_JWT = {
-   'AUTH_HEADER_TYPES': ('JWT',),
 }
 
 CHANNEL_LAYERS = {
