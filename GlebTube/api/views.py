@@ -8,7 +8,9 @@ from . import serializers
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
+
 from rest_framework.filters import SearchFilter,OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 from . import permissions
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -69,14 +71,15 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
         return Response(response_data.data)
 
 class CommentView(ModelViewSet):
-    queryset = CommentVideo.objects.all().prefetch_related('author').annotate(stars_count=Count
-                                    (Case(When(comment_rates__grade = 1,then=1))))
+    queryset = CommentVideo.objects.all().annotate(stars_count=Count
+                                    (Case(When(comment_rates__grade = 1,then=1)))).select_related('author','instance')
     serializer_class = serializers.CommentSerializer
     
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     
-    filter_backends = [OrderingFilter]
+    filter_backends = [OrderingFilter,DjangoFilterBackend]
     ordering_fields = ['stars_count']
+    filterset_fields = ['instance']
     def get_queryset(self):
         queryset = super().get_queryset()
         if self.request.user.is_authenticated:
