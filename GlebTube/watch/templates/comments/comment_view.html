@@ -7,25 +7,15 @@
 {% block comment_buttons %}
                   
 {% if request.user.is_authenticated %} 
-{% if comment.author == request.user %}
 
-<button type="button" class="btn btn-danger btn-floating float-end"
-  hx-delete="{% url 'delete_comment' comment.id %}" 
-  hx-target="closest div.d-flex.justify-content-center.row" 
-  hx-swap="outerHTML"
-  hx-headers='{"X-CSRFToken": "{{csrf_token}}"}'
-  data-mdb-tooltip-init title="Удалить комментарий"
-  >
-  <i class="fas fa-trash"></i>
-</button>
-
-{% endif %}
 
 {% if comment.user_rated == 1 %}
 {% include 'rate_comment/unrate_btn.html' %}
 {% else %}
 {% include 'rate_comment/rate_btn.html' %}
 {% endif %}
+
+{% if comment.author == request.user %}
 
 <button type="button" 
         class="btn btn-info float-end btn-floating" 
@@ -40,6 +30,8 @@
         >
         <i class="fas fa-pen"></i>
   </button>
+
+{% endif %}
 
 
 {% endif %}
