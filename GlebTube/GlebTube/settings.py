@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     # 'daphne',
     'django.contrib.staticfiles',
     # 'channels', 
-    
+    'django_filters',
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
