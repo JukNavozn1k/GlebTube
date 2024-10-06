@@ -5,15 +5,16 @@ from videos.models import Video,CommentVideo
 from auths.models import User
 from . import serializers
 
-from rest_framework.response import Response
-from rest_framework.decorators import action
+from django.shortcuts import get_object_or_404
 
+from rest_framework.response import Response
+from rest_framework.decorators import action,permission_classes
 
 from rest_framework.filters import SearchFilter,OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
 from . import permissions
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly,IsAuthenticated
 from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists,Subquery
 
 from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
@@ -80,6 +81,22 @@ class CommentView(ModelViewSet):
     filter_backends = [OrderingFilter,DjangoFilterBackend]
     ordering_fields = ['stars_count']
     filterset_fields = ['instance']
+
+    
+    @action(methods=['post'],detail=True)
+    def rate(self,request,pk):
+        rate_obj,created = UserCommentRelation.objects.get_or_create(comment_id=pk,user=request.user)
+        grade = rate_obj.grade
+        if rate_obj.grade == 1: 
+            rate_obj.grade = 0
+        else: rate_obj.grade = 1
+      
+        rate_obj.save()
+        
+        comment = serializers.CommentSerializer(rate_obj.comment)
+        comment.user_rated = bool(rate_obj.grade)
+        return Response(comment.data)
+
     def get_queryset(self):
         queryset = super().get_queryset()
         if self.request.user.is_authenticated:
