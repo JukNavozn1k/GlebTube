@@ -92,7 +92,7 @@ class CommentView(ModelViewSet):
         else: rate_obj.grade = 1
       
         rate_obj.save()
-        
+
         comment = serializers.CommentSerializer(rate_obj.comment)
         comment.user_rated = bool(rate_obj.grade)
         return Response(comment.data)
@@ -120,6 +120,20 @@ class VideoView(ModelViewSet):
     search_fields = ['caption']
     ordering_fields = ['stars_count','views']
     
+    @action(methods=['post'],detail=True)
+    def rate(self,request,pk):
+        rate_obj,created = UserVideoRelation.objects.get_or_create(video_id=pk,user=request.user)
+      
+        if rate_obj.grade == 1: 
+            rate_obj.grade = 0
+        else: rate_obj.grade = 1
+      
+        rate_obj.save()
+        
+        video = serializers.VideoSerializer(rate_obj.video)
+        video.user_rated = bool(rate_obj.grade)
+        return Response(video.data)
+
     def get_queryset(self):
         queryset = super().get_queryset()
        
