@@ -173,6 +173,10 @@ if DEBUG:
         'SHOW_TOOLBAR_CALLBACK': lambda request: True,
         'IS_RUNNING_TESTS': False
     }
+    MIDDLEWARE += [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',]
+    CORS_ALLOW_ALL_ORIGINS = True
   
 CELERY_BROKER_URL= 'redis://redis:6379/0'
 # CELERY_RESULT_BACKEND=' redis://redis:6379/0'
