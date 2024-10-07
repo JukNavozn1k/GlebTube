@@ -93,9 +93,9 @@ class CommentView(ModelViewSet):
       
         rate_obj.save()
 
-        comment = serializers.CommentSerializer(rate_obj.comment)
-        comment.user_rated = bool(rate_obj.grade)
-        return Response(comment.data)
+        comment = serializers.CommentSerializer(rate_obj.comment).data
+        comment['user_rated'] = bool(rate_obj.grade)
+        return Response(comment)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -130,9 +130,9 @@ class VideoView(ModelViewSet):
       
         rate_obj.save()
         
-        video = serializers.VideoSerializer(rate_obj.video)
-        video.user_rated = bool(rate_obj.grade)
-        return Response(video.data)
+        video = serializers.VideoSerializer(rate_obj.video).data
+        video['user_rated'] = bool(rate_obj.grade)
+        return Response(video)
 
     def get_queryset(self):
         queryset = super().get_queryset()
