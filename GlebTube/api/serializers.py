@@ -7,12 +7,10 @@ import profiles.models as profile_models
 
 class UserSerializer(serializers.ModelSerializer):
 
-   
     class Meta:
         model = auth_models.User
         fields = ("id","username", "avatar", "profile_description",'stars_count', 'subs_count')
         read_only_fields = ['stars_count', 'subs_count','user_videos','username']
-
 
 
 class CommentSerializer(serializers.ModelSerializer):
