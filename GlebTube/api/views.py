@@ -71,14 +71,14 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
     
     @action(detail=True,methods=['get'])
     def user_subscriptions(self,request,pk):
-        subs = Subscription.objects.filter(subscriber_id=pk)
+        subs = Subscription.objects.filter(subscriber_id=pk,active=1)
         subs = serializers.UserSerializer(subs,many=True)
         return Response(subs.data)
     
 
     @action(detail=True,methods=['get'])
     def user_subcribers(self,request,pk):
-        subs = Subscription.objects.filter(author_id=pk)
+        subs = Subscription.objects.filter(author_id=pk,active=1)
         subs = serializers.UserSerializer(subs,many=True)
         return Response(subs.data)
 
