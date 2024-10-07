@@ -18,7 +18,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly,IsAuthenticated
 from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists,Subquery
 
 from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
-from profiles.models import WatchHistory
+from profiles.models import WatchHistory,Subscription
 
 class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateModelMixin,GenericViewSet):
     queryset = User.objects.all()
@@ -30,9 +30,8 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
     search_fields = ['username']
     
     @action(detail=True,methods=['get'])
+    # ToDo add pagination to actions ... 
     def history(self,request,pk):
-        
-     
         queryset = WatchHistory.objects.filter(viewer_id=pk)
         if request.user.is_authenticated:
             subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('id'), grade=1)
@@ -50,7 +49,6 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
 
     @action(detail=True,methods=['get'])
     def user_videos(self,request,pk):
-        
         queryset = Video.objects.filter(author_id=pk).select_related('author')
         if request.user.is_authenticated:
             subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('pk'), grade=1)  
@@ -70,6 +68,19 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
         response_data = serializers.VideoSerializer(queryset,many=True)
         
         return Response(response_data.data)
+    
+    @action(detail=True,methods=['get'])
+    def user_subscriptions(self,request,pk):
+        subs = Subscription.objects.filter(subscriber_id=pk)
+        subs = serializers.UserSerializer(subs,many=True)
+        return Response(subs.data)
+    
+
+    @action(detail=True,methods=['get'])
+    def user_subcribers(self,request,pk):
+        subs = Subscription.objects.filter(author_id=pk)
+        subs = serializers.UserSerializer(subs,many=True)
+        return Response(subs.data)
 
 class CommentView(ModelViewSet):
     queryset = CommentVideo.objects.all().annotate(stars_count=Count
