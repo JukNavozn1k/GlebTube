@@ -12,11 +12,4 @@ jobs:
     steps:
      - name: Installing docker-compose
        run: apt install docker-compose
-  build:
-    runs-on: self-hosted
-    needs: init
-    steps:
-      -name: Fetching data...
-      run: git fetch && git pull
-      -name: Building docker-compose
-      run: docker-compose -f ./GlebTube/docker-compose.yml build 
+ 
