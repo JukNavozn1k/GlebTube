@@ -8,14 +8,15 @@ on:
 
 jobs:
   init:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
      - name: Installing docker-compose
-       run: apt install docker-compose -y
+       run: apt install docker-compose
   build:
-    
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: init
     steps:
-    - name: Building dockerfile
-      run: docker build ./GlebTube
+      -name: Fetching data...
+      run: git fetch && git pull
+      -name: Building docker-compose
+      run: docker-compose -f ./GlebTube/docker-compose.yml build 
