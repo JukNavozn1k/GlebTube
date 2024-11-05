@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: GlebTube CI/CD
 
 on:
   push:
@@ -11,5 +11,5 @@ jobs:
     runs-on: self-hosted
     steps:
      - name: Installing docker-compose
-       run: apt install docker-compose
+       run: docker ps
  
