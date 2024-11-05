@@ -16,5 +16,5 @@ jobs:
     - uses: actions/checkout@v4
     - name: Enter working path
       run: cd ./GlebTube
-      
-      run: docker-compose build
+    - name: Building dockerfile
+      run: docker build .
