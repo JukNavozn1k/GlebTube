@@ -8,8 +8,10 @@ on:
 
 jobs:
   init:
-    -name: Installing docker-compose
-    run apt install docker-compose -y
+    runs-on: ubuntu-latest
+    steps:
+      -name: Installing docker-compose
+      run apt install docker-compose -y
   build:
     needs: init
     runs-on: ubuntu-latest
