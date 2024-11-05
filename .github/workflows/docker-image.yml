@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: CI
 
 on:
   push:
@@ -9,10 +9,9 @@ on:
 jobs:
 
   build:
-
     runs-on: self-hosted
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker-compose -f ./GlebTube/docker-compose.yml
+    - name: Build the Docker compose
+      run: docker-compose -f ./GlebTube/docker-compose.yml build
