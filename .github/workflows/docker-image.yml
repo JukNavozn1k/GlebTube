@@ -7,12 +7,12 @@ on:
     branches: [ "main" ]
 
 jobs:
-
+  init:
+    -name: Installing docker-compose
+    run apt install docker-compose -y
   build:
-
+    needs: init
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
     - name: Building dockerfile
       run: docker build ./GlebTube
