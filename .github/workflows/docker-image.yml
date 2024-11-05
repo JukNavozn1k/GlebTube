@@ -10,8 +10,8 @@ jobs:
   init:
     runs-on: ubuntu-latest
     steps:
-      -name: Installing docker-compose
-      run apt install docker-compose -y
+     - name: Installing docker-compose
+       run: apt install docker-compose -y
   build:
     
     runs-on: ubuntu-latest
