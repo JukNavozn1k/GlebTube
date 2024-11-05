@@ -14,7 +14,5 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Enter working path
-      run: cd ./GlebTube
     - name: Building dockerfile
-      run: docker build .
+      run: docker build ./GlebTube
