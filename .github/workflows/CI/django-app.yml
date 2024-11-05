@@ -1,4 +1,4 @@
-name: GlebTube CI/CD
+name: django-app
 
 on:
   push:
