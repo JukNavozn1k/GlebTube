@@ -17,13 +17,14 @@ jobs:
     - name: Install Docker Compose
       run: sudo apt-get update && sudo apt-get install -y docker-compose
 
-    - name: Create .env file
+    - name: Create .env file inside GlebTube
       run: |
-        echo "DB_NAME=gleb_db" >> .env
-        echo "DB_USER=gleb" >> .env
-        echo "DB_PASS=1234" >> .env
-        echo "DB_HOST=db" >> .env
-        echo "DB_PORT=5432" >> .env
+        mkdir -p GlebTube
+        echo "DB_NAME=gleb_db" >> GlebTube/.env
+        echo "DB_USER=gleb" >> GlebTube/.env
+        echo "DB_PASS=1234" >> GlebTube/.env
+        echo "DB_HOST=db" >> GlebTube/.env
+        echo "DB_PORT=5432" >> GlebTube/.env
 
     - name: Build the Docker Compose
       run: docker-compose -f ./GlebTube/docker-compose.yml build
