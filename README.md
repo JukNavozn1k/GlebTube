@@ -59,10 +59,11 @@ _To execute the following commands, you need to install python and pip_
    ```
 2. Setup .env
    ```
-   POSTGRES_DB=db
-   POSTGRES_USER=gleb
-   PGPORT=5432
-   POSTGRES_PASSWORD=1234
+   DB_NAME=gg
+DB_USER=gleb
+DB_PASS=1234
+DB_HOST=db
+DB_PORT=5432
    ```
 2. Install poetry via pip
    ```pip
