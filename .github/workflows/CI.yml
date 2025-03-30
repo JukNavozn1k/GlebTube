@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Create .env file
+      run: |
+        echo "DB_USER=gleb" >> .env
+        echo "DB_PASS=1234" >> .env
+        echo "DB_HOST=db" >> .env
+        echo "DB_PORT=5432" >> .env
+
+    - name: Build the Docker Compose
+      run: docker-compose -f ./GlebTube/docker-compose.yml build
