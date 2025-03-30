@@ -59,21 +59,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       PGPORT : ${DB_PORT}
       POSTGRES_PASSWORD: ${DB_PASS}
-  flower:
-    build: 
-      context: .
-    hostname: flower
-    entrypoint: celery
-    command: -A celery_app.app flower
-    volumes:
-      - ./:/app
-    links: 
-      - redis
-    ports:
-      - "5555:5555"
-    depends_on:
-      - redis
-      - db
+  
 
 volumes:
   postgres_data:
