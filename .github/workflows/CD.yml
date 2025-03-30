@@ -39,14 +39,14 @@ jobs:
             if [ ! -f .env ]; then
               echo "Создаём .env файл..."
               cat > .env <<'EOF'
-                DB_NAME=gleb_db
-                DB_USER=gleb
-                DB_PASS=1234
-                DB_HOST=db
-                DB_PORT=5432
-                DEBUG=False
-                ALLOWED_HOSTS=*
-              EOF
+DB_NAME=gleb_db
+DB_USER=gleb
+DB_PASS=1234
+DB_HOST=db
+DB_PORT=5432
+DEBUG=False
+ALLOWED_HOSTS=*
+EOF
             fi
 
             # Остановить старые контейнеры
