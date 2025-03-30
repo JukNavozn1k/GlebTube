@@ -26,27 +26,28 @@ jobs:
             # Проверить наличие репозитория
             if [ ! -d "GlebTube" ]; then
               echo "Репозиторий не найден, клонируем..."
-              git clone https://github.com/JukNavozn1k/GlebTube
+              git clone https://github.com/JukNavozn1k/GlebTube.git
             else
               echo "Репозиторий найден, обновляем..."
               cd GlebTube || exit
               git pull origin main
             fi
 
+            # Перейти в папку GlebTube
             cd GlebTube || exit
 
             # Проверка на существование .env
             if [ ! -f .env ]; then
               echo "Создаём .env файл..."
               cat > .env <<EOF
-            DB_NAME=gleb_db
-            DB_USER=gleb
-            DB_PASS=1234
-            DB_HOST=db
-            DB_PORT=5432
-            DEBUG=False
-            ALLOWED_HOSTS=*
-            EOF
+              DB_NAME=gleb_db
+              DB_USER=gleb
+              DB_PASS=1234
+              DB_HOST=db
+              DB_PORT=5432
+              DEBUG=False
+              ALLOWED_HOSTS=*
+              EOF
             fi
 
             # Остановить старые контейнеры
