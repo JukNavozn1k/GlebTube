@@ -1,0 +1,60 @@
+name: CD
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy on remote server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            # Создаем директорию проекта, если она не существует
+            if [ ! -d "${{ secrets.REMOTE_PROJECT_PATH }}" ]; then
+              mkdir -p "${{ secrets.REMOTE_PROJECT_PATH }}"
+            fi
+
+            cd "${{ secrets.REMOTE_PROJECT_PATH }}"
+
+            # Если репозиторий не найден, клонируем его, иначе обновляем
+            if [ ! -d ".git" ]; then
+              echo "Репозиторий не найден, клонируем..."
+              git clone ${{ secrets.REPO_URL }} .
+            else
+              echo "Репозиторий найден, подтягиваем изменения..."
+              git reset --hard
+              git pull origin main
+            fi
+
+            # Создание файла .env с дефолтными значениями, если его нет
+            if [ ! -f .env ]; then
+              echo "Создание .env файла..."
+              cat > .env <<'EOF'
+              DB_NAME=gleb_db
+              DB_USER=gleb
+              DB_PASS=1234
+              DB_HOST=db
+              DB_PORT=5432
+              DEBUG=False
+              ALLOWED_HOSTS=*
+              EOF
+              fi
+
+            # Остановка старых контейнеров
+            docker-compose -f docker-compose.prod.yml down
+
+            # Сборка и запуск контейнеров
+            docker-compose -f docker-compose.prod.yml up -d --build
+
+            # Применение миграций
+            docker-compose -f docker-compose.prod.yml run --rm web python manage.py migrate
+
+            # Сбор статики
+            docker-compose -f docker-compose.prod.yml run --rm web python manage.py collectstatic --noinput
