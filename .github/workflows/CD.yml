@@ -26,7 +26,7 @@ jobs:
             # Проверить наличие репозитория
             if [ ! -d "GlebTube" ]; then
               echo "Репозиторий не найден, клонируем..."
-              git clone https://github.com/username/GlebTube.git
+              git clone https://github.com/JukNavozn1k/GlebTube
             else
               echo "Репозиторий найден, обновляем..."
               cd GlebTube || exit
