@@ -57,6 +57,13 @@ _To execute the following commands, you need to install python and pip_
    ```sh
    git clone https://github.com/JukNavozn1k/GlebTube
    ```
+2. Setup .env
+   ```
+   POSTGRES_DB=db
+   POSTGRES_USER=gleb
+   PGPORT=5432
+   POSTGRES_PASSWORD=1234
+   ```
 2. Install poetry via pip
    ```pip
    pip install poetry
