@@ -14,7 +14,7 @@ from . import tasks
 
 import torch
 from .models import Video
-from .semantic_search import encode_titles  
+from .semantic_search import semantic_search_videos
 import torch.nn.functional as F
 
 def search_videos(request):
@@ -23,43 +23,8 @@ def search_videos(request):
         videos = Video.objects.none()
         context = {'videos': videos}
         return render(request, 'main.html', context=context)
-    
-    # Получаем все видео, у которых есть эмбеддинг
     videos_qs = Video.objects.exclude(search_embedding__isnull=True).order_by('-stars_count', '-id')
-    
-    # Загружаем эмбеддинги из JSONField и преобразуем в тензор
-    embeddings_list = []
-    videos_list = []
-    for video in videos_qs:
-        if video.search_embedding:
-            embeddings_list.append(torch.tensor(video.search_embedding))
-            videos_list.append(video)
-    
-    if not embeddings_list:
-        # Эмбеддинги не найдены — возвращаем пустой результат
-        return render(request, 'main.html', context={'videos': []})
-    
-    title_embeddings = torch.stack(embeddings_list)  # [N, D]
-    
-    # Вычисляем эмбеддинг запроса (одно значение)
-    query_emb = encode_titles([query])  # [1, D]
-    
-    # Нормализуем эмбеддинги
-    title_embeddings = F.normalize(title_embeddings, p=2, dim=1)
-    query_emb = F.normalize(query_emb, p=2, dim=1)
-    
-    # Косинусное расстояние
-    cos_sim = torch.matmul(title_embeddings, query_emb.T).squeeze(1)
-    cos_dist = 1 - cos_sim
-    
-    k = 10
-    if k > len(cos_dist):
-        k = len(cos_dist)
-    topk_dist, topk_idx = torch.topk(cos_dist, k, largest=False)
-    
-    # Получаем видео в порядке похожести
-    results = [videos_list[idx] for idx in topk_idx]
-    
+    results = semantic_search_videos(query, videos_qs, k=10)
     context = {'videos': results}
     return render(request, 'main.html', context=context)
 

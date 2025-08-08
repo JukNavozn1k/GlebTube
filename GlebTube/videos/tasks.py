@@ -1,5 +1,5 @@
 from celery import shared_task
-from .semantic_search import encode_titles, tokenizer, model
+from .semantic_search import encode_titles, tokenizer, model, encode_title
 import torch
 @shared_task
 def remove_video(video_id,author_id):
@@ -119,17 +119,6 @@ def video_encode(duration,video_id):
 
 
 
-def encode_title(title):
-    encoded_input = tokenizer([title], padding=True, truncation=True, return_tensors='pt')
-    with torch.no_grad():
-        model_output = model(**encoded_input)
-    token_embeddings = model_output.last_hidden_state
-    attention_mask = encoded_input['attention_mask'].unsqueeze(-1)
-    masked_embeddings = token_embeddings * attention_mask
-    summed = masked_embeddings.sum(dim=1)
-    counts = attention_mask.sum(dim=1).clamp(min=1e-9)
-    embedding = (summed / counts).squeeze().tolist()  # список float
-    return embedding
 
 
 @shared_task
