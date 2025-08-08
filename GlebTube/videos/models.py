@@ -7,6 +7,8 @@ from auths.models import User
 from . import tasks
 
 from django.core.exceptions import ValidationError
+from django.db.models import JSONField
+
 
 def validate_probability(value):
     if not (0 <= value <= 1):
@@ -44,6 +46,9 @@ class Video(models.Model):
 
     date_uploaded = models.DateTimeField(default=timezone.now,verbose_name="Дата публикации")
     author = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name="Автор",related_name='user_videos')
+
+    search_embedding = JSONField(null=True, blank=True, verbose_name='Эмбеддинг для поиска')
+
 
     
     class Meta: 
