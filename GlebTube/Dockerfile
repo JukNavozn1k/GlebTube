@@ -1,8 +1,8 @@
-FROM python:3.9-alpine
+FROM python:3.10.0-slim
 
 # Install ffmpeg and any other required packages
-RUN apk update && apk add --no-cache ffmpeg
-
+RUN apt-get update && apt-get install -y ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
 # Set working directory
 WORKDIR /app
 
