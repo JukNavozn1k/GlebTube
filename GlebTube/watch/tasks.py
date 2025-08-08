@@ -3,8 +3,8 @@ from celery import shared_task
 @shared_task
 def refresh_history(video_id,viewer_id):
     from profiles.models import WatchHistory
-    new_watch = WatchHistory(video_id=video_id,viewer_id=viewer_id)
-    new_watch.save()
+    obj, save = WatchHistory.objects.get_or_create(video_id=video_id, viewer_id=viewer_id)
+    
 
 @shared_task
 def refresh_views(video_id):

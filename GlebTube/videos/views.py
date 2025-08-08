@@ -5,9 +5,6 @@ from django.views import View
 from . import forms
 from .models import Video
 
-
-from auths.models import User
-
 from django.shortcuts import get_object_or_404
 
 from django.http import JsonResponse
@@ -15,10 +12,46 @@ from django.shortcuts import redirect
 
 from . import tasks
 
+import torch
+from .models import Video
+from .semantic_search import semantic_search_knn  # предполагаем, что есть
+
 def search_videos(request):
-    videos = Video.objects.filter(caption__icontains=request.GET['search_query']).order_by('-stars_count','-id')
-    context={'videos':videos}
-    return render(request,'main.html',context=context)
+    query = request.GET.get('search_query', '').strip()
+    if not query:
+        videos = Video.objects.none()
+        context = {'videos': videos}
+        return render(request, 'main.html', context=context)
+    
+    # Получаем все видео (можно оптимизировать подгрузку только заголовков)
+    videos_qs = Video.objects.all().order_by('-stars_count', '-id')
+    
+    # Собираем заголовки и индексируем
+    titles = list(videos_qs.values_list('caption', flat=True))  # или 'title', если поле так называется
+    
+    # Преобразуем в dataset-подобную структуру для semantic_search_knn
+    class SimpleDataset:
+        def __init__(self, titles):
+            self.titles = titles
+        def __len__(self):
+            return len(self.titles)
+        def __getitem__(self, idx):
+            return {'title': self.titles[idx]}
+    dataset = SimpleDataset(titles)
+    
+    # Ищем топ-K (например 10)
+    top_results = semantic_search_knn(dataset, query, k=10)
+    
+    # Получаем индексы из результата
+    top_indices = [idx for idx, dist in top_results]
+    
+    # Список видео по найденным индексам
+    # Чтобы сохранить порядок, получим видео в порядке индексов:
+    videos = [videos_qs[i] for i in top_indices if i < len(videos_qs)]
+    
+    context = {'videos': videos}
+    return render(request, 'main.html', context=context)
+
 
 def search_my_videos(request):
     if not request.user.is_authenticated: return redirect(reverse('signIn'))

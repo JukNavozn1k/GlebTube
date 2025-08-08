@@ -17,6 +17,7 @@ class WatchHistory(models.Model):
       class Meta:
         verbose_name = 'Просмотр'
         verbose_name_plural = 'История просмотров'
+        unique_together = ('viewer', 'video')
 
 class Subscription(models.Model):
       '''
