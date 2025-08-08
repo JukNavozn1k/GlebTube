@@ -14,7 +14,8 @@ from . import tasks
 
 import torch
 from .models import Video
-from .semantic_search import semantic_search_knn  # предполагаем, что есть
+from .semantic_search import encode_titles  
+import torch.nn.functional as F
 
 def search_videos(request):
     query = request.GET.get('search_query', '').strip()
@@ -23,35 +24,44 @@ def search_videos(request):
         context = {'videos': videos}
         return render(request, 'main.html', context=context)
     
-    # Получаем все видео (можно оптимизировать подгрузку только заголовков)
-    videos_qs = Video.objects.all().order_by('-stars_count', '-id')
+    # Получаем все видео, у которых есть эмбеддинг
+    videos_qs = Video.objects.exclude(search_embedding__isnull=True).order_by('-stars_count', '-id')
     
-    # Собираем заголовки и индексируем
-    titles = list(videos_qs.values_list('caption', flat=True))  # или 'title', если поле так называется
+    # Загружаем эмбеддинги из JSONField и преобразуем в тензор
+    embeddings_list = []
+    videos_list = []
+    for video in videos_qs:
+        if video.search_embedding:
+            embeddings_list.append(torch.tensor(video.search_embedding))
+            videos_list.append(video)
     
-    # Преобразуем в dataset-подобную структуру для semantic_search_knn
-    class SimpleDataset:
-        def __init__(self, titles):
-            self.titles = titles
-        def __len__(self):
-            return len(self.titles)
-        def __getitem__(self, idx):
-            return {'title': self.titles[idx]}
-    dataset = SimpleDataset(titles)
+    if not embeddings_list:
+        # Эмбеддинги не найдены — возвращаем пустой результат
+        return render(request, 'main.html', context={'videos': []})
     
-    # Ищем топ-K (например 10)
-    top_results = semantic_search_knn(dataset, query, k=10)
+    title_embeddings = torch.stack(embeddings_list)  # [N, D]
     
-    # Получаем индексы из результата
-    top_indices = [idx for idx, dist in top_results]
+    # Вычисляем эмбеддинг запроса (одно значение)
+    query_emb = encode_titles([query])  # [1, D]
     
-    # Список видео по найденным индексам
-    # Чтобы сохранить порядок, получим видео в порядке индексов:
-    videos = [videos_qs[i] for i in top_indices if i < len(videos_qs)]
+    # Нормализуем эмбеддинги
+    title_embeddings = F.normalize(title_embeddings, p=2, dim=1)
+    query_emb = F.normalize(query_emb, p=2, dim=1)
     
-    context = {'videos': videos}
+    # Косинусное расстояние
+    cos_sim = torch.matmul(title_embeddings, query_emb.T).squeeze(1)
+    cos_dist = 1 - cos_sim
+    
+    k = 10
+    if k > len(cos_dist):
+        k = len(cos_dist)
+    topk_dist, topk_idx = torch.topk(cos_dist, k, largest=False)
+    
+    # Получаем видео в порядке похожести
+    results = [videos_list[idx] for idx in topk_idx]
+    
+    context = {'videos': results}
     return render(request, 'main.html', context=context)
-
 
 def search_my_videos(request):
     if not request.user.is_authenticated: return redirect(reverse('signIn'))
