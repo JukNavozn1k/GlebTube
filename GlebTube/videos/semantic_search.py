@@ -66,3 +66,47 @@ def semantic_search_knn(dataset, query, k=5, title_embeddings=None):
 
     
     return results_sorted
+
+
+# Универсальная функция поиска по видео (query, queryset, k)
+def semantic_search_videos(query, videos_qs, k=10):
+    """
+    query: строка запроса
+    videos_qs: QuerySet Video с search_embedding
+    k: top-k
+    Возвращает список Video в порядке похожести
+    """
+    import torch.nn.functional as F
+    embeddings_list = []
+    videos_list = []
+    for video in videos_qs:
+        if video.search_embedding:
+            embeddings_list.append(torch.tensor(video.search_embedding))
+            videos_list.append(video)
+    if not embeddings_list:
+        return []
+    title_embeddings = torch.stack(embeddings_list)
+    query_emb = encode_titles([query])
+    title_embeddings = F.normalize(title_embeddings, p=2, dim=1)
+    query_emb = F.normalize(query_emb, p=2, dim=1)
+    cos_sim = torch.matmul(title_embeddings, query_emb.T).squeeze(1)
+    cos_dist = 1 - cos_sim
+    if k > len(cos_dist):
+        k = len(cos_dist)
+    topk_dist, topk_idx = torch.topk(cos_dist, k, largest=False)
+    results = [videos_list[idx] for idx in topk_idx]
+    return results
+
+
+# Функция для получения эмбеддинга одного заголовка (для tasks)
+def encode_title(title):
+    encoded_input = tokenizer([title], padding=True, truncation=True, return_tensors='pt')
+    with torch.no_grad():
+        model_output = model(**encoded_input)
+    token_embeddings = model_output.last_hidden_state
+    attention_mask = encoded_input['attention_mask'].unsqueeze(-1)
+    masked_embeddings = token_embeddings * attention_mask
+    summed = masked_embeddings.sum(dim=1)
+    counts = attention_mask.sum(dim=1).clamp(min=1e-9)
+    embedding = (summed / counts).squeeze().tolist()
+    return embedding
