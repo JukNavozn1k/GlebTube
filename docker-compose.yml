@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/frontend:delegated
+      - /frontend/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true
+    restart: unless-stopped
+
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+  backend:
+    build: 
+      context: ./backend/.
+    env_file:
+      - .env
+    environment:
+      MONGO_USER: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_HOST: mongo  # Changed from 127.0.0.1 to container name
+      MONGO_PORT: ${MONGO_PORT}
+
+      google_client_id: ${GOOGLE_CLIENT_ID}
+      google_client_secret: ${GOOGLE_CLIENT_SECRET}
+   
+      github_client_id: ${GITHUB_CLIENT_ID}
+      github_client_secret: ${GITHUB_CLIENT_SECRET}
+
+      discord_client_id: ${DISCORD_CLIENT_ID}
+      discord_client_secret: ${DISCORD_CLIENT_SECRET}
+     
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/backend
+    depends_on:
+      - mongo
+    command: ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0"]
+
+  mongo:
+    image: mongo:6.0
+    env_file:
+      - .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    hostname: mongo  # Added hostname
+    ports:
+      - "${MONGO_PORT}:${MONGO_PORT}"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:

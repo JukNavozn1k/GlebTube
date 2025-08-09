@@ -59,11 +59,9 @@ _To execute the following commands, you need to install python and pip_
    ```
 2. Setup .env
    ```
-   DB_NAME=gg
-   DB_USER=gleb
-   DB_PASS=1234
-   DB_HOST=db
-   DB_PORT=5432
+   MONGO_INITDB_ROOT_USERNAME=mongoadmin
+   MONGO_INITDB_ROOT_PASSWORD=secret
+   MONGO_PORT=27017
    ```
 2. Install poetry via pip
    ```pip
