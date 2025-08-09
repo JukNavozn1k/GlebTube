@@ -1,8 +1,8 @@
 
 
 import type React from "react"
-import Link from "next/link"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import {Link} from "react-router-dom"
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom"
 import { Search, Upload, ListVideo } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -18,9 +18,9 @@ type HeaderProps = {
 }
 
 export function Header({ className = "", showSearch = true }: HeaderProps) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const params = useSearchParams()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [params] = useSearchParams()
   const [q, setQ] = useState<string>(params.get("q") || "")
   const { user } = useUser()
 
@@ -33,8 +33,8 @@ export function Header({ className = "", showSearch = true }: HeaderProps) {
     e?.preventDefault()
     const target = q.trim()
     const url = "/?q=" + encodeURIComponent(target)
-    if (pathname !== "/") router.push(url)
-    else router.push(url)
+    if (location.pathname !== "/") navigate(url)
+    else navigate(url)
   }
 
   return (
@@ -70,19 +70,19 @@ export function Header({ className = "", showSearch = true }: HeaderProps) {
           )}
 
           <div className="hidden sm:flex items-center gap-2 ml-2">
-            <Link href="/subscriptions" className="hidden sm:block">
+            <Link to="/subscriptions" className="hidden sm:block">
               <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50 bg-transparent">
                 <ListVideo className="h-4 w-4 mr-2" />
                 Подписки
               </Button>
             </Link>
-            <Link href="/upload" className="hidden sm:block">
+            <Link to="/upload" className="hidden sm:block">
               <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50 bg-transparent">
                 <Upload className="h-4 w-4 mr-2" />
                 Загрузить
               </Button>
             </Link>
-            <Link href="/profile" aria-label="Мой профиль">
+            <Link to="/profile" aria-label="Мой профиль">
               <Avatar className="h-8 w-8 border border-blue-200">
                 <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
                 <AvatarFallback>GL</AvatarFallback>

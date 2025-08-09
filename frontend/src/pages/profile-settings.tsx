@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { useUser } from "@/hooks/use-user"
-import { useRouter } from "next/navigation"
+import { useNavigate } from "react-router-dom"
 import { BottomNav } from "@/components/bottom-nav"
 
 export default function ProfileSettingsPage() {

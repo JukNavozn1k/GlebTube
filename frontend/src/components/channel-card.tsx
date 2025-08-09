@@ -1,6 +1,6 @@
 
 
-import Link from "next/link"
+import {Link} from "react-router-dom"
 import type { Video } from "@/lib/glebtube-data"
 import { Button } from "@/components/ui/button"
 import { isSubscribed, toggleSubscription } from "@/lib/glebtube-storage"

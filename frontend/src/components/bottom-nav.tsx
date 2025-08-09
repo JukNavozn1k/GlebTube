@@ -1,28 +1,28 @@
 
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import {Link} from "react-router-dom"
+import { useLocation } from "react-router-dom"
 import { Home, Upload, UserRound, ListVideo } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function BottomNav() {
-  const pathname = usePathname()
+  const { pathname } = useLocation()
   const items = [
-    { href: "/", label: "Главная", icon: Home },
-    { href: "/subscriptions", label: "Подписки", icon: ListVideo },
-    { href: "/upload", label: "Загрузить", icon: Upload },
-    { href: "/profile", label: "Профиль", icon: UserRound },
+    { to: "/", label: "Главная", icon: Home },
+    { to: "/subscriptions", label: "Подписки", icon: ListVideo },
+    { to: "/upload", label: "Загрузить", icon: Upload },
+    { to: "/profile", label: "Профиль", icon: UserRound },
   ]
   return (
     <nav className="fixed bottom-0 inset-x-0 z-40 border-t bg-white sm:hidden">
       <ul className="flex items-stretch justify-around">
         {items.map((it) => {
-          const active = pathname === it.href
+          const active = pathname === it.to
           const Icon = it.icon
           return (
-            <li key={it.href} className="flex-1">
+            <li key={it.to} className="flex-1">
               <Link
-                href={it.href}
+                to={it.to}
                 className={cn(
                   "flex flex-col items-center justify-center py-2 text-xs",
                   active ? "text-blue-700" : "text-gray-600",

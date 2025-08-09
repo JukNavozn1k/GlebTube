@@ -1,7 +1,7 @@
 
 
 import { useMemo, useState } from "react"
-import { useParams } from "next/navigation"
+import { useParams } from "react-router-dom"
 import { Header } from "@/components/header"
 import { videos as builtins, type Video } from "@/lib/glebtube-data"
 import { getUploads, isSubscribed, toggleSubscription } from "@/lib/glebtube-storage"
@@ -14,7 +14,7 @@ function nameFromSlug(slug: string) {
 }
 
 export default function ChannelPage() {
-  const { slug } = useParams<{ slug: string }>()
+  const { slug = "" } = useParams<{ slug: string }>()
   const uploads = getUploads()
   const all: Video[] = useMemo(() => [...uploads, ...builtins], [uploads])
   const channelNameLower = nameFromSlug(slug)

@@ -1,17 +1,17 @@
 
 import { useState } from "react"
-import { Header } from "@/components/glebtube/header"
+import { Header } from "@/components/header"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { addUpload } from "@/lib/glebtube-storage"
 import { currentUser } from "@/lib/glebtube-user"
-import { useRouter } from "next/navigation"
-import { BottomNav } from "@/components/glebtube/bottom-nav"
+import { useNavigate } from "react-router-dom"
+import { BottomNav } from "@/components/bottom-nav"
 
 export default function UploadPage() {
-  const router = useRouter()
+  const navigate = useNavigate()
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [videoFile, setVideoFile] = useState<File | null>(null)
@@ -41,7 +41,7 @@ export default function UploadPage() {
       uploaderId: currentUser.id,
     } as any)
     setSubmitting(false)
-    router.push(`/watch/${v.id}`)
+    navigate(`/watch/${v.id}`)
   }
 
   return (

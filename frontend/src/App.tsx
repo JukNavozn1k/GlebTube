@@ -1,33 +1,28 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import {HomePage} from '@/pages/home'
+import {WatchPage} from '@/pages/watch-video'
+// import ChannelPage from '@/pages/channel'
+// import UploadVideoPage from '@/pages/upload-video'
+// import EditVideoPage from '@/pages/edit-video'
+// import ProfilePage from '@/pages/profile'
+// import ProfileSettingsPage from '@/pages/profile-settings'
+// import SubscriptionsPage from '@/pages/subscriptions'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/watch/:id" element={<WatchPage />} />
+        {/* <Route path="/channel/:slug" element={<ChannelPage />} />
+        <Route path="/upload" element={<UploadVideoPage />} />
+        <Route path="/edit/:id" element={<EditVideoPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/profile/settings" element={<ProfileSettingsPage />} />
+        <Route path="/subscriptions" element={<SubscriptionsPage />} /> */}
+      </Routes>
+    </BrowserRouter>
   )
 }
 

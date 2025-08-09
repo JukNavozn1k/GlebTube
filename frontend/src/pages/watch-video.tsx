@@ -1,8 +1,8 @@
 
 
 import { useEffect, useMemo, useState } from "react"
-import Link from "next/link"
-import { useParams } from "next/navigation"
+import {Link} from "react-router-dom"
+import { useParams } from "react-router-dom"
 import { Header } from "@/components/header"
 import { StarButton } from "@/components/star-button"
 import { Comments } from "@/components/comments"
@@ -16,7 +16,7 @@ function channelSlug(name: string) {
   return encodeURIComponent(name.toLowerCase())
 }
 
-export default function WatchPage() {
+export function WatchPage() {
   const params = useParams<{ id: string }>()
   const id = params?.id || ""
   const [video, setVideo] = useState<Video | null>(null)
@@ -43,7 +43,7 @@ export default function WatchPage() {
         <Header />
         <main className="mx-auto max-w-4xl px-3 sm:px-4 py-8">
           <div className="text-lg font-semibold mb-2">Видео не найдено</div>
-          <Link href="/" className="text-blue-700 hover:underline">
+          <Link to="/" className="text-blue-700 hover:underline">
             Вернуться на главную
           </Link>
         </main>
@@ -68,7 +68,7 @@ export default function WatchPage() {
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <Link
-                    href={`/channel/${channelSlug(video.channel)}`}
+                    to={`/channel/${channelSlug(video.channel)}`}
                     className="font-medium text-blue-700 hover:underline"
                   >
                     {video.channel}
@@ -112,7 +112,7 @@ export default function WatchPage() {
           <div className="text-sm font-semibold">Рекомендованные</div>
           <div className="grid gap-3">
             {recommended.map((v) => (
-              <Link key={v.id} href={`/watch/${v.id}`} className="flex gap-3 group">
+              <Link key={v.id} to={`/watch/${v.id}`} className="flex gap-3 group">
                 <div className="relative aspect-video w-40 min-w-40 rounded-md overflow-hidden bg-blue-50">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img

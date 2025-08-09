@@ -1,6 +1,6 @@
 
 
-import Link from "next/link"
+import {Link} from "react-router-dom"
 import { useEffect, useMemo, useState } from "react"
 import { Header } from "@/components/header"
 import {

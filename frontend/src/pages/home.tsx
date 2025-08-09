@@ -1,15 +1,15 @@
 
 
 import { useEffect, useMemo, useState } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams } from "react-router-dom"
 import { Header } from "@/components/header"
 import { VideoCard } from "@/components/video-card"
 import { videos as builtins } from "@/lib/glebtube-data"
 import { getUploads, type UploadedVideo } from "@/lib/glebtube-storage"
 import { BottomNav } from "@/components/bottom-nav"
 
-export default function HomePage() {
-  const params = useSearchParams()
+export function HomePage() {
+  const [params] = useSearchParams()
   const q = (params.get("q") || "").toLowerCase().trim()
   const [uploads, setUploads] = useState<UploadedVideo[]>([])
 
