@@ -1,21 +1,21 @@
-from repositories import AbstractRepository
+from repositories.base import AbstractRepository
 from abc import ABC
 
-class AbstractService(ABC):
-    def __init__(self, repo: AbstractRepository):
-        self.repo = repo
+class AbstractCRUDService(ABC):
+    def __init__(self, repository: AbstractRepository):
+        self.repository = repository
 
     async def create(self, data):
-        return await self.repo.create(data)
+        return await self.repository.create(data)
 
-    async def retrieve(self, fdb_id):
-        return await self.repo.retrieve(fdb_id)
+    async def retrieve(self, obj_id):
+        return await self.repository.retrieve(obj_id)
 
     async def list(self, filters=None, limit: int = 10, offset: int = 0):
-        return await self.repo.list(filters, limit=limit, offset=offset)
+        return await self.repository.list(filters, limit=limit, offset=offset)
 
-    async def update(self, fdb_id, data):
-        return await self.repo.update(fdb_id, data)
+    async def update(self, obj_id, data):
+        return await self.repository.update(obj_id, data)
 
-    async def delete(self, fdb_id):
-        return await self.repo.delete(fdb_id)
+    async def delete(self, obj_id):
+        return await self.repository.delete(obj_id)

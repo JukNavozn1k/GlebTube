@@ -1,11 +1,11 @@
 import bcrypt
 from .jwt_auth import jwt_auth_service,JWTAuthService
 
-from core import settings
 
+from .base import AbstractCRUDService
 from repositories.users import users_repository
 
-class UsersService:
+class UsersService(AbstractCRUDService):
     def __init__(self, repository, auth_service : JWTAuthService):
         self.repository = repository
         self.auth_service = auth_service
