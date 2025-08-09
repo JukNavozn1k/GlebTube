@@ -1,3 +1,3 @@
-from .base import AbstractCRUDService
+from .base import AbstractCRUDService, FileService
 
-__all__ = ('AbstractCRUDService')
+__all__ = ('AbstractCRUDService','FileService')
