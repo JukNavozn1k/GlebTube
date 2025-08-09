@@ -2,13 +2,14 @@ import bcrypt
 from .jwt_auth import jwt_auth_service,JWTAuthService
 
 
-from .base import AbstractCRUDService
+from .base import AbstractCRUDService,FileService
 from repositories.users import users_repository
 
 class UsersService(AbstractCRUDService):
     def __init__(self, repository, auth_service : JWTAuthService):
         self.repository = repository
         self.auth_service = auth_service
+        self.file_service = FileService('media/users')
 
     async def login(self, data: dict):
         res = await self.repository.retrieve_by_username(data['username'])
@@ -45,6 +46,8 @@ class UsersService(AbstractCRUDService):
     async def get_user(self,user_id: any):
         return await self.repository.retrieve(user_id)
 
+    async def update_picture(self, file):
+        return await self.file_service.upload(file)
 def get_user_service(users_repository, auth_service) -> UsersService:
     return UsersService(users_repository, auth_service)
 

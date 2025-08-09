@@ -36,7 +36,7 @@ async def retrive(user_id: ObjectID):
             raise HTTPException(status_code=404, detail="User not found")
         return result
 
-@router.put('/update/me', response_model=Any)
+@router.put('/update/me', response_model=UserOut)
 async def update_me(
     description: Optional[str] = Form(None),
     avatar: UploadFile = File(None),
@@ -46,7 +46,7 @@ async def update_me(
         new_user_data = UserIn()
         # Если есть новый аватар — загружаем и сохраняем путь
         if avatar:
-            avatar_path =  'file_service.upload(avatar)'
+            avatar_path =  await users_service.update_picture(avatar)
             new_user_data.avatar = avatar_path
 
         # Если есть описание — добавляем его
@@ -54,13 +54,10 @@ async def update_me(
             new_user_data.description = description
 
 
-
-        return new_user_data
-
         # Обновляем пользователя
         
-        # res = await users_service.update(user['id'], UserIn(update_fields).model_dump())
-        # return res
+        res = await users_service.update(user['id'], new_user_data.model_dump())
+        return res
 
     except Exception as e:
         print(f'Error {e}')

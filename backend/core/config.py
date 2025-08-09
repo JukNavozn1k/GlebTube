@@ -28,13 +28,11 @@ class MongoDB(BaseSettings):
     def get_url(self) -> str:
         return f"mongodb://{self.mongo_user}:{self.mongo_password}@{self.mongo_host}:{self.mongo_port}/"
 
+
 class Settings(BaseSettings):
     app: App = App()
     auth: Auth = Auth()
     mongo: MongoDB = MongoDB()
-
-    media_dir: str = 'media'
-
 
     def configure_logger(self):
         logger = logging.getLogger("GlebTube")
