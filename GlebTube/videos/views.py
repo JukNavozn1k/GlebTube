@@ -5,9 +5,6 @@ from django.views import View
 from . import forms
 from .models import Video
 
-
-from auths.models import User
-
 from django.shortcuts import get_object_or_404
 
 from django.http import JsonResponse
@@ -15,10 +12,21 @@ from django.shortcuts import redirect
 
 from . import tasks
 
+import torch
+from .models import Video
+from .semantic_search import semantic_search_videos
+import torch.nn.functional as F
+
 def search_videos(request):
-    videos = Video.objects.filter(caption__icontains=request.GET['search_query']).order_by('-stars_count','-id')
-    context={'videos':videos}
-    return render(request,'main.html',context=context)
+    query = request.GET.get('search_query', '').strip()
+    if not query:
+        videos = Video.objects.none()
+        context = {'videos': videos}
+        return render(request, 'main.html', context=context)
+    videos_qs = Video.objects.exclude(search_embedding__isnull=True).order_by('-stars_count', '-id')
+    results = semantic_search_videos(query, videos_qs, k=10)
+    context = {'videos': results}
+    return render(request, 'main.html', context=context)
 
 def search_my_videos(request):
     if not request.user.is_authenticated: return redirect(reverse('signIn'))
