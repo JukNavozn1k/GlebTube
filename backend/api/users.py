@@ -14,7 +14,7 @@ from typing import Optional,Any
 
 router = APIRouter(prefix='/users', tags=['Users'])
 
-@router.post('/list', response_model=PaginatedResponse[UserOut])
+@router.get('/list', response_model=PaginatedResponse[UserOut])
 async def list(limit: int = Query(10, ge=1, le=100),
                offset: int = Query(0, ge=0),):
     result = await users_service.list(limit=limit, offset=offset)
@@ -25,7 +25,7 @@ async def list(limit: int = Query(10, ge=1, le=100),
         offset=offset
     )
 
-@router.post('/retrieve/{user_id}', response_model=UserOut)
+@router.get('/retrieve/{user_id}', response_model=UserOut)
 async def retrive(user_id: ObjectID):
     try:
         result = await users_service.retrieve(user_id)
@@ -53,12 +53,21 @@ async def update_me(
         if description:
             new_user_data.description = description
 
-
         # Обновляем пользователя
-        
         res = await users_service.update(user['id'], new_user_data.model_dump())
         return res
 
     except Exception as e:
         print(f'Error {e}')
         raise HTTPException(status_code=400, detail=str(e))
+    
+
+
+@router.delete('/delete/me', response_model=dict)
+async def delete_me(user: dict = Depends(get_current_user)):
+    try:
+        await users_service.delete(user['id'])
+        return {'sucsess': True}
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=e.errors())
+    
