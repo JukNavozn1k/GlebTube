@@ -1,7 +1,7 @@
 from .mongo import MongoDatabase
 from core import settings
 
-from .fbd import FBDDocument
+# from .fbd import FBDDocument
 
 # model_dir = os.path.dirname(__file__)
 
@@ -11,4 +11,4 @@ from .fbd import FBDDocument
 #         importlib.import_module(f"models.{filename[:-3]}")
 
 
-mongo = MongoDatabase(settings.mongo.get_url(), settings.mongo.mongo_db_name, [FBDDocument])
+mongo = MongoDatabase(settings.mongo.get_url(), settings.mongo.mongo_db_name, [])
