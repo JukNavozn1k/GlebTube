@@ -33,6 +33,9 @@ class Settings(BaseSettings):
     auth: Auth = Auth()
     mongo: MongoDB = MongoDB()
 
+    media_dir: str = 'media'
+
+
     def configure_logger(self):
         logger = logging.getLogger("GlebTube")
         logger.setLevel(getattr(logging, self.app.log_level.upper(), logging.INFO))

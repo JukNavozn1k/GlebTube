@@ -1,4 +1,4 @@
-from repositories.base import AbstractRepository
+from repositories import AbstractRepository
 from abc import ABC
 
 class AbstractCRUDService(ABC):
