@@ -9,6 +9,8 @@ import {ProfilePage} from '@/pages/profile'
 import {ProfileSettingsPage} from '@/pages/profile-settings'
 import {SubscriptionsPage} from '@/pages/subscriptions'
 
+import {NotFound} from '@/pages/not-found'
+
 function App() {
   return (
     <BrowserRouter>
@@ -21,6 +23,7 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/profile/settings" element={<ProfileSettingsPage />} />
         <Route path="/subscriptions" element={<SubscriptionsPage />} />
+         <Route path="/*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   )

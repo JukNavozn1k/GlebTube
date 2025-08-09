@@ -20,12 +20,12 @@ export function ChannelCard({ channel, videos }: ChannelCardProps) {
   return (
     <div className="rounded-lg border border-blue-100 p-4 flex items-center gap-4">
       <Link
-        href={`/channel/${slug(channel)}`}
+        to={`/channel/${slug(channel)}`}
         className="h-12 w-12 rounded-full bg-blue-100 border border-blue-200 shrink-0"
         aria-label={channel}
       />
       <div className="min-w-0 flex-1">
-        <Link href={`/channel/${slug(channel)}`} className="font-medium hover:text-blue-700 line-clamp-1">
+        <Link to={`/channel/${slug(channel)}`} className="font-medium hover:text-blue-700 line-clamp-1">
           {channel}
         </Link>
         <div className="text-xs text-muted-foreground">{videos.length} видео</div>

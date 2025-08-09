@@ -73,14 +73,14 @@ export function ProfilePage() {
             ) : (
               <p className="mt-1 text-sm text-muted-foreground">
                 Описание канала пока не добавлено.{" "}
-                <Link href="/profile/settings" className="text-blue-700 hover:underline">
+                <Link to="/profile/settings" className="text-blue-700 hover:underline">
                   Добавить описание
                 </Link>
                 .
               </p>
             )}
             <div className="mt-2">
-              <Link href="/profile/settings">
+              <Link to="/profile/settings">
                 <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50 bg-transparent">
                   Настройки профиля
                 </Button>
@@ -94,7 +94,7 @@ export function ProfilePage() {
         <section className="grid gap-3">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Мои видео</h2>
-            <Link href="/upload">
+            <Link to="/upload">
               <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50 bg-transparent">
                 Загрузить
               </Button>
@@ -103,7 +103,7 @@ export function ProfilePage() {
           {uploads.length === 0 ? (
             <div className="text-sm text-muted-foreground">
               У вас нет загруженных видео.{" "}
-              <Link className="text-blue-700 hover:underline" href="/upload">
+              <Link className="text-blue-700 hover:underline" to="/upload">
                 Загрузить видео
               </Link>
               .
@@ -114,7 +114,7 @@ export function ProfilePage() {
                 <div key={v.id} className="relative">
                   <VideoCard video={v} />
                   <Link
-                    href={`/video/${v.id}/edit`}
+                    to={`/video/${v.id}/edit`}
                     className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-white/90 border border-blue-200 text-blue-700 hover:bg-blue-50"
                   >
                     Редактировать
@@ -176,7 +176,7 @@ export function ProfilePage() {
           {subs.length === 0 ? (
             <div className="text-sm text-muted-foreground">
               У вас нет подписок. Найдите интересные каналы{" "}
-              <Link className="text-blue-700 hover:underline" href="/subscriptions">
+              <Link className="text-blue-700 hover:underline" to="/subscriptions">
                 в разделе “Подписки”
               </Link>
               .
@@ -186,7 +186,7 @@ export function ProfilePage() {
               {subs.map((c) => (
                 <Link
                   key={c}
-                  href={`/channel/${encodeURIComponent(c.toLowerCase())}`}
+                  to={`/channel/${encodeURIComponent(c.toLowerCase())}`}
                   className="inline-flex items-center gap-2 rounded-full pr-3 pl-2 py-1 border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100"
                   title={c}
                 >
@@ -208,7 +208,7 @@ export function ProfilePage() {
           {starredVideos.length === 0 ? (
             <div className="text-sm text-muted-foreground">
               Нет отмеченных звездой видео. Найдите интересное{" "}
-              <Link className="text-blue-700 hover:underline" href="/">
+              <Link className="text-blue-700 hover:underline" to="/">
                 на главной
               </Link>
               .
