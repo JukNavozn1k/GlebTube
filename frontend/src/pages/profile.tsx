@@ -30,7 +30,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-export default function ProfilePage() {
+export function ProfilePage() {
   const { user } = useUser()
   const [starred, setStarred] = useState<string[]>([])
   const [history, setHistory] = useState<{ id: string; at: string }[]>([])

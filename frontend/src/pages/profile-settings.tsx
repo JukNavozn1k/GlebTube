@@ -10,7 +10,7 @@ import { useUser } from "@/hooks/use-user"
 import { useNavigate } from "react-router-dom"
 import { BottomNav } from "@/components/bottom-nav"
 
-export default function ProfileSettingsPage() {
+export function ProfileSettingsPage() {
   const { user, setAvatarFile, setDescription } = useUser()
   const fileRef = useRef<HTMLInputElement>(null)
   const [desc, setDesc] = useState<string>(user.description ?? "")

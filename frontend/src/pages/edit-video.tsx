@@ -21,7 +21,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-export default function EditVideoPage() {
+export function EditVideoPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
   const [video, setVideo] = useState<UploadedVideo | null>(null)

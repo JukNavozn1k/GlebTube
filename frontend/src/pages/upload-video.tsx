@@ -10,7 +10,7 @@ import { currentUser } from "@/lib/glebtube-user"
 import { useNavigate } from "react-router-dom"
 import { BottomNav } from "@/components/bottom-nav"
 
-export default function UploadPage() {
+export function UploadPage() {
   const navigate = useNavigate()
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")

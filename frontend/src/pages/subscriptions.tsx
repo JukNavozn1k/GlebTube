@@ -7,7 +7,7 @@ import { getSubscriptions, getUploads, type UploadedVideo } from "@/lib/glebtube
 import { videos as builtins, type Video } from "@/lib/glebtube-data"
 import { ChannelCard } from "@/components/channel-card"
 
-export default function SubscriptionsPage() {
+export function SubscriptionsPage() {
   const [subs, setSubs] = useState<string[]>([])
   const [uploads, setUploads] = useState<UploadedVideo[]>([])
 

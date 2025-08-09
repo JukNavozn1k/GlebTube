@@ -13,7 +13,7 @@ function nameFromSlug(slug: string) {
   return decodeURIComponent(String(slug)).toLowerCase()
 }
 
-export default function ChannelPage() {
+export function ChannelPage() {
   const { slug = "" } = useParams<{ slug: string }>()
   const uploads = getUploads()
   const all: Video[] = useMemo(() => [...uploads, ...builtins], [uploads])
