@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Depends
 
 from core import ObjectID
 
-from schemas.users import UserOut
+from schemas.users import UserOut,UserIn
 from schemas.pagination import PaginationParams,PaginatedResponse
 from services.users import users_service, jwt_auth_service
 
@@ -34,3 +34,11 @@ async def retrive(user_id: ObjectID):
             raise HTTPException(status_code=404, detail="User not found")
         return result
 
+@router.put('/update/me', response_model=UserOut)
+async def update_me(new_data: UserIn,user: dict = Depends(get_current_user)):
+    try:
+        res = await users_service.update(user['id'], new_data.model_dump())
+        return res 
+    except Exception as e:
+        print(f'Error {e}')
+        raise HTTPException(status_code=400, detail=f'{e}')
