@@ -23,7 +23,7 @@ import {
 
 export function EditVideoPage() {
   const { id } = useParams<{ id: string }>()
-  const router = useRouter()
+  const navigate = useNavigate()
   const [video, setVideo] = useState<UploadedVideo | null>(null)
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
@@ -46,7 +46,7 @@ export function EditVideoPage() {
         <Header />
         <main className="mx-auto max-w-2xl px-3 sm:px-4 py-6">
           <div className="text-lg font-semibold">Видео не найдено или не является загруженным.</div>
-          <Button className="mt-4" onClick={() => router.push("/")}>
+          <Button className="mt-4" onClick={() => navigate("/")}>
             На главную
           </Button>
         </main>
@@ -70,14 +70,14 @@ export function EditVideoPage() {
       thumbnail: patch.thumbnail,
     })
     setSaving(false)
-    router.push(`/watch/${video.id}`)
+    navigate(`/watch/${video.id}`)
   }
 
   async function confirmDelete() {
     setDeleting(true)
     deleteUpload(video.id)
     setDeleting(false)
-    router.push("/profile")
+    navigate("/profile")
   }
 
   return (
@@ -116,7 +116,7 @@ export function EditVideoPage() {
             >
               {saving ? "Сохранение..." : "Сохранить"}
             </Button>
-            <Button variant="outline" onClick={() => router.push(`/watch/${video.id}`)}>
+            <Button variant="outline" onClick={() => navigate(`/watch/${video.id}`)}>
               Отмена
             </Button>
 

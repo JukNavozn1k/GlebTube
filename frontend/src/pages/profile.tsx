@@ -114,7 +114,7 @@ export function ProfilePage() {
                 <div key={v.id} className="relative">
                   <VideoCard video={v} />
                   <Link
-                    to={`/video/${v.id}/edit`}
+                    to={`/edit/${v.id}`}
                     className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-white/90 border border-blue-200 text-blue-700 hover:bg-blue-50"
                   >
                     Редактировать
