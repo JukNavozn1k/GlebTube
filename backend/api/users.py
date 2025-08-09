@@ -1,14 +1,16 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends,UploadFile,Query,File,Form
 
 from core import ObjectID
 
 from schemas.users import UserOut,UserIn
-from schemas.pagination import PaginationParams,PaginatedResponse
-from services.users import users_service, jwt_auth_service
+from schemas.pagination import PaginatedResponse
+from services.users import users_service
 
-from dependencies.auth import jwt_bearer, TokenGateway,get_current_user
+from dependencies.auth import get_current_user
 
-from fastapi import Query 
+
+
+from typing import Optional,Any
 
 router = APIRouter(prefix='/users', tags=['Users'])
 
@@ -34,11 +36,32 @@ async def retrive(user_id: ObjectID):
             raise HTTPException(status_code=404, detail="User not found")
         return result
 
-@router.put('/update/me', response_model=UserOut)
-async def update_me(new_data: UserIn,user: dict = Depends(get_current_user)):
+@router.put('/update/me', response_model=Any)
+async def update_me(
+    description: Optional[str] = Form(None),
+    avatar: UploadFile = File(None),
+    user: dict = Depends(get_current_user)
+):
     try:
-        res = await users_service.update(user['id'], new_data.model_dump())
-        return res 
+        new_user_data = UserIn()
+        # Если есть новый аватар — загружаем и сохраняем путь
+        if avatar:
+            avatar_path =  'file_service.upload(avatar)'
+            new_user_data.avatar = avatar_path
+
+        # Если есть описание — добавляем его
+        if description:
+            new_user_data.description = description
+
+
+
+        return new_user_data
+
+        # Обновляем пользователя
+        
+        # res = await users_service.update(user['id'], UserIn(update_fields).model_dump())
+        # return res
+
     except Exception as e:
         print(f'Error {e}')
-        raise HTTPException(status_code=400, detail=f'{e}')
+        raise HTTPException(status_code=400, detail=str(e))
