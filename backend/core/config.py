@@ -3,7 +3,7 @@ import logging
 import sys
 
 class App(BaseSettings):
-    title: str = 'BlockForge API'
+    title: str = 'GlebTube API'
     version: str = '1.0.0'
     frontend_url: str = '*'
     log_level: str = 'INFO'  # добавлено
