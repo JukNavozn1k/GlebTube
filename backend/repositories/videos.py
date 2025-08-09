@@ -3,8 +3,8 @@ from models.videos import VideoDocument
 class VideoRepository(AbstractMongoRepository):
     def __init__(self):
         super().__init__(VideoDocument)
-    async def retrieve_by_username(self, username: str):
-        return await super().retrieve_by_field('username', username)
+    async def retrieve_by_title(self, title: str):
+        return await super().retrieve_by_field('title', title)
 
 def get_video_repository() -> VideoRepository:
     return VideoRepository()

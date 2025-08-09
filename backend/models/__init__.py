@@ -1,5 +1,6 @@
 from .mongo import MongoDatabase
 from .users import UserDocument
+from .videos import VideoDocument
 from core import settings
 
 
@@ -9,4 +10,4 @@ from core import settings
 #         importlib.import_module(f"models.{filename[:-3]}")
 
 
-mongo = MongoDatabase(settings.mongo.get_url(), settings.mongo.mongo_db_name, [UserDocument])
+mongo = MongoDatabase(settings.mongo.get_url(), settings.mongo.mongo_db_name, [UserDocument, VideoDocument])
