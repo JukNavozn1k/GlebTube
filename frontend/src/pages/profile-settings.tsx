@@ -15,7 +15,7 @@ export function ProfileSettingsPage() {
   const fileRef = useRef<HTMLInputElement>(null)
   const [desc, setDesc] = useState<string>(user.description ?? "")
   const [saving, setSaving] = useState(false)
-  const router = useRouter()
+  const navigate = useNavigate()
 
   async function onPickAvatar(files: FileList | null) {
     const f = files?.[0]
@@ -27,7 +27,7 @@ export function ProfileSettingsPage() {
     setSaving(true)
     setDescription(desc)
     setSaving(false)
-    router.push("/profile")
+    navigate("/profile")
   }
 
   return (
@@ -81,7 +81,7 @@ export function ProfileSettingsPage() {
             >
               {saving ? "Сохранение..." : "Сохранить"}
             </Button>
-            <Button variant="outline" onClick={() => router.push("/profile")}>
+            <Button variant="outline" onClick={() => navigate("/profile")}>
               Отмена
             </Button>
           </div>
