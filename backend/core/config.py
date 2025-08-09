@@ -23,7 +23,7 @@ class MongoDB(BaseSettings):
     mongo_password: str = 'secret'
     mongo_host: str = 'mongo'
     mongo_port: int = 27017
-    mongo_db_name: str = 'BlockForge'
+    mongo_db_name: str = 'GlebTube'
    
     def get_url(self) -> str:
         return f"mongodb://{self.mongo_user}:{self.mongo_password}@{self.mongo_host}:{self.mongo_port}/"
@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     mongo: MongoDB = MongoDB()
 
     def configure_logger(self):
-        logger = logging.getLogger("blockforge")
+        logger = logging.getLogger("GlebTube")
         logger.setLevel(getattr(logging, self.app.log_level.upper(), logging.INFO))
         handler = logging.StreamHandler(sys.stdout)
         handler.setFormatter(logging.Formatter(self.app.log_format))
