@@ -198,7 +198,7 @@ CACHE_HLS_PATH = lambda video_id: f'CACHE_HLS_PATH:{video_id}'
     
 
 # 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png' david star 
-DEFAULT_AVATAR_URL = 'https://static-00.iconduck.com/assets.00/user-avatar-happy-icon-2048x2048-ssmbv1ou.png'
+DEFAULT_AVATAR_URL = 'https://images.icon-icons.com/11/PNG/256/person_man_people_Jew_religion_1620.png'
 DEFAULT_THUMBNAIL_URL = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQztLRnAWYw2TSTe-eQpoMj3PM3qlfHddTKXA&usqp=CAU'
 
 REST_FRAMEWORK = {
