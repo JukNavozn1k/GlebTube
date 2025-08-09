@@ -3,7 +3,7 @@
 <br />
 <div align="center">
   <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
-    <img src="https://www.iconpacks.net/icons/1/free-video-icon-818-thumb.png" alt="Logo" width="80" height="80">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Israeli_blue_Star_of_David.png" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">GlebTube</h3>

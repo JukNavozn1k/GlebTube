@@ -9,7 +9,7 @@
                     <div class="d-flex flex-column justify-content-start ml-2 mx-3"><span 
                       onclick="location.href='{% url 'user_profile' comment.author_id %}';" style="cursor:pointer;"
                       class="d-block font-weight-bold name"><strong>{{comment.author}}</strong></span>
-                      <span class="date"><i class="fas fa-clock"></i> Дата публикации: {{comment.date_uploaded|date:"m.d.Y"}} <i class="fas fa-star"></i> Количество звёзд: 
+                      <span class="date"><i class="fas fa-clock"></i> Дата публикации: {{comment.date_uploaded|date:"m.d.Y"}} <i class="fas fa-star-of-david"></i> Количество звёзд: 
                         {% if comment.stars_count %}
                         {{comment.stars_count}}
                         {% else %}0{% endif %}</span></div>
