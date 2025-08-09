@@ -1,4 +1,4 @@
-"use client"
+
 
 import { useEffect, useState } from "react"
 import { currentUser as defaultUser, type User } from "@/lib/glebtube-user"

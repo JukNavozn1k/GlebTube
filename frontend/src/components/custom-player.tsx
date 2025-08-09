@@ -1,4 +1,4 @@
-"use client"
+
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Maximize, Minimize, Pause, Play, Volume2, VolumeX, PictureInPicture2, Settings } from "lucide-react"

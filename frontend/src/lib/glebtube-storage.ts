@@ -1,4 +1,4 @@
-"use client"
+
 
 import type { User } from "./glebtube-user"
 import type { Video } from "./glebtube-data"

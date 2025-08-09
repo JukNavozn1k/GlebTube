@@ -1,4 +1,4 @@
-"use client"
+
 
 import Link from "next/link"
 import type { Video } from "@/lib/glebtube-data"
