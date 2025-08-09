@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 from fastapi import Request, HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from services.users import users_service
+from services.users import user_service
 
 class TokenGateway(ABC):
     @abstractmethod
@@ -38,7 +38,7 @@ jwt_bearer = JWTBearer()
 async def get_current_user(token_gateway: TokenGateway = Depends(jwt_bearer)):
     try:
         token = token_gateway.get_token()
-        return await users_service.retrieve_by_token(f"Bearer {token}")
+        return await user_service.retrieve_by_token(f"Bearer {token}")
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

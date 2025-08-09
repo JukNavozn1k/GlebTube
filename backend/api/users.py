@@ -4,7 +4,7 @@ from core import ObjectID
 
 from schemas.users import UserOut,UserIn
 from schemas.pagination import PaginatedResponse
-from services.users import users_service
+from services.users import user_service
 
 from dependencies.auth import get_current_user
 
@@ -17,7 +17,7 @@ router = APIRouter(prefix='/users', tags=['Users'])
 @router.get('/list', response_model=PaginatedResponse[UserOut])
 async def list(limit: int = Query(10, ge=1, le=100),
                offset: int = Query(0, ge=0),):
-    result = await users_service.list(limit=limit, offset=offset)
+    result = await user_service.list(limit=limit, offset=offset)
     return PaginatedResponse[UserOut](
         total=result["total"],
         items=[UserOut(**item) for item in result["items"]],
@@ -28,7 +28,7 @@ async def list(limit: int = Query(10, ge=1, le=100),
 @router.get('/retrieve/{user_id}', response_model=UserOut)
 async def retrive(user_id: ObjectID):
     try:
-        result = await users_service.retrieve(user_id)
+        result = await user_service.retrieve(user_id)
     except Exception as e:
         HTTPException(status_code=422, detail=e.errors())
     else:
@@ -46,7 +46,7 @@ async def update_me(
         new_user_data = UserIn()
         # Если есть новый аватар — загружаем и сохраняем путь
         if avatar:
-            avatar_path =  await users_service.update_picture(avatar)
+            avatar_path =  await user_service.update_picture(avatar)
             new_user_data.avatar = avatar_path
 
         # Если есть описание — добавляем его
@@ -54,7 +54,7 @@ async def update_me(
             new_user_data.description = description
 
         # Обновляем пользователя
-        res = await users_service.update(user['id'], new_user_data.model_dump())
+        res = await user_service.update(user['id'], new_user_data.model_dump())
         return res
 
     except Exception as e:
@@ -66,7 +66,7 @@ async def update_me(
 @router.delete('/delete/me', response_model=dict)
 async def delete_me(user: dict = Depends(get_current_user)):
     try:
-        await users_service.delete(user['id'])
+        await user_service.delete(user['id'])
         return {'sucsess': True}
     except Exception as e:
         raise HTTPException(status_code=401, detail=e.errors())

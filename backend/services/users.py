@@ -3,9 +3,9 @@ from .jwt_auth import jwt_auth_service,JWTAuthService
 
 
 from .base import AbstractCRUDService,FileService
-from repositories.users import users_repository
+from repositories.users import user_repository
 
-class UsersService(AbstractCRUDService):
+class UserService(AbstractCRUDService):
     def __init__(self, repository, auth_service : JWTAuthService):
         self.repository = repository
         self.auth_service = auth_service
@@ -48,10 +48,10 @@ class UsersService(AbstractCRUDService):
 
     async def update_picture(self, file):
         return await self.file_service.upload(file)
-def get_user_service(users_repository, auth_service) -> UsersService:
-    return UsersService(users_repository, auth_service)
+def get_user_service(user_repository, auth_service) -> UserService:
+    return UserService(user_repository, auth_service)
 
 
 
 
-users_service = get_user_service(users_repository, jwt_auth_service)
+user_service = get_user_service(user_repository, jwt_auth_service)
