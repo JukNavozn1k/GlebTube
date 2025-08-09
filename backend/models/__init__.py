@@ -1,5 +1,8 @@
 from .mongo import MongoDatabase
+from .users import UserDocument
 from core import settings
+
+
 
 # from .fbd import FBDDocument
 
@@ -11,4 +14,4 @@ from core import settings
 #         importlib.import_module(f"models.{filename[:-3]}")
 
 
-mongo = MongoDatabase(settings.mongo.get_url(), settings.mongo.mongo_db_name, [])
+mongo = MongoDatabase(settings.mongo.get_url(), settings.mongo.mongo_db_name, [UserDocument])

@@ -1,7 +1,7 @@
 import jwt
 from typing import Optional
 from datetime import datetime, timedelta
-from core.config import settings
+from core import settings
 
 
 class JWTAuthService:
@@ -55,3 +55,12 @@ class JWTAuthService:
         return self.decode_token(token, is_refresh)
 
 
+def get_jwt_auth_service() -> JWTAuthService:
+    return JWTAuthService(
+        secret_key=settings.auth.secret_key,
+        refresh_key=settings.auth.refresh_key,
+        access_token_expiration=settings.auth.access_token_expiration,
+        refresh_token_expiration=settings.auth.refresh_token_expiration,
+    )
+
+jwt_auth_service = get_jwt_auth_service()
