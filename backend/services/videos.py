@@ -8,11 +8,8 @@ from repositories.videos import video_repository
 class VideoService(AbstractCRUDService):
     def __init__(self, repository):
         super().__init__(repository)
-        self.video_file_service = FileService('media/videos')
-        self.thumbnail_file_service = FileService('media/videos')
-
-    async def list(self, filters=None, limit = 10, offset = 0):
-        return await super().list(filters, limit, offset, populate=['channel'])
+        self.video_file_service = FileService('videos')
+        self.thumbnail_file_service = FileService('thumbnail')
 
     async def update_video(self, file):
         return await self.video_file_service.upload(file)

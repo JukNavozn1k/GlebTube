@@ -12,7 +12,7 @@ from dependencies.auth import get_current_user
 
 
 
-from typing import Optional,Any
+from typing import Optional
 
 router = APIRouter(prefix='/videos', tags=['Videos'])
 
@@ -20,8 +20,9 @@ router = APIRouter(prefix='/videos', tags=['Videos'])
 async def create(title: str = Form(...),description: Optional[str] = Form(...), 
                  video: UploadFile = File(...), thumbnail: UploadFile = File(None),
                  user: dict = Depends(get_current_user)):
-    video_path = 'sk'
-    thumbnail_path = 'sk'
+    video_path = video_service.update_video(video)
+    thumbnail_path = video_service.update_thumbnail(thumbnail)
+
     new_video = VideoOut(title=title, channel=user, src=video_path, thumbnail=thumbnail_path, description=description)
     result = await video_service.create(new_video.model_dump())
 

@@ -9,7 +9,7 @@ class UserService(AbstractCRUDService):
     def __init__(self, repository, auth_service : JWTAuthService):
         self.repository = repository
         self.auth_service = auth_service
-        self.file_service = FileService('media/users')
+        self.file_service = FileService('users')
 
     async def login(self, data: dict):
         res = await self.repository.retrieve_by_username(data['username'])

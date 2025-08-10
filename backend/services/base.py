@@ -8,11 +8,11 @@ import aiofiles
 
 
 class FileService:
-    def __init__(self, directory: str):
+    def __init__(self, directory: str, base_dir: str = 'media'):
         """
         directory — директория для сохранения файлов
         """
-        self.directory = directory
+        self.directory = os.path.join(base_dir ,directory)
         os.makedirs(self.directory, exist_ok=True)
 
     def _get_file_location(self, filename: str) -> str:

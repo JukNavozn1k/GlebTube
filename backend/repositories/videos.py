@@ -5,6 +5,9 @@ class VideoRepository(AbstractMongoRepository):
         super().__init__(VideoDocument)
     async def retrieve_by_title(self, title: str):
         return await super().retrieve_by_field('title', title)
+    
+    async def list(self, filters = None, limit = None, offset = None, populate = ['channel']):
+        return await super().list(filters, limit, offset, populate=populate)
 
 def get_video_repository() -> VideoRepository:
     return VideoRepository()
