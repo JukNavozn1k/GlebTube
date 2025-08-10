@@ -323,6 +323,9 @@ class AbstractMongoRepository(AbstractRepository):
         if limit:
             cursor = cursor.limit(limit)
         documents = await cursor.to_list()
+        if populate:
+            for doc in documents:
+                await self._populate_document(doc, populate)
         return {"total": total, "items": [doc.model_dump() for doc in documents]}
 
     async def update(self, pk: Any, data: Dict, populate: Optional[List[str]] = None) -> Optional[Dict]:
