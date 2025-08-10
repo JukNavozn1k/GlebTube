@@ -7,7 +7,7 @@ from django.conf.urls.static import static
 from .settings import DEBUG
 
 from . import views
-
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('',views.home),
@@ -25,6 +25,15 @@ urlpatterns = [
     path('serve_hls_segment/<int:video_id>/<str:segment_name>/',views.serve_hls_segment, name='serve_hls_segment'),
     
     path('api/', include('api.urls')),
+
+    path(
+        "manifest.json",
+        TemplateView.as_view(
+            template_name="manifest.json",
+            content_type="application/json"
+        ),
+        name="manifest"
+    ),
     
 ] 
 
