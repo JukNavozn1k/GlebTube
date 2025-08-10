@@ -1,13 +1,18 @@
-FROM python:3.11-alpine
+FROM python:3.11-slim
 
 WORKDIR /backend
 
 COPY requirements.txt .
 
-RUN apk add --no-cache gcc musl-dev postgresql-libs postgresql-dev \
-    && pip install --no-cache-dir -r requirements.txt \
-    && apk del gcc musl-dev postgresql-dev
+# Устанавливаем ffmpeg и зависимости для postgresql
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    gcc \
+    libpq-dev \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
+RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 EXPOSE 8000
