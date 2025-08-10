@@ -7,13 +7,17 @@ from auths.models import User
 from videos.models import Video
 
 from django.core.exceptions import ValidationError
-
+from django.utils import timezone
 class WatchHistory(models.Model):
       '''
           Allows you to record your watch history.
       '''
       viewer = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name='Зритель',related_name='watch_history')
       video = models.ForeignKey(Video,null=True,on_delete=models.CASCADE,verbose_name='Видео')
+      watch_time = models.DateTimeField(
+        verbose_name='Время просмотра',
+        auto_now_add=True
+    )
       class Meta:
         verbose_name = 'Просмотр'
         verbose_name_plural = 'История просмотров'

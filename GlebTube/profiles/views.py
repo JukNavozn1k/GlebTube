@@ -5,15 +5,16 @@ from django.urls import reverse
 
 from . import forms
 from . import models
-from . import tasks
 
 from videos.models import Video,UserVideoRelation
 from auths.models import User
 
+from .models import WatchHistory
 
 
 from django.shortcuts import get_object_or_404
 
+from django.db.models import F
 
 # Shows user profile with additional info
 class Profile(views.View):
@@ -76,7 +77,9 @@ class SubscribeButtonView(views.View):
         if request.user.is_authenticated:
             user = get_object_or_404(User,id=user)
             subscription,created = models.Subscription.objects.get_or_create(subscriber = request.user,author=user)
-            tasks.update_subscription.delay(request.user.id,user.id)
+            
+            subscription.active = not F('active')
+            subscription.save()
             return self.get_response_data(request,{'user':user},not subscription.active)
         return HttpResponse("",status=401)
 
@@ -84,13 +87,13 @@ class SubscribeButtonView(views.View):
 class History(views.View):
       # return's all watched wideo in -watched order
     def get(self,request,user):
-        videos = models.WatchHistory.objects.filter(viewer__id=user).select_related('video').order_by('-id')
+        videos = models.WatchHistory.objects.filter(viewer__id=user).select_related('video').order_by('-watch_time')
         videos = [v.video for v in videos]
         context = {'videos':videos,'title':'История'}
         return render(request,'video/video_list.html',context=context)
     def delete(self,request):
         if request.user.is_authenticated:
-            tasks.clear_history.delay(request.user.id)
+            WatchHistory.objects.filter(viewer__id=request.user.id).delete()
             return render(request,'alerts/success.html',context={'desc': 'История очищена'})
         else: 
             return render(request,'alerts/error.html',context={'desc': 'История не очищена'})

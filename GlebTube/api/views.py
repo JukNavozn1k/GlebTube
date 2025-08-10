@@ -32,7 +32,7 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
     @action(detail=True,methods=['get'])
     # ToDo add pagination to actions ... 
     def history(self,request,pk):
-        queryset = WatchHistory.objects.filter(viewer_id=pk)
+        queryset = WatchHistory.objects.filter(viewer_id=pk).order_by('-watch_time')
         if request.user.is_authenticated:
             subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('id'), grade=1)
             prefetched_data = Prefetch('video', Video.objects.all().annotate(user_rated=Exists(subquery)) .select_related('author'))

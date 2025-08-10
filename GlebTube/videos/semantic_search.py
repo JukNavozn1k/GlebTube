@@ -4,11 +4,14 @@ import torch.nn.functional as F
 import numpy as np
 
 # 1. Модель и токенайзер для энкодинга заголовков (используем готовую предобученную)
-# tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
-# model = AutoModel.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
-tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-mpnet-base-v2")
-model = AutoModel.from_pretrained("sentence-transformers/all-mpnet-base-v2")
+# tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-mpnet-base-v2")
+# model = AutoModel.from_pretrained("sentence-transformers/all-mpnet-base-v2")
 
+tokenizer = AutoTokenizer.from_pretrained("./tokenizer")
+model = AutoModel.from_pretrained("./encoder")
+
+# tokenizer.save_pretrained("./tokenizer")
+# model.save_pretrained("./encoder")
 
 def encode_titles(titles, batch_size=32):
     """
