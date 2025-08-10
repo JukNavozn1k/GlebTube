@@ -13,5 +13,7 @@ def video_signal(sender, instance, created,*args, **kwargs):
 
 @receiver(post_save, sender=Video)
 def video_signal(sender, instance, created, **kwargs):
-    # Если видео создано или обновлено - пересчитать эмбеддинг
-    tasks.update_video_embedding.delay(instance.id)
+    if created:
+        # Если видео создано — запускаем задачу
+        tasks.update_video_embedding.delay(instance.id)
+

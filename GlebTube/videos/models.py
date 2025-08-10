@@ -50,6 +50,9 @@ class Video(models.Model):
     search_embedding = JSONField(null=True, blank=True, verbose_name='Эмбеддинг для поиска')
 
 
+    def save(self,*args,**kwargs):
+        tasks.update_video_embedding.delay(self.id)
+        return super().save(*args,**kwargs)
     
     class Meta: 
         verbose_name = 'Видео'
@@ -72,9 +75,6 @@ class UserVideoRelation(models.Model):
 
         unique_together = ['video', 'user']
     
-    def save(self,*args,**kwargs):
-        tasks.refresh_rates.delay(self.video.id)
-        super().save(*args,**kwargs)
 
 
     
