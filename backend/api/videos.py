@@ -18,8 +18,21 @@ router = APIRouter(prefix='/videos', tags=['Videos'])
 
 @router.post('/', response_model=VideoOut)
 async def create(title: str = Form(...),description: Optional[str] = Form(...), 
-                 video: UploadFile = File(...), thumbnail: UploadFile = File(None),
+                 video: UploadFile = File(...), thumbnail: UploadFile = File(...),
                  user: dict = Depends(get_current_user)):
+    # Проверка типа видео
+    if not video.content_type.startswith("video/"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Uploaded file must be a video."
+        )
+
+    # Проверка типа изображения (если thumbnail есть)
+    if thumbnail and not thumbnail.content_type.startswith("image/"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Thumbnail must be an image."
+        )
     video_path = await video_service.update_video(video)
     thumbnail_path = await video_service.update_thumbnail(thumbnail)
 
