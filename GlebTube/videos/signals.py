@@ -2,7 +2,7 @@ from django.db.models.signals import  post_save
 from django.dispatch import receiver
 # from .tasks import video_encode
 from .models import Video
-
+from videos.models import Video
 from . import tasks
 
 @receiver(post_save, sender=Video)
@@ -16,4 +16,5 @@ def video_signal(sender, instance, created, **kwargs):
     if created:
         # Если видео создано — запускаем задачу
         tasks.update_video_embedding.delay(instance.id)
+
 
