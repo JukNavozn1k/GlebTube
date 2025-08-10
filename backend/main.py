@@ -41,7 +41,7 @@ async def global_exception_handler(request, exc):
     logger.error(f"Unhandled error: {exc}", exc_info=True)
     return ORJSONResponse(status_code=500, content={"detail": "Internal Server Error"})
 
-@app.get("/media/{file_name}")
+@app.get("/media/{directory}/{file_name}")
 async def get_media_file(directory: str, file_name: str):
     file_path = os.path.join('media', directory)
     file_path = os.path.join(file_path, file_name)
