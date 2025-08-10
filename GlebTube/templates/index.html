@@ -119,35 +119,12 @@
           import { Input, initMDB } from "mdb-ui-kit";
           initMDB({ Input });
     </script>
-    <script>
-      function setTheme (mode = 'auto') {
-    const userMode = localStorage.getItem('mdb-theme');
-    const sysMode = window.matchMedia('(prefers-color-scheme: light)').matches;
-    const useSystem = mode === 'system' || (!userMode && mode === 'auto');
-    const modeChosen = useSystem ? 'system' : mode === 'dark' || mode === 'light' ? mode : userMode;
-  
-    if (useSystem) {
-      localStorage.removeItem('mdb-theme');
-    } else {
-      localStorage.setItem('mdb-theme', modeChosen);
-    }
-  
-    document.documentElement.setAttribute('data-mdb-theme', useSystem ? (sysMode ? 'light' : 'dark') : modeChosen);
-    // document.querySelectorAll('.mode-switch .dropdown-item').forEach(e => e.classList.remove('text-body'));
-    // document.getElementById(modeChosen).classList.add('text-body');
-  }
-  
-  setTheme();
-  document.querySelectorAll('.mode-switch .dropdown-item').forEach(e => e.addEventListener('click', () => setTheme(e.id)));
-  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => setTheme());
-  
-
-  
-    </script>
+   
 
     {% load static %}
       <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.umd.min.js"></script>
       <script src="https://unpkg.com/htmx.org@2.0.1" integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
+      <script src="{% static '/js/theme-switcher.js' %}"></script>
       <script>
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker.register("{% static '/js/service-worker.js' %}")
