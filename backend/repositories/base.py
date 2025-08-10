@@ -323,6 +323,7 @@ class AbstractMongoRepository(AbstractRepository):
         if limit:
             cursor = cursor.limit(limit)
         documents = await cursor.to_list()
+        # TODO FIX N+1
         if populate:
             for doc in documents:
                 await self._populate_document(doc, populate)

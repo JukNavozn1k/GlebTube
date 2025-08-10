@@ -1,12 +1,15 @@
 from fastapi import FastAPI
-from fastapi.responses import ORJSONResponse
+from fastapi.responses import ORJSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from core import settings, logger
 from api import router as api_router
 
-from models import mongo  
+from models import mongo 
+
+import os
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await mongo.init() 
@@ -37,3 +40,11 @@ async def log_requests(request, call_next):
 async def global_exception_handler(request, exc):
     logger.error(f"Unhandled error: {exc}", exc_info=True)
     return ORJSONResponse(status_code=500, content={"detail": "Internal Server Error"})
+
+@app.get("/media/{file_name}")
+async def get_media_file(directory: str, file_name: str):
+    file_path = os.path.join('media', directory)
+    file_path = os.path.join(file_path, file_name)
+    if os.path.exists(file_path):
+        return await FileResponse(file_path)
+    else: return {"error": f"File not found"}
