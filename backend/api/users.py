@@ -45,6 +45,11 @@ async def update_me(
     try:
         new_user_data = UserIn()
         # Если есть новый аватар — загружаем и сохраняем путь
+        if avatar and not avatar.content_type.startswith("image/"):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Avatar must be an image."
+            )
         if avatar:
             avatar_path =  await user_service.update_picture(avatar)
             new_user_data.avatar = avatar_path
