@@ -7,11 +7,11 @@ import numpy as np
 # tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-mpnet-base-v2")
 # model = AutoModel.from_pretrained("sentence-transformers/all-mpnet-base-v2")
 
-tokenizer = AutoTokenizer.from_pretrained("./tokenizer")
-model = AutoModel.from_pretrained("./encoder")
+tokenizer = AutoTokenizer.from_pretrained("ml/tokenizer")
+model = AutoModel.from_pretrained("ml/encoder")
 
-# tokenizer.save_pretrained("./tokenizer")
-# model.save_pretrained("./encoder")
+# tokenizer.save_pretrained("ml/tokenizer")
+# model.save_pretrained("ml/encoder")
 
 def encode_titles(titles, batch_size=32):
     """
