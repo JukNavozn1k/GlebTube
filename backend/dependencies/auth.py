@@ -45,3 +45,10 @@ async def get_current_user(token_gateway: TokenGateway = Depends(jwt_bearer)):
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    
+async def get_current_user_or_none(token_gateway: TokenGateway = Depends(jwt_bearer)):
+    try:
+        token = token_gateway.get_token()
+        return await user_service.retrieve_by_token(f"Bearer {token}")
+    except Exception as e:
+        return None

@@ -11,6 +11,9 @@ class VideoService(AbstractCRUDService):
         self.video_file_service = FileService('media/videos')
         self.thumbnail_file_service = FileService('media/videos')
 
+    async def list(self, filters=None, limit = 10, offset = 0):
+        return await super().list(filters, limit, offset, populate=['channel'])
+
     async def update_video(self, file):
         return await self.video_file_service.upload(file)
     

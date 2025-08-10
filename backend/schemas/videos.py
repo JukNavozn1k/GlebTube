@@ -1,14 +1,13 @@
-from typing import List
-from beanie import Document
-from pydantic import Field
+from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional
+from .users import UserOut
 
-from beanie import Link
-from .users import UserDocument
-class VideoDocument(Document):
+from typing import List,Optional
+
+
+class VideoOut(BaseModel):
     title: str = Field(None, min_length=1, max_length=32)
-    channel: Link[UserDocument]
+    channel: UserOut
     views: int = 0
     createdAt: datetime  = Field(default_factory=datetime.utcnow)
     duration: str = '00:00:00'
@@ -19,4 +18,4 @@ class VideoDocument(Document):
     tags: List[str] = []
 
     class Settings:
-        name = "videos"  # имя коллекции в MongoDB
+        name = "videos" 
