@@ -12,7 +12,7 @@ from dependencies.auth import get_current_user
 
 
 
-from typing import Optional
+from typing import Optional, Any
 
 router = APIRouter(prefix='/videos', tags=['Videos'])
 
@@ -64,3 +64,15 @@ async def list(limit: int = Query(10, ge=1, le=100),
         limit=limit,
         offset=offset
     )
+
+
+@router.delete('/delete/{video_id}')
+async def delete_video(video_id : ObjectID ,user: dict = Depends(get_current_user)):
+    video = await video_service.retrieve(video_id)
+    if not video: raise HTTPException(status_code=404, detail='Video not found')
+    try:
+        if video['channel']['id'] != user['id']: raise HTTPException(status_code=403, detail='Access denied')
+        await video_service.delete(video_id)
+        return {'sucsess': True}
+    except Exception as e: 
+        raise HTTPException(status_code=500, detail=f'Error {e}')

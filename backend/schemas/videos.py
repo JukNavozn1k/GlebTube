@@ -4,8 +4,9 @@ from .users import UserOut
 
 from typing import List,Optional
 
+from .base import EntityBase
 
-class VideoOut(BaseModel):
+class VideoOut(EntityBase, BaseModel):
     title: str = Field(None, min_length=1, max_length=32)
     channel: UserOut
     views: int = 0
