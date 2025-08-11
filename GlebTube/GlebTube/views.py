@@ -57,7 +57,7 @@ def home(request):
    
     if not user.is_authenticated or not user.user_embeddings:
         # Если нет эмбеддингов — просто отдаем топ видео по звёздам и id
-        print('A new default!')
+        'A new default!'
         videos = models.Video.objects.all().order_by('-stars_count', '-id')[:20]
         return render(request, 'main.html', {'title': 'Главная', 'videos': videos})
 

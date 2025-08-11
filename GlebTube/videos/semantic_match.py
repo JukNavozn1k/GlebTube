@@ -14,10 +14,10 @@ def format_video_text(video: Video) -> str:
     author_subs = getattr(author, 'subs_count', 0)
     return (
         f"{video.caption} {description} {author.username} "
-        f"{video.duration} {stars_count} {views_count} "
-        f"{author_stars} {author_subs} "
-        f"{date_uploaded}"
-        f"{profile_description} "
+        # f"{video.duration} {stars_count} {views_count} "
+        # f"{author_stars} {author_subs} "
+        # f"{date_uploaded}"
+        # f"{profile_description} "
         
     )
 
