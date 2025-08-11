@@ -20,7 +20,7 @@ def refresh_history(video_id, viewer_id):
         # Если объект уже существует — обновляем время просмотра
         obj.watch_time = timezone.now()
         obj.save()
-    
+    compute_and_save_user_embeddings.delay(viewer_id)
 
 @shared_task
 def refresh_views(video_id):
