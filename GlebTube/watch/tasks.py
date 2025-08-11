@@ -84,6 +84,7 @@ def compute_and_save_user_embeddings(user_id, eps=0.3, min_samples=2):
     for label, cluster_embs in clusters.items():
         mean_vector = np.mean(cluster_embs, axis=0)
         result.append({
+            "total_clusters": len(clusters),
             "cluster_id": int(label),
             "mean_vector": mean_vector.tolist(),
             "count": len(cluster_embs)
