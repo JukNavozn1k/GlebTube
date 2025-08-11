@@ -43,7 +43,7 @@ def update_video_rate(video_id,author_id):
 
 
 @shared_task
-def compute_and_save_user_embeddings(user_id, eps=0.3, min_samples=2):
+def compute_and_save_user_embeddings(user_id, eps=0.1, min_samples=1):
     try:
         user = User.objects.get(id=user_id)
     except User.DoesNotExist:
