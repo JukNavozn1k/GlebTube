@@ -52,7 +52,7 @@ def compute_and_save_user_embeddings(user_id, eps=0.3, min_samples=2):
     # Получаем embeddings просмотренных видео пользователя
     history = (
         WatchHistory.objects
-        .filter(viewer=user)
+        .filter(viewer_id=user.id)
         .select_related('video')
         .only('video__video_embedding')
     )
