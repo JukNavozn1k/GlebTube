@@ -77,10 +77,10 @@ class SubscribeButtonView(views.View):
         if request.user.is_authenticated:
             user = get_object_or_404(User,id=user)
             subscription,created = models.Subscription.objects.get_or_create(subscriber = request.user,author=user)
+            models.Subscription.objects.filter(pk=subscription.pk).update(active=~F('active'))
+            # subscription.refresh_from_db()
             
-            subscription.active = not F('active')
-            subscription.save()
-            return self.get_response_data(request,{'user':user},not subscription.active)
+            return self.get_response_data(request,{'user':user}, not subscription.active)
         return HttpResponse("",status=401)
 
 
