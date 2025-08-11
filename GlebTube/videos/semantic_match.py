@@ -3,23 +3,26 @@ from videos.models import Video
 from profiles.models import WatchHistory
 
 def format_video_text(video: Video) -> str:
-    description = video.description or ""
-    date_uploaded = video.date_uploaded.isoformat() if video.date_uploaded else ""
+    parts = []
+    parts.append(f"caption: {video.caption or ''}")
+    if video.description:
+        parts.append(f"description: {video.description}")
+    if video.author:
+        parts.append(f"author: {video.author.username}")
+        if video.author.profile_description:
+            parts.append(f"author_bio: {video.author.profile_description}")
+    if hasattr(video, 'stars_count'):
+        parts.append(f"stars_count: {video.stars_count}")
+    if hasattr(video, 'views'):
+        parts.append(f"views: {video.views}")
+    if hasattr(video.author, 'stars_count'):
+        parts.append(f"author_stars: {video.author.stars_count}")
+    if hasattr(video.author, 'subs_count'):
+        parts.append(f"author_subs: {video.author.subs_count}")
+    if video.date_uploaded:
+        parts.append(f"date_uploaded: {video.date_uploaded.isoformat()}")
 
-    author = video.author
-    profile_description = author.profile_description or ""
-    stars_count = getattr(video, 'stars_count', 0)  # если есть у видео
-    views_count = getattr(video, 'views', 0)
-    author_stars = getattr(author, 'stars_count', 0)
-    author_subs = getattr(author, 'subs_count', 0)
-    return (
-        f"{video.caption} {description} {author.username} "
-        # f"{video.duration} {stars_count} {views_count} "
-        # f"{author_stars} {author_subs} "
-        # f"{date_uploaded}"
-        # f"{profile_description} "
-        
-    )
+    return " | ".join(parts)
 
 
 
