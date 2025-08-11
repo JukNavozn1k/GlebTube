@@ -134,6 +134,7 @@ def update_video_embedding(video_id):
     video.search_embedding = search_embedding
 
     text = format_video_text(video)
+    print(text)
     full_embedding = encode_title(text)
     video.video_embedding = full_embedding
 
