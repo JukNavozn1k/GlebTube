@@ -2,6 +2,12 @@ from celery import shared_task
 
 from django.utils import timezone
 
+import numpy as np
+from profiles.models import WatchHistory
+from sklearn.cluster import DBSCAN
+from auths.models import User
+
+
 @shared_task
 def refresh_history(video_id, viewer_id):
     from profiles.models import WatchHistory
@@ -36,3 +42,52 @@ def update_video_rate(video_id,author_id):
 
 
 
+@shared_task
+def compute_and_save_user_embeddings(user_id, eps=0.3, min_samples=2):
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return
+
+    # Получаем embeddings просмотренных видео пользователя
+    history = (
+        WatchHistory.objects
+        .filter(viewer=user)
+        .select_related('video')
+        .only('video__video_embedding')
+    )
+
+    embeddings = []
+    for item in history:
+        emb = item.video.video_embedding
+        if emb is not None:
+            embeddings.append(emb)
+
+    if not embeddings:
+        # Нет данных — очищаем поле
+        user.user_embeddings = None
+        user.save(update_fields=['user_embeddings'])
+        return
+
+    X = np.array(embeddings, dtype=np.float32)
+
+    clustering = DBSCAN(eps=eps, min_samples=min_samples, metric='cosine').fit(X)
+    labels = clustering.labels_
+
+    clusters = {}
+    for label, emb in zip(labels, X):
+        if label == -1:  # шум
+            continue
+        clusters.setdefault(label, []).append(emb)
+
+    result = []
+    for label, cluster_embs in clusters.items():
+        mean_vector = np.mean(cluster_embs, axis=0)
+        result.append({
+            "cluster_id": int(label),
+            "mean_vector": mean_vector.tolist(),
+            "count": len(cluster_embs)
+        })
+
+    user.user_embeddings = result
+    user.save(update_fields=['user_embeddings'])

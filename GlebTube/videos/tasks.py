@@ -138,3 +138,24 @@ def update_video_embedding(video_id):
     video.video_embedding = full_embedding
 
     video.save(update_fields=['search_embedding', 'video_embedding'], update_embedding=False)
+
+
+
+@shared_task
+def update_users_embeddings():
+    # from django.core.exceptions import ObjectDoesNotExist
+    # from .models import Video
+    # from .semantic_match import format_video_text
+    # try:
+    #     video = Video.objects.select_related('author').get(id=video_id)
+    # except ObjectDoesNotExist:
+    #     return
+    # search_embedding = encode_title(video.caption or '')
+    # video.search_embedding = search_embedding
+
+    # text = format_video_text(video)
+    # full_embedding = encode_title(text)
+    # video.video_embedding = full_embedding
+
+    # video.save(update_fields=['search_embedding', 'video_embedding'], update_embedding=False)
+    print('Worked!')
