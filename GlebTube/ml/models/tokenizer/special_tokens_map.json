@@ -42,7 +42,7 @@
     "single_word": false
   },
   "unk_token": {
-    "content": "<unk>",
+    "content": "[UNK]",
     "lstrip": false,
     "normalized": false,
     "rstrip": false,
