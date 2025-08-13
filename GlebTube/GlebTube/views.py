@@ -13,6 +13,9 @@ from django.shortcuts import get_object_or_404
 from django.core.cache import cache
 from . import settings
 
+import numpy as np
+from scipy.spatial.distance import cosine
+
 def serve_hls_playlist(request, video_id):
     try:
         video = get_object_or_404(models.Video, pk=video_id)
@@ -47,10 +50,51 @@ def serve_hls_segment(request, video_id, segment_name):
         return FileResponse(open(segment_path, 'rb'))
     except (models.Video.DoesNotExist, FileNotFoundError):
         return HttpResponse("Video or HLS segment not found", status=404)
-
+    
 def home(request):
-  videos = models.Video.objects.all().order_by('-stars_count','-id')
-  print(request.GET) 
-  context= {'title' : 'Главная','videos':videos}
-  return render(request,'main.html',context=context)
+    user = request.user
 
+    if not user.is_authenticated or not user.user_embeddings:
+        videos = models.Video.objects.all().order_by('-stars_count', '-id')
+        return render(request, 'main.html', {'title': 'Главная', 'videos': videos})
+
+    all_videos = list(models.Video.objects.all())
+    user_clusters = user.user_embeddings
+
+    recommended_video_ids = set()
+    recommended_videos = []
+
+    for cluster in user_clusters:
+        mean_vector = np.array(cluster['mean_vector'])
+        cluster_id = cluster['cluster_id']
+
+        # Отбираем видео, которых ещё нет в рекомендациях и у которых есть эмбеддинг
+        candidate_videos = [v for v in all_videos if v.id not in recommended_video_ids and v.video_embedding is not None]
+
+        # Вычисляем расстояния
+        distances = []
+        for video in candidate_videos:
+            emb = np.array(video.video_embedding)
+            dist = cosine(mean_vector, emb)
+            distances.append((dist, video))
+
+        # Сортируем по возрастанию расстояния (чем меньше — тем лучше)
+        distances.sort(key=lambda x: x[0])
+
+        # Добавляем все видео этого кластера (от самых похожих до менее похожих)
+        recommended_videos.extend([v for _, v in distances])
+
+        # Обновляем множество рекомендованных видео
+        recommended_video_ids.update(v.id for _, v in distances)
+
+    # Можно убрать добавление "популярных" видео, либо оставить как запасной вариант
+    # если рекомендованных видео совсем нет, тогда добавим
+    if not recommended_videos:
+        extra = models.Video.objects.order_by('-stars_count', '-id')[:20]
+        recommended_videos.extend(extra)
+
+    context = {
+        'title': 'Главная',
+        'videos': recommended_videos,
+    }
+    return render(request, 'main.html', context)

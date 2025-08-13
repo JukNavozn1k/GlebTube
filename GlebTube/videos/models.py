@@ -48,12 +48,15 @@ class Video(models.Model):
     author = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name="Автор",related_name='user_videos')
 
     search_embedding = JSONField(null=True, blank=True, verbose_name='Эмбеддинг для поиска')
+    video_embedding = JSONField(null=True, blank=True, verbose_name='Эмбеддинг видео')
 
 
-    def save(self,*args,**kwargs):
-        tasks.update_video_embedding.delay(self.id)
-        return super().save(*args,**kwargs)
-    
+    def save(self, *args, update_embedding=True, **kwargs):
+        super().save(*args, **kwargs)
+        if update_embedding:
+            from .tasks import update_video_embedding
+            update_video_embedding.delay(self.id)
+
     class Meta: 
         verbose_name = 'Видео'
         verbose_name_plural = verbose_name

@@ -1,6 +1,4 @@
 from celery import shared_task
-
-    
 @shared_task
 def refresh_user_stats(author_id):
     from videos.models import UserVideoRelation
@@ -12,3 +10,7 @@ def refresh_user_stats(author_id):
     additonal.subs_count = Subscription.objects.filter(author_id=author_id,active=True).count()
     additonal.save()
     
+    
+
+
+

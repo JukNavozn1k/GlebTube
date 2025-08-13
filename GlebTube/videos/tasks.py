@@ -125,10 +125,18 @@ def video_encode(duration,video_id):
 def update_video_embedding(video_id):
     from django.core.exceptions import ObjectDoesNotExist
     from .models import Video
+    from .semantic_match import format_video_text
     try:
-        video = Video.objects.get(id=video_id)
+        video = Video.objects.select_related('author').get(id=video_id)
     except ObjectDoesNotExist:
         return
-    embedding = encode_title(video.caption or '')
-    video.search_embedding = embedding
-    video.save(update_fields=['search_embedding'])
+    search_embedding = encode_title(video.caption or '')
+    video.search_embedding = search_embedding
+
+    text = format_video_text(video)
+    print(text)
+    full_embedding = encode_title(text)
+    video.video_embedding = full_embedding
+
+    video.save(update_fields=['search_embedding', 'video_embedding'], update_embedding=False)
+

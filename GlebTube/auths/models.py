@@ -8,6 +8,8 @@ class User(AbstractUser):
 
     stars_count = models.PositiveBigIntegerField(default=0, verbose_name='Количество звёзд')
     subs_count = models.PositiveBigIntegerField(default=0, verbose_name='Количество подписчиков')
+
+    user_embeddings = models.JSONField(null=True, blank=True, verbose_name='Кластеры эмбеддингов')
     
     class Meta:
         verbose_name = 'Пользователь'
