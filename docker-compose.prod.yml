@@ -2,23 +2,25 @@ version: "3.0"
 services:
   web:
     build: 
-      context: .
+      context: ./backend
     env_file:
       - .env
     environment:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
-      DB_HOST: ${DB_HOST}
+      DB_HOST: ${DB_HOST}  # This is the service name defined in docker-compose.yml
       DB_PORT: ${DB_PORT}
-    ports:
-      - "8000:8000"
+      DEBUG: ${DEBUG}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
     volumes:
-      - ./:/app
+      - ./backend:/backend
+      - ./backend/media:/backend/media
+      - ./backend/static:/backend/static
     depends_on:
       - db
     command: > 
-      sh -c "python manage.py runserver 0.0.0.0:8000"
+      sh -c "gunicorn --workers 2 --bind 0.0.0.0:8000 GlebTube.wsgi"
 
   db:
     image: postgres:16.3-alpine3.20
@@ -27,9 +29,10 @@ services:
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
+      PGPORT : ${DB_PORT}
       POSTGRES_PASSWORD: ${DB_PASS}
     ports:
-      - "5432:5432"
+      - "${DB_PORT}:${DB_PORT}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -39,12 +42,15 @@ services:
 
   worker:
     build: 
-      context: .
+      context: ./backend
     hostname: worker
     entrypoint: celery
     command: -A celery_app.app worker --loglevel=info
     volumes:
-      - ./:/app
+      - ./backend/:/backend
+
+    links: 
+      - redis
     depends_on:
       - redis
       - db
@@ -53,39 +59,19 @@ services:
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
+      PGPORT : ${DB_PORT}
       POSTGRES_PASSWORD: ${DB_PASS}
-
-  beat:
-    build:
-      context: .
-    hostname: beat
-    entrypoint: celery
-    command: -A celery_app.app beat --loglevel=info
-    volumes:
-      - ./:/app
-    depends_on:
-      - redis
-      - db
-    env_file:
-      - .env
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASS}
-
-  flower:
-    build:
-      context: .
-    hostname: flower
-    entrypoint: celery
-    command: -A celery_app.app flower --port=5555 --broker=redis://redis:6379/0
+  
+  nginx:
+    image: nginx:latest
     ports:
-      - "5555:5555"
+      - "80:80"
+    volumes:
+      - ./backend/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./backend/media:/backend/media
+      - ./backend/static:/backend/static
     depends_on:
-      - redis
-      - worker
-    env_file:
-      - .env
+      - web
 
 volumes:
   postgres_data:
