@@ -43,7 +43,7 @@ def update_video_rate(video_id,author_id):
 logger = logging.getLogger(__name__)
 
 @shared_task
-def compute_and_save_user_embeddings(user_id, eps=0.1, min_samples=2):
+def compute_and_save_user_embeddings(user_id, eps=0.08, min_samples=2):
     try:
         user = User.objects.get(id=user_id)
     except User.DoesNotExist:
