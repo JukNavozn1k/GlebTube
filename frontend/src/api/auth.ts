@@ -1,7 +1,7 @@
 import type { AxiosInstance } from "axios";
 import type { LoginCredentials, RegisterCredentials, AuthTokens, RegisterResponse, UserProfile } from "@/types/auth";
 import { AUTH_ENDPOINTS } from "@/lib/constants";
-import { Api } from "./api";
+import { Api } from "@/api//api";
 
 export class AuthApi extends Api<AuthTokens> {
   constructor(apiClient: AxiosInstance) {

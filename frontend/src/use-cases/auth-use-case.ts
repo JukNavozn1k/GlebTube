@@ -2,6 +2,7 @@ import type { LoginCredentials, RegisterCredentials, AuthTokens, RegisterRespons
 import { AuthApi } from "@/api/auth";
 import { LOCAL_STORAGE_KEYS } from "@/lib/constants";
 import api from "@/api/client";
+import { parseAxiosError } from "@/types/http";
 
 export class AuthUseCase {
   private authApi: AuthApi;
@@ -9,6 +10,20 @@ export class AuthUseCase {
 
   constructor() {
     this.authApi = new AuthApi(api);
+  }
+
+  /**
+   * Initialize use-case on app start: if tokens exist, try to load user profile.
+   * If profile fetch fails, perform logout to clear tokens.
+   */
+  async initialize(): Promise<void> {
+    if (!this.isAuthenticated()) return
+    try {
+      await this.loadUserProfile()
+    } catch {
+      // If initializing fails (expired token etc) clear stored tokens
+      this.logout()
+    }
   }
 
   async login(credentials: LoginCredentials): Promise<AuthTokens> {
@@ -19,8 +34,8 @@ export class AuthUseCase {
       await this.loadUserProfile();
       return tokens;
     } catch (error) {
-      console.error("Login error:", error);
-      throw error;
+  console.error("Login error:", error);
+  throw parseAxiosError(error)
     }
   }
 
@@ -31,8 +46,8 @@ export class AuthUseCase {
       await this.login(credentials);
       return response;
     } catch (error) {
-      console.error("Registration error:", error);
-      throw error;
+  console.error("Registration error:", error);
+  throw parseAxiosError(error)
     }
   }
 

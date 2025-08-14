@@ -10,13 +10,13 @@ export abstract class Api<T> {
   }
 
   async list(): Promise<T[]> {
-    const res = await this.apiClient.get<T[]>(`/api/${this.prefix}/`)
+    const res = await this.apiClient.get<T[]>(`${this.prefix}/`)
     return res.data
   }
 
   async get(id: string): Promise<T> {
     try {
-      const res = await this.apiClient.get<T>(`/api/${this.prefix}/${id}`)
+      const res = await this.apiClient.get<T>(`${this.prefix}/${id}`)
       return res.data
     } catch (error: any) {
       if (error.response) {
@@ -30,17 +30,17 @@ export abstract class Api<T> {
   }
 
   async create(data: unknown): Promise<T> {
-    const res = await this.apiClient.post<T>(`/api/${this.prefix}/`, data)
+    const res = await this.apiClient.post<T>(`${this.prefix}/`, data)
     return res.data
   }
 
   async update(id: string, data: unknown): Promise<T> {
-    const res = await this.apiClient.put<T>(`/api/${this.prefix}/${id}`, data)
+    const res = await this.apiClient.put<T>(`${this.prefix}/${id}`, data)
     return res.data
   }
 
   async delete(id: string): Promise<any> {
-    const res = await this.apiClient.delete(`/api/${this.prefix}/${id}`)
+    const res = await this.apiClient.delete(`${this.prefix}/${id}`)
     return res.data
   }
 }

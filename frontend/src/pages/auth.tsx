@@ -46,12 +46,20 @@ export function AuthPage() {
     }
 
     setLoading(true)
-    // Имитация задержки
-    await new Promise((resolve) => setTimeout(resolve, 800))
-
-    login(loginData.username.trim())
-    setLoading(false)
-    navigate(returnUrl)
+    try {
+      await login({ username: loginData.username.trim(), password: loginData.password })
+      navigate(returnUrl)
+    } catch (err) {
+      console.error('Login failed', err)
+      // try to read structured http error
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const anyErr = err as any
+      const msg = anyErr?.detail || anyErr?.message || "Не удалось войти. Проверьте данные и попробуйте снова."
+      if (typeof msg === 'string') setErrors({ general: msg })
+      else setErrors({ general: JSON.stringify(msg) })
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -72,12 +80,19 @@ export function AuthPage() {
     }
 
     setLoading(true)
-    // Имитация задержки
-    await new Promise((resolve) => setTimeout(resolve, 800))
-
-    register(registerData.username.trim())
-    setLoading(false)
-    navigate(returnUrl)
+    try {
+      await register({ username: registerData.username.trim(), password: registerData.password })
+      navigate(returnUrl)
+    } catch (err) {
+      console.error('Register failed', err)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const anyErr = err as any
+      const msg = anyErr?.detail || anyErr?.message || "Не удалось зарегистрировать аккаунт. Попробуйте позже."
+      if (typeof msg === 'string') setErrors({ general: msg })
+      else setErrors({ general: JSON.stringify(msg) })
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (auth.loggedIn) {
@@ -131,6 +146,11 @@ export function AuthPage() {
                 </TabsList>
 
                 <TabsContent value="login" className="space-y-4">
+                  {errors.general && (
+                    <div className="p-3 bg-red-50 border border-red-200 text-red-800 rounded-md text-sm">
+                      {errors.general}
+                    </div>
+                  )}
                   <div className="text-center mb-4">
                     <CardTitle className="text-xl">Войти в аккаунт</CardTitle>
                     <CardDescription className="mt-1">Введите свои данные для входа</CardDescription>
@@ -202,6 +222,11 @@ export function AuthPage() {
                 </TabsContent>
 
                 <TabsContent value="register" className="space-y-4">
+                  {errors.general && (
+                    <div className="p-3 bg-red-50 border border-red-200 text-red-800 rounded-md text-sm">
+                      {errors.general}
+                    </div>
+                  )}
                   <div className="text-center mb-4">
                     <CardTitle className="text-xl">Создать аккаунт</CardTitle>
                     <CardDescription className="mt-1">Заполните форму для регистрации</CardDescription>
