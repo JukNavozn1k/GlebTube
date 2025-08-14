@@ -7,10 +7,10 @@ import { getUploads, type UploadedVideo } from "@/lib/glebtube-storage"
 import { ChannelCard } from "@/components/channel-card"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
-
+import { useProtectedRoute } from "@/hooks/use-protected-route"
 export function ChannelsPage() {
   const [uploads, setUploads] = useState<UploadedVideo[]>([])
-  
+  const isAuthorized = useProtectedRoute("/upload")
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -55,6 +55,10 @@ export function ChannelsPage() {
     setSearchParams({})
   }
 
+  
+  if (!isAuthorized) {
+    return null
+  }
   return (
     <div className="min-h-dvh bg-white pb-14 sm:pb-0">
       <main className="mx-auto max-w-5xl px-3 sm:px-4 py-6 grid gap-4">
