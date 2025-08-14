@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { BASE_URL } from '@/lib/constants';
+import { BASE_URL, LOCAL_STORAGE_KEYS } from '@/lib/constants';
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -7,10 +7,10 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
     if (token) {
-      // Гарантируем, что headers существует и это объект
-      (config.headers as any)["Authorization"] = `Bearer ${token}`;
+      config.headers = config.headers || {};
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
   },
