@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     # 'daphne',
     'django.contrib.staticfiles',
     # 'channels', 
+    'drf_spectacular',
     'django_filters',
     'rest_framework',
     'rest_framework.authtoken',
@@ -209,11 +210,18 @@ DEFAULT_THUMBNAIL_URL = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ
 REST_FRAMEWORK = {
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     # 'PAGE_SIZE': 10,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ]
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'GlebTube',
+    'VERSION': '1.0.0',
+    'DESCRIPTION': 'Документация для проекта с Djoser и JWT',
 }
 
 CHANNEL_LAYERS = {
