@@ -1,0 +1,192 @@
+import type { User } from "@/types/user"
+import type { UploadedVideo } from "@/types/video"
+import type { Comment } from "@/types/comment"
+
+const STAR_KEY = "glebtube:stars"
+const COMMENTS_PREFIX = "glebtube:comments:"
+const COMMENT_STARS_KEY = "glebtube:comment-stars"
+const HISTORY_KEY = "glebtube:history"
+const UPLOADS_KEY = "glebtube:uploads"
+const SUBS_KEY = "glebtube:subs"
+
+function safeParse<T>(val: string | null, fallback: T): T {
+  try {
+    return val ? (JSON.parse(val) as T) : fallback
+  } catch {
+    return fallback
+  }
+}
+
+/* Video stars (1-star toggle per video) */
+export function getStarred(): string[] {
+  if (typeof window === "undefined") return []
+  return safeParse(localStorage.getItem(STAR_KEY), [])
+}
+
+export function isStarred(videoId: string): boolean {
+  return getStarred().includes(videoId)
+}
+
+export function toggleStar(videoId: string): boolean {
+  if (typeof window === "undefined") return false
+  const set = new Set(getStarred())
+  if (set.has(videoId)) set.delete(videoId)
+  else set.add(videoId)
+  const arr = Array.from(set)
+  localStorage.setItem(STAR_KEY, JSON.stringify(arr))
+  return arr.includes(videoId)
+}
+
+/* Comments with replies */
+export function getComments(videoId: string): Comment[] {
+  if (typeof window === "undefined") return []
+  return safeParse(localStorage.getItem(COMMENTS_PREFIX + videoId), [])
+}
+
+export function addComment(videoId: string, text: string, user: User, parentId?: string): Comment {
+  const c: Comment = {
+    id: `${videoId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    videoId,
+    parentId,
+    userId: user.id,
+    userName: user.name,
+    userHandle: user.handle,
+    userAvatar: user.avatar,
+    text,
+    createdAt: new Date().toISOString(),
+    stars: 0,
+  }
+  const list = getComments(videoId)
+  list.unshift(c)
+  localStorage.setItem(COMMENTS_PREFIX + videoId, JSON.stringify(list))
+  return c
+}
+
+export function updateComment(videoId: string, commentId: string, newText: string): boolean {
+  if (typeof window === "undefined") return false
+  const list = getComments(videoId)
+  const idx = list.findIndex((c) => c.id === commentId)
+  if (idx === -1) return false
+
+  list[idx].text = newText
+  localStorage.setItem(COMMENTS_PREFIX + videoId, JSON.stringify(list))
+  return true
+}
+
+export function removeComment(videoId: string, commentId: string) {
+  // remove the comment and its direct replies
+  const list = getComments(videoId).filter((c) => c.id !== commentId && c.parentId !== commentId)
+  localStorage.setItem(COMMENTS_PREFIX + videoId, JSON.stringify(list))
+}
+
+/* Comment stars (per-user 1-star) */
+function getMyCommentStars(): string[] {
+  if (typeof window === "undefined") return []
+  return safeParse(localStorage.getItem(COMMENT_STARS_KEY), [])
+}
+
+export function hasStarredComment(commentId: string): boolean {
+  return getMyCommentStars().includes(commentId)
+}
+
+export function toggleCommentStar(videoId: string, commentId: string): boolean {
+  if (typeof window === "undefined") return false
+  const mine = new Set(getMyCommentStars())
+  const list = getComments(videoId)
+  const idx = list.findIndex((c) => c.id === commentId)
+  if (idx === -1) return hasStarredComment(commentId)
+
+  const currently = mine.has(commentId)
+  if (currently) {
+    mine.delete(commentId)
+    list[idx].stars = Math.max(0, (list[idx].stars || 0) - 1)
+  } else {
+    mine.add(commentId)
+    list[idx].stars = (list[idx].stars || 0) + 1
+  }
+  localStorage.setItem(COMMENT_STARS_KEY, JSON.stringify(Array.from(mine)))
+  localStorage.setItem(COMMENTS_PREFIX + videoId, JSON.stringify(list))
+  return !currently
+}
+
+/* History: array of { id, at } sorted by latest */
+export function addHistory(videoId: string) {
+  if (typeof window === "undefined") return
+  const list = safeParse<{ id: string; at: string }[]>(localStorage.getItem(HISTORY_KEY), [])
+  const filtered = list.filter((x) => x.id !== videoId)
+  filtered.unshift({ id: videoId, at: new Date().toISOString() })
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(filtered.slice(0, 200)))
+}
+
+export function getHistory(): { id: string; at: string }[] {
+  if (typeof window === "undefined") return []
+  return safeParse(localStorage.getItem(HISTORY_KEY), [])
+}
+
+export function clearHistory() {
+  if (typeof window === "undefined") return
+  localStorage.removeItem(HISTORY_KEY)
+}
+
+/* Uploads */
+export function getUploads(): UploadedVideo[] {
+  if (typeof window === "undefined") return []
+  return safeParse(localStorage.getItem(UPLOADS_KEY), [])
+}
+
+export function addUpload(
+  v: Omit<UploadedVideo, "id" | "views" | "createdAt" | "baseStars" | "isUploaded">,
+): UploadedVideo {
+  const id = `upl-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`
+  const item: UploadedVideo = {
+    ...v,
+    id,
+    views: 0,
+    createdAt: new Date().toISOString(),
+    baseStars: 0,
+    isUploaded: true,
+  }
+  const list = getUploads()
+  list.unshift(item)
+  localStorage.setItem(UPLOADS_KEY, JSON.stringify(list))
+  return item
+}
+
+export function updateUpload(
+  id: string,
+  patch: Partial<Pick<UploadedVideo, "title" | "description" | "thumbnail">>,
+): UploadedVideo | null {
+  const list = getUploads()
+  const idx = list.findIndex((x) => x.id === id)
+  if (idx === -1) return null
+  list[idx] = { ...list[idx], ...patch }
+  localStorage.setItem(UPLOADS_KEY, JSON.stringify(list))
+  return list[idx]
+}
+
+export function deleteUpload(id: string) {
+  const list = getUploads().filter((x) => x.id !== id)
+  localStorage.setItem(UPLOADS_KEY, JSON.stringify(list))
+}
+
+/* Subscriptions: store channel names */
+export function getSubscriptions(): string[] {
+  if (typeof window === "undefined") return []
+  return safeParse(localStorage.getItem(SUBS_KEY), [])
+}
+
+export function isSubscribed(channel: string): boolean {
+  return getSubscriptions().includes(channel)
+}
+
+export function toggleSubscription(channel: string): boolean {
+  if (typeof window === "undefined") return false
+  const set = new Set(getSubscriptions())
+  if (set.has(channel)) set.delete(channel)
+  else set.add(channel)
+  const arr = Array.from(set)
+  localStorage.setItem(SUBS_KEY, JSON.stringify(arr))
+  return arr.includes(channel)
+}
+
+export { HISTORY_KEY } // in case it's useful elsewhere
