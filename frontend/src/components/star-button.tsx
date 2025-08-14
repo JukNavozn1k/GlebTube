@@ -1,9 +1,8 @@
 
-
 import { useEffect, useMemo, useState } from "react"
 import { Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { isStarred, toggleStar } from "@/lib/glebtube-storage"
+import { isStarred, toggleStar } from "@/utils/storage"
 
 type StarButtonProps = {
   videoId: string

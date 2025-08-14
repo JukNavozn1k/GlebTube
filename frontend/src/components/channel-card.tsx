@@ -1,9 +1,8 @@
 
-
 import {Link} from "react-router-dom"
-import type { Video } from "@/lib/glebtube-data"
+import type { Video } from "@/types/video"
 import { Button } from "@/components/ui/button"
-import { isSubscribed, toggleSubscription } from "@/lib/glebtube-storage"
+import { isSubscribed, toggleSubscription } from "@/utils/storage"
 import { useState } from "react"
 
 function slug(name: string) {

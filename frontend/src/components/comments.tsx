@@ -5,32 +5,39 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
   addComment,
   getComments,
   removeComment,
+  updateComment,
   toggleCommentStar,
   hasStarredComment,
-  type Comment,
-} from "@/lib/glebtube-storage"
-import { currentUser } from "@/lib/glebtube-user"
-import { Star, ChevronDown, ChevronRight } from "lucide-react"
-import { cn } from "@/lib/utils"
+} from "@/utils/storage"
+import type { Comment } from "@/types/comment"
+import { currentUser } from "@/data/user"
+import { formatCommentTime } from "@/utils/format"
 import { useUser } from "@/hooks/use-user"
+import {
+  Star,
+  ChevronDown,
+  ChevronRight,
+  Edit,
+  X,
+  Check,
+  MoreHorizontal,
+  Trash2,
+  ArrowUpDown,
+  Clock,
+  TrendingUp,
+} from "lucide-react"
+import { cn } from "@/lib/utils"
 
 type CommentsProps = {
   videoId: string
 }
 
-function formatTime(iso: string) {
-  const diff = Date.now() - new Date(iso).getTime()
-  const mins = Math.floor(diff / 60000)
-  if (mins < 60) return `${mins} мин назад`
-  const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${hours} ч назад`
-  const days = Math.floor(hours / 24)
-  return `${days} дн назад`
-}
+type SortOption = "newest" | "oldest" | "popular"
 
 export function Comments({ videoId }: CommentsProps) {
   const [items, setItems] = useState<Comment[]>([])
@@ -38,6 +45,9 @@ export function Comments({ videoId }: CommentsProps) {
   const [replyTo, setReplyTo] = useState<string | null>(null)
   const [replyText, setReplyText] = useState<string>("")
   const [openReplies, setOpenReplies] = useState<Record<string, boolean>>({})
+  const [editingComment, setEditingComment] = useState<string | null>(null)
+  const [editText, setEditText] = useState<string>("")
+  const [sortBy, setSortBy] = useState<SortOption>("newest")
   const { user } = useUser()
 
   useEffect(() => {
@@ -46,11 +56,28 @@ export function Comments({ videoId }: CommentsProps) {
     setReplyText("")
     setText("")
     setOpenReplies({})
+    setEditingComment(null)
+    setEditText("")
   }, [videoId])
 
   const me = useMemo(() => ({ ...currentUser, avatar: user.avatar }), [user.avatar])
 
-  const roots = useMemo(() => items.filter((c) => !c.parentId), [items])
+  const roots = useMemo(() => {
+    const rootComments = items.filter((c) => !c.parentId)
+
+    // Сортируем корневые комментарии
+    switch (sortBy) {
+      case "newest":
+        return rootComments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      case "oldest":
+        return rootComments.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      case "popular":
+        return rootComments.sort((a, b) => (b.stars || 0) - (a.stars || 0))
+      default:
+        return rootComments
+    }
+  }, [items, sortBy])
+
   const repliesByParent = useMemo(() => {
     const map = new Map<string, Comment[]>()
     for (const c of items) {
@@ -58,6 +85,7 @@ export function Comments({ videoId }: CommentsProps) {
       if (!map.has(c.parentId)) map.set(c.parentId, [])
       map.get(c.parentId)!.push(c)
     }
+    // Ответы всегда сортируем по дате (новые сначала)
     for (const arr of map.values()) {
       arr.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     }
@@ -82,6 +110,27 @@ export function Comments({ videoId }: CommentsProps) {
     setOpenReplies((s) => ({ ...s, [parentId]: true }))
   }
 
+  function startEdit(comment: Comment) {
+    setEditingComment(comment.id)
+    setEditText(comment.text)
+  }
+
+  function cancelEdit() {
+    setEditingComment(null)
+    setEditText("")
+  }
+
+  function saveEdit(commentId: string) {
+    const newText = editText.trim()
+    if (!newText) return
+
+    if (updateComment(videoId, commentId, newText)) {
+      setItems(getComments(videoId))
+      setEditingComment(null)
+      setEditText("")
+    }
+  }
+
   function onRemove(id: string) {
     removeComment(videoId, id)
     setItems((prev) => prev.filter((c) => c.id !== id && c.parentId !== id))
@@ -94,17 +143,62 @@ export function Comments({ videoId }: CommentsProps) {
 
   const count = items.filter((c) => !c.parentId).length
 
+  const sortOptions = [
+    { value: "newest" as const, label: "Сначала новые", icon: Clock },
+    { value: "oldest" as const, label: "Сначала старые", icon: Clock },
+    { value: "popular" as const, label: "По популярности", icon: TrendingUp },
+  ]
+
+  const currentSortLabel = sortOptions.find((opt) => opt.value === sortBy)?.label || "Сначала новые"
+
   return (
-    <section className="grid gap-4">
-      <h3 className="text-lg font-semibold">Комментарии ({count})</h3>
+    <section className="grid gap-4 min-w-0">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-lg font-semibold">Комментарии ({count})</h3>
+
+        {/* Сортировка - адаптивная для мобильных */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-blue-200 text-blue-700 hover:bg-blue-50 bg-transparent flex-shrink-0"
+            >
+              <ArrowUpDown className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">{currentSortLabel}</span>
+              <span className="sm:hidden">Сорт.</span>
+              <ChevronDown className="h-4 w-4 ml-1" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-[180px]">
+            {sortOptions.map((option) => {
+              const Icon = option.icon
+              return (
+                <DropdownMenuItem
+                  key={option.value}
+                  onClick={() => setSortBy(option.value)}
+                  className={cn(
+                    "flex items-center gap-2",
+                    sortBy === option.value && "bg-blue-50 text-blue-700 font-medium",
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{option.label}</span>
+                  {sortBy === option.value && <div className="ml-auto h-2 w-2 rounded-full bg-blue-600" />}
+                </DropdownMenuItem>
+              )
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
       {/* Create comment */}
-      <div className="flex items-start gap-3">
-        <Avatar className="h-9 w-9 border border-blue-200">
+      <div className="flex items-start gap-3 min-w-0">
+        <Avatar className="h-9 w-9 border border-blue-200 flex-shrink-0">
           <AvatarImage src={me.avatar || "/placeholder.svg"} alt={me.name} />
           <AvatarFallback>GL</AvatarFallback>
         </Avatar>
-        <div className="flex-1 grid gap-2">
+        <div className="flex-1 grid gap-2 min-w-0">
           <Textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -129,78 +223,143 @@ export function Comments({ videoId }: CommentsProps) {
       <Separator />
 
       {/* List */}
-      <div className="grid gap-4">
+      <div className="grid gap-4 min-w-0">
         {roots.map((c) => {
           const replies = repliesByParent.get(c.id) || []
           const meRoot = c.userId === me.id
           const starred = hasStarredComment(c.id)
           const isOpen = openReplies[c.id] || false
+          const isEditing = editingComment === c.id
           return (
-            <div key={c.id} className="flex items-start gap-3">
-              <Avatar className="h-9 w-9 border border-blue-200">
+            <div key={c.id} className="flex items-start gap-3 min-w-0">
+              <Avatar className="h-9 w-9 border border-blue-200 flex-shrink-0">
                 <AvatarImage src={c.userAvatar || "/placeholder.svg"} alt={c.userName} />
                 <AvatarFallback>US</AvatarFallback>
               </Avatar>
               <div className="grid gap-1 flex-1 min-w-0">
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="font-medium">{c.userName}</span>
-                  {c.userHandle ? <span className="text-muted-foreground">{c.userHandle}</span> : null}
-                  <span className="text-muted-foreground">• {formatTime(c.createdAt)}</span>
-                </div>
-                <div className="text-sm whitespace-pre-wrap break-words">{c.text}</div>
-                <div className="flex flex-wrap gap-2 mt-1">
-                  <Button
-                    variant={starred ? "default" : "ghost"}
-                    size="sm"
-                    className={cn(
-                      "h-8 px-2",
-                      starred ? "bg-blue-600 text-white hover:bg-blue-700" : "text-blue-700 hover:bg-blue-50",
-                    )}
-                    onClick={() => onToggleCommentStar(c.id)}
-                    aria-pressed={starred}
-                  >
-                    <Star className={cn("h-4 w-4", starred ? "fill-white" : "text-blue-700")} />
-                    <span className="ml-1 text-xs">{(c.stars || 0).toLocaleString("ru-RU")}</span>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 px-2 text-blue-700 hover:bg-blue-50"
-                    onClick={() => setReplyTo(replyTo === c.id ? null : c.id)}
-                  >
-                    Ответить
-                  </Button>
-                  {replies.length > 0 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 px-2 text-blue-700 hover:bg-blue-50"
-                      onClick={() => setOpenReplies((s) => ({ ...s, [c.id]: !isOpen }))}
-                    >
-                      {isOpen ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronRight className="h-4 w-4 mr-1" />}
-                      {isOpen ? "Скрыть ответы" : `Показать ответы (${replies.length})`}
-                    </Button>
-                  )}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm flex-wrap min-w-0">
+                    <span className="font-medium break-words">{c.userName}</span>
+                    {c.userHandle ? <span className="text-muted-foreground break-words">{c.userHandle}</span> : null}
+                    <span className="text-muted-foreground">• {formatCommentTime(c.createdAt)}</span>
+                  </div>
+
+                  {/* Actions Dropdown - только для редактирования и удаления */}
                   {meRoot && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 px-2 text-blue-700 hover:bg-blue-50"
-                      onClick={() => onRemove(c.id)}
-                    >
-                      Удалить
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-gray-500 hover:bg-gray-100 flex-shrink-0"
+                          aria-label="Действия с комментарием"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="min-w-[160px]">
+                        <DropdownMenuItem onClick={() => startEdit(c)}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Редактировать
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onRemove(c.id)} className="text-red-600 focus:text-red-700">
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Удалить
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   )}
                 </div>
 
+                {isEditing ? (
+                  <div className="grid gap-2 mt-1">
+                    <Textarea
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      className="min-h-[60px] focus-visible:ring-blue-600"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        className="h-8 px-3 bg-blue-600 hover:bg-blue-700 text-white"
+                        onClick={() => saveEdit(c.id)}
+                        disabled={!editText.trim()}
+                      >
+                        <Check className="h-3 w-3 mr-1" />
+                        Сохранить
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 px-3 text-gray-600 hover:bg-gray-100"
+                        onClick={cancelEdit}
+                      >
+                        <X className="h-3 w-3 mr-1" />
+                        Отмена
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div
+                      className="text-sm break-words overflow-wrap-anywhere"
+                      style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}
+                    >
+                      {c.text}
+                    </div>
+                    <div className="flex flex-wrap gap-2 mt-1 items-center">
+                      {/* Кнопка звезды вынесена из dropdown */}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          "h-8 px-2 transition-colors",
+                          starred
+                            ? "text-blue-700 hover:bg-blue-50"
+                            : "text-gray-600 hover:bg-gray-100 hover:text-blue-700",
+                        )}
+                        onClick={() => onToggleCommentStar(c.id)}
+                      >
+                        <Star className={cn("h-4 w-4 mr-1", starred ? "fill-blue-600 text-blue-600" : "")} />
+                        <span className="text-xs">{(c.stars || 0).toLocaleString("ru-RU")}</span>
+                      </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2 text-blue-700 hover:bg-blue-50"
+                        onClick={() => setReplyTo(replyTo === c.id ? null : c.id)}
+                      >
+                        Ответить
+                      </Button>
+
+                      {replies.length > 0 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-2 text-blue-700 hover:bg-blue-50"
+                          onClick={() => setOpenReplies((s) => ({ ...s, [c.id]: !isOpen }))}
+                        >
+                          {isOpen ? (
+                            <ChevronDown className="h-4 w-4 mr-1" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4 mr-1" />
+                          )}
+                          {isOpen ? "Скрыть ответы" : `Показать ответы (${replies.length})`}
+                        </Button>
+                      )}
+                    </div>
+                  </>
+                )}
+
                 {/* Reply editor */}
                 {replyTo === c.id && (
-                  <div className="mt-2 flex items-start gap-2">
-                    <Avatar className="h-7 w-7 border border-blue-200">
+                  <div className="mt-2 flex items-start gap-2 min-w-0">
+                    <Avatar className="h-7 w-7 border border-blue-200 flex-shrink-0">
                       <AvatarImage src={me.avatar || "/placeholder.svg"} alt={me.name} />
                       <AvatarFallback>GL</AvatarFallback>
                     </Avatar>
-                    <div className="flex-1 grid gap-2">
+                    <div className="flex-1 grid gap-2 min-w-0">
                       <Textarea
                         value={replyText}
                         onChange={(e) => setReplyText(e.target.value)}
@@ -232,50 +391,114 @@ export function Comments({ videoId }: CommentsProps) {
 
                 {/* Replies */}
                 {replies.length > 0 && isOpen && (
-                  <div className="mt-2 pl-10 grid gap-3">
+                  <div className="mt-2 pl-10 grid gap-3 min-w-0">
                     {replies.map((r) => {
                       const rMe = r.userId === me.id
                       const rStarred = hasStarredComment(r.id)
+                      const rIsEditing = editingComment === r.id
                       return (
-                        <div key={r.id} className="flex items-start gap-3">
-                          <Avatar className="h-7 w-7 border border-blue-200">
+                        <div key={r.id} className="flex items-start gap-3 min-w-0">
+                          <Avatar className="h-7 w-7 border border-blue-200 flex-shrink-0">
                             <AvatarImage src={r.userAvatar || "/placeholder.svg"} alt={r.userName} />
                             <AvatarFallback>US</AvatarFallback>
                           </Avatar>
                           <div className="grid gap-1 flex-1 min-w-0">
-                            <div className="flex items-center gap-2 text-sm">
-                              <span className="font-medium">{r.userName}</span>
-                              {r.userHandle ? <span className="text-muted-foreground">{r.userHandle}</span> : null}
-                              <span className="text-muted-foreground">• {formatTime(r.createdAt)}</span>
-                            </div>
-                            <div className="text-sm whitespace-pre-wrap break-words">{r.text}</div>
-                            <div className="flex gap-2 mt-1">
-                              <Button
-                                variant={rStarred ? "default" : "ghost"}
-                                size="sm"
-                                className={cn(
-                                  "h-8 px-2",
-                                  rStarred
-                                    ? "bg-blue-600 text-white hover:bg-blue-700"
-                                    : "text-blue-700 hover:bg-blue-50",
-                                )}
-                                onClick={() => onToggleCommentStar(r.id)}
-                                aria-pressed={rStarred}
-                              >
-                                <Star className={cn("h-4 w-4", rStarred ? "fill-white" : "text-blue-700")} />
-                                <span className="ml-1 text-xs">{(r.stars || 0).toLocaleString("ru-RU")}</span>
-                              </Button>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2 text-sm flex-wrap min-w-0">
+                                <span className="font-medium break-words">{r.userName}</span>
+                                {r.userHandle ? (
+                                  <span className="text-muted-foreground break-words">{r.userHandle}</span>
+                                ) : null}
+                                <span className="text-muted-foreground">• {formatCommentTime(r.createdAt)}</span>
+                              </div>
+
+                              {/* Actions Dropdown для реплаев - только для редактирования и удаления */}
                               {rMe && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-8 px-2 text-blue-700 hover:bg-blue-50"
-                                  onClick={() => onRemove(r.id)}
-                                >
-                                  Удалить
-                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8 w-8 p-0 text-gray-500 hover:bg-gray-100 flex-shrink-0"
+                                      aria-label="Действия с ответом"
+                                    >
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="min-w-[160px]">
+                                    <DropdownMenuItem onClick={() => startEdit(r)}>
+                                      <Edit className="h-4 w-4 mr-2" />
+                                      Редактировать
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => onRemove(r.id)}
+                                      className="text-red-600 focus:text-red-700"
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      Удалить
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                               )}
                             </div>
+
+                            {rIsEditing ? (
+                              <div className="grid gap-2 mt-1">
+                                <Textarea
+                                  value={editText}
+                                  onChange={(e) => setEditText(e.target.value)}
+                                  className="min-h-[60px] focus-visible:ring-blue-600"
+                                />
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    className="h-8 px-3 bg-blue-600 hover:bg-blue-700 text-white"
+                                    onClick={() => saveEdit(r.id)}
+                                    disabled={!editText.trim()}
+                                  >
+                                    <Check className="h-3 w-3 mr-1" />
+                                    Сохранить
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-8 px-3 text-gray-600 hover:bg-gray-100"
+                                    onClick={cancelEdit}
+                                  >
+                                    <X className="h-3 w-3 mr-1" />
+                                    Отмена
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <div
+                                  className="text-sm break-words overflow-wrap-anywhere"
+                                  style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}
+                                >
+                                  {r.text}
+                                </div>
+                                {/* Кнопка звезды для реплаев тоже вынесена */}
+                                <div className="flex flex-wrap gap-2 mt-1 items-center">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className={cn(
+                                      "h-8 px-2 transition-colors",
+                                      rStarred
+                                        ? "text-blue-700 hover:bg-blue-50"
+                                        : "text-gray-600 hover:bg-gray-100 hover:text-blue-700",
+                                    )}
+                                    onClick={() => onToggleCommentStar(r.id)}
+                                  >
+                                    <Star
+                                      className={cn("h-4 w-4 mr-1", rStarred ? "fill-blue-600 text-blue-600" : "")}
+                                    />
+                                    <span className="text-xs">{(r.stars || 0).toLocaleString("ru-RU")}</span>
+                                  </Button>
+                                </div>
+                              </>
+                            )}
                           </div>
                         </div>
                       )

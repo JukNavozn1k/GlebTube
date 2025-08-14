@@ -12,7 +12,7 @@ import { ClientLayout } from "@/ClientLayout"
 import { AuthPage } from "@/pages/auth"
 import {StarredPage} from "@/pages/starred"
 import {HistoryPage} from "@/pages/history"
-
+import { ChannelsPage } from "@/pages/channels"
 function App() {
   return (
     <BrowserRouter>
@@ -23,6 +23,7 @@ function App() {
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/starred" element={<StarredPage />} />
           <Route path="/history" element={<HistoryPage />} />
+          <Route path="/channels" element={<ChannelsPage />} />
           <Route path="/watch/:id" element={<WatchPage />} />
           <Route path="/channel/:slug" element={<ChannelPage />} />
           <Route path="/upload" element={<UploadPage />} />
