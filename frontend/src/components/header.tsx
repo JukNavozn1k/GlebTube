@@ -5,11 +5,18 @@ import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { useEffect, useState, useMemo } from "react"
-import { GlebTubeLogo } from "@/components/logo"
+import { useEffect, useMemo, useState } from "react"
+import { GlebTubeLogo } from "./logo"
 import { useUser } from "@/hooks/use-user"
-import { useAuth } from "@/hooks/use-auth"
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { useAuth } from "@/contexts/auth-context"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,19 +27,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { AuthDialog } from "@/components/auth-dialog"
 
 type HeaderProps = {
   className?: string
   showSearch?: boolean
+  sidebarCollapsed?: boolean
 }
 
 function initials(name: string) {
@@ -41,34 +40,44 @@ function initials(name: string) {
   return s.toUpperCase() || "US"
 }
 
-export function Header({ className = "", showSearch = true }: HeaderProps) {
+export function Header({ className = "", showSearch = true, sidebarCollapsed = false }: HeaderProps) {
   const navigate = useNavigate()
   const location = useLocation()
-  const pathname = location.pathname
-  const [params] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  const [q, setQ] = useState<string>(params.get("q") || "")
+  const [q, setQ] = useState<string>(searchParams.get("q") || "")
   const { user } = useUser()
-  const { auth, login, register, logout } = useAuth()
-  const [authOpen, setAuthOpen] = useState(false)
+  const { auth, logout } = useAuth()
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [windowWidth, setWindowWidth] = useState(0)
 
   useEffect(() => {
-    setQ(params.get("q") || "")
-  }, [params])
+    const updateWidth = () => {
+      setWindowWidth(window.innerWidth)
+    }
+    updateWidth()
+    window.addEventListener("resize", updateWidth)
+    return () => window.removeEventListener("resize", updateWidth)
+  }, [])
+
+  useEffect(() => {
+    setQ(searchParams.get("q") || "")
+  }, [searchParams])
 
   function onSubmit(e?: React.FormEvent) {
     e?.preventDefault()
     const target = q.trim()
-    const url = "/?q=" + encodeURIComponent(target)
-    navigate(url)
+    setSearchParams({ q: target })
+    if (location.pathname !== "/") {
+      navigate(`/?q=${encodeURIComponent(target)}`)
+    }
   }
 
-  const displayInitials = useMemo(
-    () => initials(auth.name || user.name || "User"),
-    [auth.name, user.name]
-  )
+  const displayInitials = useMemo(() => initials(auth.name || user.name || "User"), [auth.name, user.name])
+
+  const isMobile = windowWidth < 1024
+  const showLogo = isMobile || windowWidth >= 1024
 
   return (
     <header
@@ -78,11 +87,11 @@ export function Header({ className = "", showSearch = true }: HeaderProps) {
       )}
     >
       <div className="mx-auto max-w-6xl px-3 sm:px-4">
-        <div className="flex h-14 items-center gap-3">
-          <GlebTubeLogo />
+        <div className="flex h-14 items-center gap-3 justify-between">
+          {showLogo && <GlebTubeLogo className="flex-shrink-0" />}
 
           {showSearch && (
-            <form onSubmit={onSubmit} className="ml-auto flex-1 max-w-xl">
+            <form onSubmit={onSubmit} className="flex-1 max-w-xl mx-auto">
               <div className="relative flex">
                 <Input
                   value={q}
@@ -102,7 +111,7 @@ export function Header({ className = "", showSearch = true }: HeaderProps) {
             </form>
           )}
 
-          <div className="hidden sm:flex items-center gap-2 ml-2">
+          <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
             {auth.loggedIn ? (
               <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
                 <DropdownMenuTrigger asChild>
@@ -159,7 +168,9 @@ export function Header({ className = "", showSearch = true }: HeaderProps) {
                     className="text-red-600 focus:text-red-700"
                     onClick={() => {
                       setMenuOpen(false)
-                      setConfirmOpen(true)
+                      setTimeout(() => {
+                        setConfirmOpen(true)
+                      }, 100)
                     }}
                   >
                     <LogOut className="h-4 w-4" />
@@ -168,11 +179,7 @@ export function Header({ className = "", showSearch = true }: HeaderProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-                onClick={() => setAuthOpen(true)}
-                aria-haspopup="dialog"
-              >
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => navigate("/auth")}>
                 Войти
               </Button>
             )}
@@ -180,7 +187,6 @@ export function Header({ className = "", showSearch = true }: HeaderProps) {
         </div>
       </div>
 
-      {/* Confirm logout dialog */}
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -193,10 +199,7 @@ export function Header({ className = "", showSearch = true }: HeaderProps) {
               className="bg-red-600 hover:bg-red-700 text-white"
               onClick={() => {
                 setConfirmOpen(false)
-                setMenuOpen(false)
-                setTimeout(() => {
-                  logout()
-                }, 0)
+                logout()
               }}
             >
               Выйти
@@ -204,14 +207,6 @@ export function Header({ className = "", showSearch = true }: HeaderProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* Auth modal */}
-      <AuthDialog
-        open={authOpen}
-        onOpenChange={setAuthOpen}
-        onLogin={(name) => login(name)}
-        onRegister={(name) => register(name)}
-      />
     </header>
   )
 }

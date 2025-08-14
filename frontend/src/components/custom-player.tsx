@@ -1,5 +1,4 @@
 
-
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Maximize, Minimize, Pause, Play, Volume2, VolumeX, PictureInPicture2, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -18,9 +17,19 @@ type CustomPlayerProps = {
   title?: string
   className?: string
   autoPlay?: boolean
+  theater?: boolean
+  onToggleTheater?: () => void
 }
 
-export function CustomPlayer({ src, poster, title = "Видео", className = "", autoPlay = false }: CustomPlayerProps) {
+export function CustomPlayer({
+  src,
+  poster,
+  title = "Видео",
+  className = "",
+  autoPlay = false,
+  theater = false,
+  onToggleTheater,
+}: CustomPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
   const progressRef = useRef<HTMLDivElement>(null)
@@ -209,7 +218,7 @@ export function CustomPlayer({ src, poster, title = "Видео", className = ""
     const show = () => {
       setControlsVisible(true)
       window.clearTimeout(t)
-      t = window.setTimeout(() => setControlsVisible(false), 2200)
+      t = window.setTimeout(() => setControlsVisible(false), 2500)
     }
     const w = wrapRef.current
     if (!w) return
@@ -278,7 +287,7 @@ export function CustomPlayer({ src, poster, title = "Видео", className = ""
 
   if (useNative) {
     return (
-      <div className={cn("relative w-full rounded-lg overflow-hidden bg-black", className)}>
+      <div className={cn("relative w-full rounded-xl overflow-hidden bg-black shadow-lg", className)}>
         <video
           src={src}
           poster={poster}
@@ -294,13 +303,14 @@ export function CustomPlayer({ src, poster, title = "Видео", className = ""
   const played = duration > 0 ? (current / duration) * 100 : 0
   const buff = buffered * 100
 
+  // Уменьшенные кнопки
   const btn =
-    "grid place-items-center rounded-md ring-1 ring-white/20 bg-white/5 hover:bg-white/15 active:bg-white/25 transition-colors h-8 w-8 p-1.5 md:h-9 md:w-9 md:p-2"
+    "grid place-items-center rounded-lg ring-1 ring-white/25 bg-black/20 backdrop-blur-sm hover:bg-black/30 active:bg-black/40 transition-all duration-200 h-7 w-7 p-1.5 md:h-8 md:w-8"
 
   return (
     <div
       ref={wrapRef}
-      className={cn("relative w-full rounded-lg overflow-hidden bg-black select-none", className)}
+      className={cn("relative w-full rounded-xl overflow-hidden bg-black select-none shadow-lg", className)}
       onDoubleClick={onToggleFs}
     >
       <video
@@ -317,27 +327,27 @@ export function CustomPlayer({ src, poster, title = "Видео", className = ""
       </video>
 
       {(isLoading || (!ready && !useNative)) && (
-        <div className="absolute inset-0 grid place-items-center">
-          <div className="h-7 w-7 rounded-full border border-white/25 border-t-white animate-spin" />
+        <div className="absolute inset-0 grid place-items-center bg-black/20 backdrop-blur-sm">
+          <div className="h-8 w-8 rounded-full border-2 border-white/30 border-t-white animate-spin" />
         </div>
       )}
 
-      {/* Title bar */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 p-2 text-white bg-gradient-to-b from-black/35 to-transparent text-[12px] sm:text-[13px]">
-        <div className="line-clamp-1">{title}</div>
+      {/* Title bar with gradient */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 p-4 text-white bg-gradient-to-b from-black/60 via-black/20 to-transparent text-sm">
+        <div className="line-clamp-1 font-medium">{title}</div>
       </div>
 
-      {/* Controls */}
+      {/* Controls with improved styling */}
       <div
         className={cn(
-          "absolute inset-x-0 bottom-0 px-2 pb-2 pt-1 bg-gradient-to-t from-black/65 to-transparent transition-opacity",
+          "absolute inset-x-0 bottom-0 px-4 pb-4 pt-8 bg-gradient-to-t from-black/80 via-black/40 to-transparent transition-all duration-300",
           controlsVisible ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
         )}
       >
-        {/* Progress (medium) */}
+        {/* Progress bar with enhanced design */}
         <div
           ref={progressRef}
-          className="relative h-[6px] cursor-pointer group"
+          className="relative h-2 cursor-pointer group mb-4"
           onMouseDown={(e) => {
             setIsScrubbing(true)
             seekToPercent(getPercentFromClientX(e.clientX))
@@ -347,18 +357,21 @@ export function CustomPlayer({ src, poster, title = "Видео", className = ""
             seekToPercent(getPercentFromClientX(e.touches[0]?.clientX ?? 0))
           }}
         >
-          <div className="absolute inset-0 rounded-full bg-white/15" />
-          <div className="absolute inset-y-0 left-0 rounded-full bg-white/30" style={{ width: `${buff}%` }} />
-          <div className="absolute inset-y-0 left-0 rounded-full bg-blue-600" style={{ width: `${played}%` }} />
-          {/* thumb (smaller) */}
+          <div className="absolute inset-0 rounded-full bg-white/20 backdrop-blur-sm" />
+          <div className="absolute inset-y-0 left-0 rounded-full bg-white/40" style={{ width: `${buff}%` }} />
           <div
-            className="absolute top-1/2 -translate-y-1/2 h-2.5 w-2.5 rounded-full bg-white outline outline-1 outline-blue-600 transition-opacity opacity-0 group-hover:opacity-100"
-            style={{ left: `calc(${played}% - 5px)` }}
+            className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-blue-500 to-blue-400 shadow-sm"
+            style={{ width: `${played}%` }}
           />
-          {/* hover time */}
+          {/* Enhanced thumb */}
+          <div
+            className="absolute top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-white shadow-lg ring-2 ring-blue-500 transition-all duration-200 opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100"
+            style={{ left: `calc(${played}% - 8px)` }}
+          />
+          {/* Hover time tooltip */}
           {hoverX !== null && hoverTime !== null && (
             <div
-              className="absolute -top-6 -translate-x-1/2 px-1.5 py-0.5 rounded bg-black/80 text-white text-[10px]"
+              className="absolute -top-8 -translate-x-1/2 px-2 py-1 rounded-md bg-black/80 backdrop-blur-sm text-white text-xs font-medium"
               style={{ left: hoverX }}
             >
               {fmt(hoverTime)}
@@ -366,17 +379,17 @@ export function CustomPlayer({ src, poster, title = "Видео", className = ""
           )}
         </div>
 
-        {/* Buttons row (new design) */}
-        <div className="mt-1.5 flex items-center gap-1.5 text-white group">
+        {/* Control buttons */}
+        <div className="flex items-center gap-2 text-white group">
           <button aria-label={playing ? "Пауза" : "Воспроизвести"} onClick={onTogglePlay} className={btn}>
-            {playing ? <Pause className="h-4 w-4 md:h-5 md:w-5" /> : <Play className="h-4 w-4 md:h-5 md:w-5" />}
+            {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}
           </button>
 
           <button aria-label={muted ? "Включить звук" : "Выключить звук"} onClick={onToggleMute} className={btn}>
-            <VolIcon className="h-4 w-4 md:h-5 md:w-5" />
+            <VolIcon className="h-4 w-4" />
           </button>
 
-          {/* Thin volume slider; shows on hover (desktop) */}
+          {/* Volume slider with improved styling */}
           <input
             aria-label="Громкость"
             type="range"
@@ -385,84 +398,84 @@ export function CustomPlayer({ src, poster, title = "Видео", className = ""
             step={0.05}
             value={muted ? 0 : volume}
             onChange={(e) => onChangeVolume(Number(e.target.value))}
-            className="player-range w-24 hidden md:block opacity-0 group-hover:opacity-100 transition-opacity"
+            className="player-range w-20 hidden md:block opacity-0 group-hover:opacity-100 transition-opacity duration-200"
           />
 
-          <div className="ml-2 text-[11px] tabular-nums opacity-90">
+          <div className="ml-2 text-sm tabular-nums font-medium opacity-90">
             {fmt(current)} / {fmt(duration)}
           </div>
 
-          <div className="ml-auto flex items-center gap-1.5">
-            {/* Settings (speed) */}
+          <div className="ml-auto flex items-center gap-2">
+            {/* Settings dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className={btn} aria-label="Настройки">
-                  <Settings className="h-4 w-4 md:h-5 md:w-5" />
+                  <Settings className="h-4 w-4" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-[180px]">
-                <DropdownMenuLabel>Скорость</DropdownMenuLabel>
+                <DropdownMenuLabel>Скорость воспроизведения</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {[0.5, 0.75, 1, 1.25, 1.5, 2].map((r) => (
                   <DropdownMenuItem key={r} onClick={() => setPlaybackRate(r)}>
-                    {r}x
+                    <span className={r === playbackRate ? "font-semibold" : ""}>{r}x</span>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
 
             <button aria-label="Картинка в картинке" onClick={onTogglePiP} className={btn}>
-              <PictureInPicture2 className="h-4 w-4 md:h-5 md:w-5" />
+              <PictureInPicture2 className="h-4 w-4" />
             </button>
 
             <button
-              aria-label={fs ? "Выйти из полноэкранного режима" : "На весь экран"}
+              aria-label={fs ? "Выйти из полноэкранного режима" : "Полноэкранный режим"}
               onClick={onToggleFs}
               className={btn}
             >
-              {fs ? <Minimize className="h-4 w-4 md:h-5 md:w-5" /> : <Maximize className="h-4 w-4 md:h-5 md:w-5" />}
+              {fs ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Range styling (thin track + small thumb) */}
+      {/* Enhanced range styling */}
       <style jsx>{`
         .player-range {
           appearance: none;
           -webkit-appearance: none;
           background: transparent;
           outline: none;
-          height: 16px; /* clickable area; visual track is handled in pseudo elements */
+          height: 20px;
         }
-        /* WebKit */
         .player-range::-webkit-slider-runnable-track {
-          height: 2px;
-          background: rgba(255, 255, 255, 0.25);
+          height: 3px;
+          background: rgba(255, 255, 255, 0.3);
           border-radius: 9999px;
         }
         .player-range::-webkit-slider-thumb {
           -webkit-appearance: none;
           appearance: none;
-          height: 10px;
-          width: 10px;
-          margin-top: -4px; /* centers thumb over 2px track */
+          height: 12px;
+          width: 12px;
+          margin-top: -4.5px;
           background: #ffffff;
           border-radius: 9999px;
-          border: 1px solid rgba(59, 130, 246, 1); /* blue-600 */
+          border: 2px solid rgba(59, 130, 246, 1);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
-        /* Firefox */
         .player-range::-moz-range-track {
-          height: 2px;
-          background: rgba(255, 255, 255, 0.25);
+          height: 3px;
+          background: rgba(255, 255, 255, 0.3);
           border-radius: 9999px;
         }
         .player-range::-moz-range-thumb {
-          height: 10px;
-          width: 10px;
+          height: 12px;
+          width: 12px;
           background: #ffffff;
           border-radius: 9999px;
-          border: 1px solid rgba(59, 130, 246, 1);
+          border: 2px solid rgba(59, 130, 246, 1);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
       `}</style>
     </div>
