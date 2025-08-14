@@ -9,6 +9,9 @@ import { ProfileSettingsPage } from "@/pages/profile-settings"
 import { SubscriptionsPage } from "@/pages/subscriptions"
 import { NotFound } from "@/pages/not-found"
 import { ClientLayout } from "@/ClientLayout"
+import { AuthPage } from "@/pages/auth"
+import {StarredPage} from "@/pages/starred"
+import {HistoryPage} from "@/pages/history"
 
 function App() {
   return (
@@ -17,10 +20,13 @@ function App() {
         {/* Layout-обертка */}
         <Route element={<ClientLayout />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/starred" element={<StarredPage />} />
+          <Route path="/history" element={<HistoryPage />} />
           <Route path="/watch/:id" element={<WatchPage />} />
           <Route path="/channel/:slug" element={<ChannelPage />} />
           <Route path="/upload" element={<UploadPage />} />
-          <Route path="/edit/:id" element={<EditVideoPage />} />
+          <Route path="/video/:id/edit" element={<EditVideoPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/settings" element={<ProfileSettingsPage />} />
           <Route path="/subscriptions" element={<SubscriptionsPage />} />

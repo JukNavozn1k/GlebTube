@@ -1,20 +1,22 @@
 
-
 import { useEffect, useMemo, useState } from "react"
-import { Header } from "@/components/header"
 import { BottomNav } from "@/components/bottom-nav"
 import { getSubscriptions, getUploads, type UploadedVideo } from "@/lib/glebtube-storage"
 import { videos as builtins, type Video } from "@/lib/glebtube-data"
 import { ChannelCard } from "@/components/channel-card"
+import { useProtectedRoute } from "@/hooks/use-protected-route"
 
-export function SubscriptionsPage() {
+export  function SubscriptionsPage() {
+  const isAuthorized = useProtectedRoute("/subscriptions")
   const [subs, setSubs] = useState<string[]>([])
   const [uploads, setUploads] = useState<UploadedVideo[]>([])
 
   useEffect(() => {
-    setSubs(getSubscriptions())
-    setUploads(getUploads())
-  }, [])
+    if (isAuthorized) {
+      setSubs(getSubscriptions())
+      setUploads(getUploads())
+    }
+  }, [isAuthorized])
 
   const all: Video[] = useMemo(() => [...uploads, ...builtins], [uploads])
 
@@ -28,9 +30,12 @@ export function SubscriptionsPage() {
     return Array.from(map.entries()).map(([channel, videos]) => ({ channel, videos }))
   }, [subs, all])
 
+  if (!isAuthorized) {
+    return null
+  }
+
   return (
     <div className="min-h-dvh bg-white pb-14 sm:pb-0">
-      <Header />
       <main className="mx-auto max-w-5xl px-3 sm:px-4 py-6 grid gap-4">
         <h1 className="text-xl sm:text-2xl font-semibold">Мои подписки</h1>
         {channels.length === 0 ? (
