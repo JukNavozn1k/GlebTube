@@ -9,7 +9,7 @@
 {% if request.user.is_authenticated %} 
 
 
-{% if comment.user_rated == 1 %}
+{% if comment.starred == 1 %}
 {% include 'rate_comment/unrate_btn.html' %}
 {% else %}
 {% include 'rate_comment/rate_btn.html' %}

@@ -16,7 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     baseStars = serializers.IntegerField(default=0,read_only=True)
-    user_rated = serializers.BooleanField(default=False,read_only=True)
+    starred = serializers.BooleanField(default=False,read_only=True)
     
     class Meta:
         model = video_models.CommentVideo
@@ -28,7 +28,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class VideoSerializer(serializers.ModelSerializer):
     
     author = UserSerializer(read_only=True)
-    user_rated = serializers.BooleanField(default=False,read_only=True)
+    starred = serializers.BooleanField(default=False,read_only=True)
     
     # video_comments = CommentSerializer(many=True,read_only=True)
     

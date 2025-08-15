@@ -35,7 +35,7 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
         queryset = WatchHistory.objects.filter(viewer_id=pk).order_by('-watch_time')
         if request.user.is_authenticated:
             subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('id'), grade=1)
-            prefetched_data = Prefetch('video', Video.objects.all().annotate(user_rated=Exists(subquery)) .select_related('author'))
+            prefetched_data = Prefetch('video', Video.objects.all().annotate(starred=Exists(subquery)) .select_related('author'))
             queryset = queryset.prefetch_related(prefetched_data)
         else:
             queryset = queryset.select_related('video__author')
@@ -52,7 +52,7 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
         queryset = Video.objects.filter(author_id=pk).select_related('author')
         if request.user.is_authenticated:
             subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('pk'), grade=1)  
-            queryset = queryset.annotate(user_rated=Exists(subquery))                         
+            queryset = queryset.annotate(starred=Exists(subquery))                         
         response_data = serializers.VideoSerializer(queryset,many=True)
         return Response(response_data.data)
 
@@ -64,7 +64,7 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
         # Check if viewer rated
         if request.user.is_authenticated:
             subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('pk'),grade=1)
-            queryset = queryset.annotate(user_rated=Exists(subquery))                                             
+            queryset = queryset.annotate(starred=Exists(subquery))                                             
         response_data = serializers.VideoSerializer(queryset,many=True)
         
         return Response(response_data.data)
@@ -110,13 +110,13 @@ class CommentView(ModelViewSet):
       
         rate_obj.save()
 
-        return Response({'user_rated': bool(rate_obj.grade)})
+        return Response({'starred': bool(rate_obj.grade)})
 
     def get_queryset(self):
         queryset = super().get_queryset()
         if self.request.user.is_authenticated:
             subquery = UserCommentRelation.objects.filter(comment_id=OuterRef('pk'),user=self.request.user,grade=1)
-            queryset = queryset.annotate(user_rated=Exists(subquery))
+            queryset = queryset.annotate(starred=Exists(subquery))
         return queryset
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -146,14 +146,14 @@ class VideoView(ModelViewSet):
         rate_obj.save()
         
         
-        return Response({'user_rated': bool(rate_obj.grade)})
+        return Response({'starred': bool(rate_obj.grade)})
 
     def get_queryset(self):
         queryset = super().get_queryset()
        
         if self.request.user.is_authenticated:
             subquery = UserVideoRelation.objects.filter(video_id=OuterRef('pk'),user=self.request.user,grade=1)
-            queryset = queryset.annotate(user_rated=Exists(subquery))
+            queryset = queryset.annotate(starred=Exists(subquery))
         return queryset
     
     def perform_create(self, serializer):

@@ -89,7 +89,7 @@ class ViewComments(View):
             'author__username','author__avatar','content','createdAt').annotate(baseStars=Count(Case(When(comment_rates__grade=1,then=1))))
         if request.user.is_authenticated:
             subquery = models.UserCommentRelation.objects.filter(comment_id=OuterRef('pk'), grade=1,user=request.user)
-            comments = comments.annotate(user_rated=Exists(subquery))
+            comments = comments.annotate(starred=Exists(subquery))
         context = {'comments':comments}
         return render(request,'comments/comment_list.html',context=context)
     
