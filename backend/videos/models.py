@@ -27,7 +27,7 @@ class Video(models.Model):
     )
 
     id = models.BigAutoField(primary_key=True)
-    caption = models.CharField(max_length=64,null = False,verbose_name="Название",db_index=True)
+    title = models.CharField(max_length=64,null = False,verbose_name="Название",db_index=True)
     description = models.TextField(max_length=1024,verbose_name="Описание",blank=True,null=True)
 
     thumbnail = models.ImageField(upload_to="thumbnails",null=True,blank=True,verbose_name='Превью')
@@ -42,9 +42,9 @@ class Video(models.Model):
 
     # Cache fields
     views = models.PositiveBigIntegerField(default=0,verbose_name="Количество просмотров")
-    stars_count = models.PositiveBigIntegerField(default=0,verbose_name='Количество звёзд')
+    baseStars = models.PositiveBigIntegerField(default=0,verbose_name='Количество звёзд')
 
-    date_uploaded = models.DateTimeField(default=timezone.now,verbose_name="Дата публикации")
+    createdAt = models.DateTimeField(default=timezone.now,verbose_name="Дата публикации")
     author = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name="Автор",related_name='user_videos')
 
     search_embedding = JSONField(null=True, blank=True, verbose_name='Эмбеддинг для поиска')
@@ -61,7 +61,7 @@ class Video(models.Model):
         verbose_name = 'Видео'
         verbose_name_plural = verbose_name
     def __str__(self) -> str:
-        return f"Id: {self.id} Caption: {self.caption}"
+        return f"Id: {self.id} title: {self.title}"
 
 class UserVideoRelation(models.Model):
 
@@ -86,7 +86,7 @@ class CommentVideo(models.Model):
     author = models.ForeignKey(User,on_delete=models.CASCADE,related_name='user_comments')
     content = models.TextField(null=False,blank=False,verbose_name='Контент')
     
-    date_uploaded = models.DateTimeField(default=timezone.now)
+    createdAt = models.DateTimeField(default=timezone.now)
     class Meta:
          verbose_name = 'Комментарий-Видео'
          verbose_name_plural = 'Коментарии-Видео'

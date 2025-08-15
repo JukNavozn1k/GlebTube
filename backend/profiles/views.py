@@ -22,9 +22,9 @@ class Profile(views.View):
         user = get_object_or_404(User,id=user)
         
         isOwner = request.user.id == user.id
-        stars_count = user.stars_count
-        subscribers_count = user.subs_count
-        context = {'isOwner':isOwner,'user': user,'stars_count':stars_count,'subscribers_count':subscribers_count}
+        baseStars = user.baseStars
+        subscribers_count = user.subscriberCount
+        context = {'isOwner':isOwner,'user': user,'baseStars':baseStars,'subscribers_count':subscribers_count}
         return render(request,'profile/profile.html',context=context)
 
 class ProfileEdit(views.View):

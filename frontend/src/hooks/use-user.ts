@@ -26,9 +26,9 @@ export function useUser() {
         name: profile?.username || auth.name || u.name,
         username: profile?.username || u.username,
         avatar: profile?.avatar ?? savedAvatar ?? u.avatar,
-        description: profile?.profile_description ?? savedDesc ?? u.description ?? "",
-        stars_count: profile?.stars_count ?? u.stars_count,
-        subs_count: profile?.subs_count ?? u.subs_count,
+        description: profile?.bio ?? savedDesc ?? u.description ?? "",
+        baseStars: profile?.baseStars ?? u.baseStars,
+        subscriberCount: profile?.subscriberCount ?? u.subscriberCount,
       }))
     }, [auth.name, auth.currentUser])
   async function setAvatarFile(file: File) {

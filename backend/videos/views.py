@@ -23,14 +23,14 @@ def search_videos(request):
         videos = Video.objects.none()
         context = {'videos': videos}
         return render(request, 'main.html', context=context)
-    videos_qs = Video.objects.exclude(search_embedding__isnull=True).order_by('-stars_count', '-id')
+    videos_qs = Video.objects.exclude(search_embedding__isnull=True).order_by('-baseStars', '-id')
     results = semantic_search_videos(query, videos_qs, k=10)
     context = {'videos': results}
     return render(request, 'main.html', context=context)
 
 def search_my_videos(request):
     if not request.user.is_authenticated: return redirect(reverse('signIn'))
-    videos = Video.objects.filter(caption__icontains=request.GET['search_query'],author=request.user).order_by('-stars_count','-id')
+    videos = Video.objects.filter(title__icontains=request.GET['search_query'],author=request.user).order_by('-baseStars','-id')
     context={'videos':videos,'author_buttons':True}
     return render(request,'main.html',context=context)
 

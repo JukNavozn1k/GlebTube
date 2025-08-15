@@ -55,7 +55,7 @@ def home(request):
     user = request.user
 
     if not user.is_authenticated or not user.user_embeddings:
-        videos = models.Video.objects.all().order_by('-stars_count', '-id')
+        videos = models.Video.objects.all().order_by('-baseStars', '-id')
         return render(request, 'main.html', {'title': 'Главная', 'videos': videos})
 
     all_videos = list(models.Video.objects.all())
@@ -90,7 +90,7 @@ def home(request):
     # Можно убрать добавление "популярных" видео, либо оставить как запасной вариант
     # если рекомендованных видео совсем нет, тогда добавим
     if not recommended_videos:
-        extra = models.Video.objects.order_by('-stars_count', '-id')[:20]
+        extra = models.Video.objects.order_by('-baseStars', '-id')[:20]
         recommended_videos.extend(extra)
 
     context = {

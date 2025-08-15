@@ -13,7 +13,7 @@ def refresh_rates(video_id):
     from .models import Video,UserVideoRelation
     from profiles.tasks import refresh_user_stats
     video = Video.objects.get(id=video_id)
-    video.stars_count = UserVideoRelation.objects.filter(grade=1,video__id=video_id).count()
+    video.baseStars = UserVideoRelation.objects.filter(grade=1,video__id=video_id).count()
     video.save()
     # refresh_total_rates.delay(video.author_id)
     refresh_user_stats.delay(video.author_id)
@@ -98,7 +98,7 @@ def video_encode(duration,video_id):
                 subprocess.run(ffmpeg_cmd, check=True)
                 obj.thumbnail = output_thumbnail_path
                 with open(output_thumbnail_path, 'rb') as f:
-                    obj.thumbnail.save(f'{obj.caption}_{obj.id}.jpg', File(f))
+                    obj.thumbnail.save(f'{obj.title}_{obj.id}.jpg', File(f))
             
             # Update the Video object status to 'Processed' or something similar
             obj.hls = output_hls_path 
@@ -130,7 +130,7 @@ def update_video_embedding(video_id):
         video = Video.objects.select_related('author').get(id=video_id)
     except ObjectDoesNotExist:
         return
-    search_embedding = encode_title(video.caption or '')
+    search_embedding = encode_title(video.title or '')
     video.search_embedding = search_embedding
 
     text = format_video_text(video)

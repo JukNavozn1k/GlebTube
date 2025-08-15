@@ -54,7 +54,7 @@ def compute_and_save_user_embeddings(user_id, eps=0.08, min_samples=2):
         WatchHistory.objects
         .filter(viewer_id=user.id)
         .select_related('video')
-        .only('video__id', 'video__caption', 'video__video_embedding')
+        .only('video__id', 'video__title', 'video__video_embedding')
     )
 
     embeddings = []
@@ -63,7 +63,7 @@ def compute_and_save_user_embeddings(user_id, eps=0.08, min_samples=2):
         emb = item.video.video_embedding
         if emb is not None:
             embeddings.append(emb)
-            video_info.append((item.video.id, getattr(item.video, "caption", None)))
+            video_info.append((item.video.id, getattr(item.video, "title", None)))
 
     if not embeddings:
         user.user_embeddings = None
@@ -76,11 +76,11 @@ def compute_and_save_user_embeddings(user_id, eps=0.08, min_samples=2):
     labels = clustering.labels_
 
     # Логируем, какие видео куда попали
-    for (vid, caption), label in zip(video_info, labels):
+    for (vid, title), label in zip(video_info, labels):
         if label == -1:
-            logger.info(f"User {user_id} | Video {vid} ('{caption}') → Noise")
+            logger.info(f"User {user_id} | Video {vid} ('{title}') → Noise")
         else:
-            logger.info(f"User {user_id} | Video {vid} ('{caption}') → Cluster {label}")
+            logger.info(f"User {user_id} | Video {vid} ('{title}') → Cluster {label}")
 
     clusters = {}
     for label, emb in zip(labels, X):

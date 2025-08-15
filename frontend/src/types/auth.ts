@@ -24,7 +24,7 @@ export interface UserProfile {
   id: number;
   username: string;
   avatar?: string | null;
-  profile_description?: string;
-  stars_count?: number;
-  subs_count?: number;
+  bio?: string;
+  baseStars?: number;
+  subscriberCount?: number;
 }

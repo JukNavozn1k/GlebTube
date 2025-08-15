@@ -89,14 +89,14 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
         return Response(serializer.data)
     
 class CommentView(ModelViewSet):
-    queryset = CommentVideo.objects.all().annotate(stars_count=Count
+    queryset = CommentVideo.objects.all().annotate(baseStars=Count
                                     (Case(When(comment_rates__grade = 1,then=1)))).select_related('author','instance')
     serializer_class = serializers.CommentSerializer
     
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     
     filter_backends = [OrderingFilter,DjangoFilterBackend]
-    ordering_fields = ['stars_count']
+    ordering_fields = ['baseStars']
     filterset_fields = ['instance']
 
     
@@ -132,8 +132,8 @@ class VideoView(ModelViewSet):
     
     filter_backends = [SearchFilter,OrderingFilter]
     
-    search_fields = ['caption']
-    ordering_fields = ['stars_count','views']
+    search_fields = ['title']
+    ordering_fields = ['baseStars','views']
     
     @action(methods=['post'],detail=True)
     def rate(self,request,pk):
