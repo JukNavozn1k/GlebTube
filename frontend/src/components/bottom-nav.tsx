@@ -68,12 +68,12 @@ export function BottomNav() {
       <AuthDialog
         open={open}
         onOpenChange={setOpen}
-        onLogin={(name) => {
-          login(name)
+        onLogin={(username) => {
+          login(username)
           setOpen(false)
         }}
-        onRegister={(name) => {
-          register(name)
+        onRegister={(username) => {
+          register(username)
           setOpen(false)
         }}
       />

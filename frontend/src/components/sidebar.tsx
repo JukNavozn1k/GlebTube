@@ -88,8 +88,8 @@ export function Sidebar({ className = "", onWidthChange, onCollapseChange }: Sid
     { href: "/upload", label: "Загрузить", icon: Upload },
   ]
 
-  function initials(name: string) {
-    const parts = name.trim().split(" ")
+  function initials(username: string) {
+    const parts = username.trim().split(" ")
     const s = (parts[0]?.[0] || "") + (parts[1]?.[0] || "")
     return s.toUpperCase() || "US"
   }
@@ -256,16 +256,16 @@ export function Sidebar({ className = "", onWidthChange, onCollapseChange }: Sid
                 <Avatar className="h-8 w-8 border border-blue-200 flex-shrink-0">
                   <AvatarImage
                     src={auth.loggedIn ? user.avatar || "/placeholder.svg" : "/placeholder.svg"}
-                    alt={auth.loggedIn ? auth.name || user.name : "Гость"}
+                    alt={auth.loggedIn ? auth.username || user.username : "Гость"}
                   />
                   <AvatarFallback className="text-xs">
-                    {auth.loggedIn ? initials(auth.name || user.name || "User") : "?"}
+                    {auth.loggedIn ? initials(auth.username || user.username || "User") : "?"}
                   </AvatarFallback>
                 </Avatar>
                 {!collapsed && (
                   <div className="flex-1 min-w-0 text-left">
                     <div className="text-sm font-medium truncate">
-                      {auth.loggedIn ? auth.name || user.name || "User" : "Войти"}
+                      {auth.loggedIn ? auth.username || user.username || "User" : "Войти"}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {auth.loggedIn ? "Нажмите для меню" : "Нажмите для входа"}
@@ -278,7 +278,7 @@ export function Sidebar({ className = "", onWidthChange, onCollapseChange }: Sid
             <DropdownMenuContent align={collapsed ? "center" : "start"} className="min-w-[240px]">
               {auth.loggedIn ? (
                 <>
-                  <DropdownMenuLabel className="line-clamp-1">{auth.name || user.name || "User"}</DropdownMenuLabel>
+                  <DropdownMenuLabel className="line-clamp-1">{auth.username || user.username || "User"}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link to="/profile" className="flex items-center gap-2">

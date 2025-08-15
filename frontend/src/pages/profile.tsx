@@ -50,8 +50,8 @@ export function ProfilePage() {
     return history.map((h) => map.get(h.id)).filter(Boolean) as Video[]
   }, [history, all])
 
-  function initials(name: string) {
-    const parts = name.trim().split(" ")
+  function initials(username: string) {
+    const parts = username.trim().split(" ")
     const s = (parts[0]?.[0] || "") + (parts[1]?.[0] || "")
     return s.toUpperCase() || "US"
   }
@@ -79,11 +79,11 @@ export function ProfilePage() {
         <section className="mb-4 sm:mb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
             <Avatar className="h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 border-2 border-blue-200">
-              <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
+              <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.username} />
               <AvatarFallback className="text-sm sm:text-lg">GL</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold break-words">{user.name}</h1>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold break-words">{user.username}</h1>
               {user.bio ? (
                 <div
                   className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-700 line-clamp-2"
@@ -329,11 +329,11 @@ export function ProfilePage() {
                       className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border border-blue-100 hover:bg-blue-50 transition-colors"
                     >
                       <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border border-blue-200">
-                        <AvatarImage src={channel.avatar || "/blue-channel-avatar.png"} alt={channel.name} />
-                        <AvatarFallback className="text-xs sm:text-sm">{initials(channel.name || "")}</AvatarFallback>
+                        <AvatarImage src={channel.avatar || "/blue-channel-avatar.png"} alt={channel.username} />
+                        <AvatarFallback className="text-xs sm:text-sm">{initials(channel.username || "")}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-medium line-clamp-1 text-sm sm:text-base">{channel.name}</h3>
+                        <h3 className="font-medium line-clamp-1 text-sm sm:text-base">{channel.username}</h3>
                         <p className="text-xs sm:text-sm text-muted-foreground">Канал</p>
                       </div>
                     </Link>

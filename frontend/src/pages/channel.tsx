@@ -17,9 +17,9 @@ function nameFromSlug(slug: string) {
   return decodeURIComponent(String(slug))
 }
 
-function initials(name?: string) {
-  if (!name || typeof name !== "string") return "CH"
-  const parts = name.trim().split(" ")
+function initials(username?: string) {
+  if (!username || typeof username !== "string") return "CH"
+  const parts = username.trim().split(" ")
   const s = (parts[0]?.[0] || "") + (parts[1]?.[0] || "")
   return s.toUpperCase() || "CH"
 }
@@ -29,7 +29,7 @@ export function ChannelPage() {
   const uploads = getUploads()
   const all: Video[] = useMemo(() => [...uploads, ...builtins], [uploads])
 
-  // Try to find channel by ID first, then by name
+  // Try to find channel by ID first, then by username
   const channelIdentifier = nameFromSlug(slug || "")
   let channel: User | undefined = getChannelById(channelIdentifier)
 
@@ -40,7 +40,7 @@ export function ChannelPage() {
   const channelVideos = all.filter(
     (v) =>
       v.channel?.id === channel?.id ||
-      v.channel?.name?.toLowerCase() === channelIdentifier.toLowerCase(),
+      v.channel?.username?.toLowerCase() === channelIdentifier.toLowerCase(),
   )
 
   const [sub, setSub] = useState(isSubscribed(channel?.id || ""))
@@ -76,13 +76,13 @@ export function ChannelPage() {
         <section className="mb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
             <Avatar className="h-20 w-20 sm:h-24 sm:w-24 border-2 border-blue-200 flex-shrink-0">
-              <AvatarImage src={channel.avatar || "/blue-channel-avatar.png"} alt={channel.name || "Channel"} />
-              <AvatarFallback className="text-lg">{initials(channel.name)}</AvatarFallback>
+              <AvatarImage src={channel.avatar || "/blue-channel-avatar.png"} alt={channel.username || "Channel"} />
+              <AvatarFallback className="text-lg">{initials(channel.username)}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl sm:text-3xl font-bold break-words hyphens-auto overflow-wrap-anywhere">
-                  {channel.name || "Unknown Channel"}
+                  {channel.username || "Unknown Channel"}
                 </h1>
               </div>
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
@@ -154,7 +154,7 @@ export function ChannelPage() {
                 <h3 className="text-lg font-semibold mb-4">Описание канала</h3>
                 <p className="text-gray-700 whitespace-pre-wrap break-words hyphens-auto overflow-wrap-anywhere">
                   {channel.bio ||
-                    `Добро пожаловать на канал ${channel.name || "Unknown Channel"}! Здесь вы найдете интересный контент и полезную информацию.`}
+                    `Добро пожаловать на канал ${channel.username || "Unknown Channel"}! Здесь вы найдете интересный контент и полезную информацию.`}
                 </p>
               </div>
             </div>

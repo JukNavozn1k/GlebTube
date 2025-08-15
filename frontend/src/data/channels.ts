@@ -3,7 +3,7 @@ import type { User } from "@/types/user"
 export const channels: User[] = [
   {
     id: "vercel",
-    name: "Vercel",
+    username: "Vercel",
     avatar: "/blue-channel-avatar.png",
     bio: "Официальный канал Vercel — платформы для фронтенд-разработчиков. Здесь вы найдете обучающие материалы по Next.js, React, и современным веб-технологиям.",
     subscriberCount: 125000,
@@ -13,7 +13,7 @@ export const channels: User[] = [
   },
   {
     id: "nextjs",
-    name: "Next.js",
+    username: "Next.js",
     avatar: "/blue-accented-code-editor.png",
     bio: "Изучайте Next.js — React-фреймворк для продакшена. Туториалы, лучшие практики и новости о разработке.",
     subscriberCount: 89000,
@@ -23,7 +23,7 @@ export const channels: User[] = [
   },
   {
     id: "edge-academy",
-    name: "Edge Academy",
+    username: "Edge Academy",
     avatar: "/placeholder-3sfuq.png",
     bio: "Академия Edge-вычислений. Изучайте современные подходы к распределенным системам и граничным вычислениям.",
     subscriberCount: 34000,
@@ -32,7 +32,7 @@ export const channels: User[] = [
   },
   {
     id: "react-labs",
-    name: "React Labs",
+    username: "React Labs",
     avatar: "/placeholder-9bxl7.png",
     bio: "Экспериментальные возможности React, исследования производительности и будущее библиотеки.",
     subscriberCount: 156000,
@@ -42,7 +42,7 @@ export const channels: User[] = [
   },
   {
     id: "css-pro",
-    name: "CSS Pro",
+    username: "CSS Pro",
     avatar: "/tailwind-components-gallery-blue-white.png",
     bio: "Профессиональные техники CSS, Tailwind CSS и современная стилизация веб-приложений.",
     subscriberCount: 67000,
@@ -55,8 +55,8 @@ export function getChannelById(id: string): User | undefined {
   return channels.find((channel) => channel.id === id)
 }
 
-export function getChannelByName(name: string): User {
-  const existing = channels.find((channel) => channel.name.toLowerCase() === name.toLowerCase())
+export function getChannelByName(username: string): User {
+  const existing = channels.find((channel) => channel.username.toLowerCase() === username.toLowerCase())
 
   if (existing) {
     return existing
@@ -64,9 +64,9 @@ export function getChannelByName(name: string): User {
 
   // Создаём новый канал для неизвестных имён
   return {
-    id: name.toLowerCase().replace(/\s+/g, "-"),
-    name,
-    bio: `Канал ${name}`,
+    id: username.toLowerCase().replace(/\s+/g, "-"),
+    username,
+    bio: `Канал ${username}`,
     subscriberCount: Math.floor(Math.random() * 10000) + 1000,
     videoCount: 0,
     joinedAt: new Date().toISOString(),

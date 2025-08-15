@@ -17,20 +17,20 @@ export function useUser() {
       const savedAvatar = localStorage.getItem(AVATAR_KEY)
       const savedDesc = localStorage.getItem(DESC_KEY)
 
-      // If auth.currentUser is present, prefer fields from it. Otherwise fall back to auth.name and local storage.
+      // If auth.currentUser is present, prefer fields from it. Otherwise fall back to auth.username and local storage.
       const profile = auth.currentUser
 
       setUser((u) => ({
         ...u,
         id: profile ? String(profile.id) : u.id,
-        name: profile?.username || auth.name || u.name,
+        username: profile?.username || auth.username || u.username,
         username: profile?.username || u.username,
         avatar: profile?.avatar ?? savedAvatar ?? u.avatar,
         description: profile?.bio ?? savedDesc ?? u.description ?? "",
         baseStars: profile?.baseStars ?? u.baseStars,
         subscriberCount: profile?.subscriberCount ?? u.subscriberCount,
       }))
-    }, [auth.name, auth.currentUser])
+    }, [auth.username, auth.currentUser])
   async function setAvatarFile(file: File) {
     const dataUrl = await fileToDataUrl(file)
     localStorage.setItem(AVATAR_KEY, dataUrl)

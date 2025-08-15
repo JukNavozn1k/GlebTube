@@ -12,11 +12,11 @@ function channelSlug(channelId: string) {
   return encodeURIComponent(channelId)
 }
 
-function getInitials(name?: string): string {
-  if (!name || typeof name !== "string") return "CH"
+function getInitials(username?: string): string {
+  if (!username || typeof username !== "string") return "CH"
 
   return (
-    name
+    username
       .trim()
       .split(" ")
       .map((word) => word.charAt(0))
@@ -58,13 +58,13 @@ export function VideoCard({ video, showChannelAvatar = true }: VideoCardProps) {
               {video.channel.avatar ? (
                 <img
                   src={video.channel.avatar || "/placeholder.svg"}
-                  alt={`${video.channel.name || "Channel"} avatar`}
+                  alt={`${video.channel.username || "Channel"} avatar`}
                   width={36}
                   height={36}
                   className="object-cover w-full h-full"
                 />
               ) : (
-                <span className="text-xs font-semibold text-blue-700">{getInitials(video.channel.name)}</span>
+                <span className="text-xs font-semibold text-blue-700">{getInitials(video.channel.username)}</span>
               )}
             </div>
           </Link>
@@ -80,7 +80,7 @@ export function VideoCard({ video, showChannelAvatar = true }: VideoCardProps) {
           </Link>
           <div className="mt-0.5 text-xs text-muted-foreground">
             <Link to={`/channel/${channelSlug(video.channel.id || "unknown")}`} className="hover:text-blue-700">
-              <span>{video.channel.name || "Unknown Channel"}</span>
+              <span>{video.channel.username || "Unknown Channel"}</span>
             </Link>
           </div>
           <div className="text-xs text-muted-foreground">

@@ -34,8 +34,8 @@ type HeaderProps = {
   sidebarCollapsed?: boolean
 }
 
-function initials(name: string) {
-  const parts = name.trim().split(" ")
+function initials(username: string) {
+  const parts = username.trim().split(" ")
   const s = (parts[0]?.[0] || "") + (parts[1]?.[0] || "")
   return s.toUpperCase() || "US"
 }
@@ -74,7 +74,7 @@ export function Header({ className = "", showSearch = true, sidebarCollapsed = f
     }
   }
 
-  const displayInitials = useMemo(() => initials(auth.name || user.name || "User"), [auth.name, user.name])
+  const displayInitials = useMemo(() => initials(auth.username || user.username || "User"), [auth.username, user.username])
 
   const isMobile = windowWidth < 1024
   const showLogo = isMobile || windowWidth >= 1024
@@ -120,14 +120,14 @@ export function Header({ className = "", showSearch = true, sidebarCollapsed = f
                     aria-label="Меню пользователя"
                   >
                     <Avatar className="h-8 w-8 border border-blue-200">
-                      <AvatarImage src={user.avatar || "/placeholder.svg"} alt={auth.name || user.name} />
+                      <AvatarImage src={user.avatar || "/placeholder.svg"} alt={auth.username || user.username} />
                       <AvatarFallback>{displayInitials}</AvatarFallback>
                     </Avatar>
                     <ChevronDown className="h-4 w-4 text-gray-600" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-[240px]">
-                  <DropdownMenuLabel className="line-clamp-1">{auth.name || user.name || "User"}</DropdownMenuLabel>
+                  <DropdownMenuLabel className="line-clamp-1">{auth.username || user.username || "User"}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link to="/profile" className="flex items-center gap-2">

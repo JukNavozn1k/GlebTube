@@ -15,10 +15,10 @@ function channelSlug(channelId: string) {
   return encodeURIComponent(channelId || "unknown")
 }
 
-function getInitials(name?: string): string {
-  if (!name || typeof name !== "string") return "CH"
+function getInitials(username?: string): string {
+  if (!username || typeof username !== "string") return "CH"
   return (
-    name
+    username
       .trim()
       .split(" ")
       .map((word) => word.charAt(0))
@@ -91,13 +91,13 @@ export function WatchPage() {
                   {video.channel.avatar ? (
                     <img
                       src={video.channel.avatar || "/placeholder.svg"}
-                      alt={`${video.channel.name || "Channel"} avatar`}
+                      alt={`${video.channel.username || "Channel"} avatar`}
                       width={40}
                       height={40}
                       className="object-cover w-full h-full"
                     />
                   ) : (
-                    <span className="text-xs font-semibold text-blue-700">{getInitials(video.channel.name)}</span>
+                    <span className="text-xs font-semibold text-blue-700">{getInitials(video.channel.username)}</span>
                   )}
                 </div>
               </Link>
@@ -107,7 +107,7 @@ export function WatchPage() {
                     to={`/channel/${channelSlug(video.channel.id)}`}
                     className="font-medium text-blue-700 hover:underline break-words"
                   >
-                    <span>{video.channel.name || "Unknown Channel"}</span>
+                    <span>{video.channel.username || "Unknown Channel"}</span>
                   </Link>
                   <Button
                     size="sm"
@@ -170,7 +170,7 @@ export function WatchPage() {
                       {v.title}
                     </div>
                     <div className="text-xs text-muted-foreground break-words">
-                      <span>{v.channel.name || "Unknown Channel"}</span>
+                      <span>{v.channel.username || "Unknown Channel"}</span>
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {formatViews(v.views)} просмотров • {timeAgo(v.createdAt)}

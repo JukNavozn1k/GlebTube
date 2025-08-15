@@ -2,7 +2,7 @@ import type { User } from "@/types/user"
 
 export const currentUser: User = {
   id: "me",
-  name: "Gleb",
+  username: "Gleb",
 
   avatar: "/user-avatar-blue.png",
   bio: "",

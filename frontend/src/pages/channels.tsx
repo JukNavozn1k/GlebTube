@@ -51,16 +51,16 @@ export function ChannelsPage() {
       const qc = q.toLowerCase()
       channelList = channelList.filter(
         (item) =>
-          (item.channel.name && item.channel.name.toLowerCase().includes(qc)) ||
+          (item.channel.username && item.channel.username.toLowerCase().includes(qc)) ||
           (item.channel.bio && item.channel.bio.toLowerCase().includes(qc))
       )
     }
 
-    // Sort: by number of videos desc, then by name asc
+    // Sort: by number of videos desc, then by username asc
     channelList.sort((a, b) => {
       const videoCountDiff = b.videos.length - a.videos.length
       if (videoCountDiff !== 0) return videoCountDiff
-      return a.channel.name.localeCompare(b.channel.name)
+      return a.channel.username.localeCompare(b.channel.username)
     })
 
     return channelList

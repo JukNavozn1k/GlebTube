@@ -100,7 +100,7 @@ export function ProfileSettingsPage() {
             <Label>Аватар профиля</Label>
             <div className="flex flex-col sm:flex-row items-center gap-6">
               <Avatar className="h-24 w-24 border-2 border-blue-200">
-                <AvatarImage src={currentAvatar || "/placeholder.svg"} alt={user.name} />
+                <AvatarImage src={currentAvatar || "/placeholder.svg"} alt={user.username} />
                 <AvatarFallback className="text-lg">GL</AvatarFallback>
               </Avatar>
 

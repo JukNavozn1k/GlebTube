@@ -57,10 +57,10 @@ export function Comments({ videoId }: CommentsProps) {
   const currentUser = useMemo(
     () => ({
       id: user.id || "me",
-      name: auth.name || user.name || "User",
+      username: auth.username || user.username || "User",
       avatar: user.avatar,
     }),
-    [user, auth.name],
+    [user, auth.username],
   )
 
   const roots = useMemo(() => {
@@ -196,7 +196,7 @@ export function Comments({ videoId }: CommentsProps) {
       {/* Create comment */}
       <div className="flex items-start gap-3 min-w-0">
         <Avatar className="h-9 w-9 border border-blue-200 flex-shrink-0">
-          <AvatarImage src={currentUser.avatar || "/placeholder.svg"} alt={currentUser.name} />
+          <AvatarImage src={currentUser.avatar || "/placeholder.svg"} alt={currentUser.username} />
           <AvatarFallback>GL</AvatarFallback>
         </Avatar>
         <div className="flex-1 grid gap-2 min-w-0">
@@ -233,13 +233,13 @@ export function Comments({ videoId }: CommentsProps) {
           return (
             <div key={c.id} className="flex items-start gap-3 min-w-0">
               <Avatar className="h-9 w-9 border border-blue-200 flex-shrink-0">
-                <AvatarImage src={c.user.avatar || "/placeholder.svg"} alt={c.user.name} />
+                <AvatarImage src={c.user.avatar || "/placeholder.svg"} alt={c.user.username} />
                 <AvatarFallback>US</AvatarFallback>
               </Avatar>
               <div className="grid gap-1 flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm flex-wrap min-w-0">
-                    <span className="font-medium break-words">{c.user.name}</span>
+                    <span className="font-medium break-words">{c.user.username}</span>
                     <span className="text-muted-foreground">• {formatCommentTime(c.createdAt)}</span>
                   </div>
 
@@ -355,7 +355,7 @@ export function Comments({ videoId }: CommentsProps) {
                 {replyTo === c.id && (
                   <div className="mt-2 flex items-start gap-2 min-w-0">
                     <Avatar className="h-7 w-7 border border-blue-200 flex-shrink-0">
-                      <AvatarImage src={currentUser.avatar || "/placeholder.svg"} alt={currentUser.name} />
+                      <AvatarImage src={currentUser.avatar || "/placeholder.svg"} alt={currentUser.username} />
                       <AvatarFallback>GL</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 grid gap-2 min-w-0">
@@ -397,13 +397,13 @@ export function Comments({ videoId }: CommentsProps) {
                       return (
                         <div key={r.id} className="flex items-start gap-3 min-w-0">
                           <Avatar className="h-7 w-7 border border-blue-200 flex-shrink-0">
-                            <AvatarImage src={r.user.avatar || "/placeholder.svg"} alt={r.user.name} />
+                            <AvatarImage src={r.user.avatar || "/placeholder.svg"} alt={r.user.username} />
                             <AvatarFallback>US</AvatarFallback>
                           </Avatar>
                           <div className="grid gap-1 flex-1 min-w-0">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2 text-sm flex-wrap min-w-0">
-                                <span className="font-medium break-words">{r.user.name}</span>
+                                <span className="font-medium break-words">{r.user.username}</span>
                                 <span className="text-muted-foreground">• {formatCommentTime(r.createdAt)}</span>
                               </div>
 

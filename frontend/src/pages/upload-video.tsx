@@ -74,7 +74,7 @@ export function UploadPage() {
     setSubmitting(true)
     const v = addUpload({
       title: title.trim(),
-      channel: currentUser.name,
+      channel: currentUser.username,
       duration: "00:00",
       src,
       thumbnail,
@@ -138,7 +138,7 @@ export function UploadPage() {
                 {videoFile ? (
                   <div className="space-y-2">
                     <FileVideo className="h-8 w-8 mx-auto text-green-600" />
-                    <div className="font-medium text-green-700">{videoFile.name}</div>
+                    <div className="font-medium text-green-700">{videoFile.username}</div>
                     <div className="text-sm text-green-600">{formatFileSize(videoFile.size)}</div>
                     <Button
                       type="button"
@@ -192,7 +192,7 @@ export function UploadPage() {
                 {thumbFile ? (
                   <div className="space-y-2">
                     <ImageIcon className="h-6 w-6 mx-auto text-green-600" />
-                    <div className="font-medium text-green-700">{thumbFile.name}</div>
+                    <div className="font-medium text-green-700">{thumbFile.username}</div>
                     <div className="text-sm text-green-600">{formatFileSize(thumbFile.size)}</div>
                     <Button
                       type="button"

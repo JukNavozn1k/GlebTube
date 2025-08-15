@@ -1,6 +1,6 @@
 export type User = {
   id: string
-  name: string
+  username: string
   email?: string
   avatar?: string
   bio?: string
@@ -14,7 +14,7 @@ export type User = {
 
 export type AuthState = {
   loggedIn: boolean
-  name: string
+  username: string
   // currentUser is the latest profile returned by the use-case (null when not authenticated)
   currentUser?: {
     id: number

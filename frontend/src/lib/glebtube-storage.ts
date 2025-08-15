@@ -52,7 +52,7 @@ export function addComment(videoId: string, text: string, user: User, parentId?:
     videoId,
     parentId,
     userId: user.id,
-    userName: user.name,
+    userName: user.username,
     userHandle: user.handle,
     userAvatar: user.avatar,
     text,

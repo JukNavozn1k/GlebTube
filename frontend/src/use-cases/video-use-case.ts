@@ -31,12 +31,12 @@ export class VideoUseCase extends UseCases<Video> {
   //     const channel = author
   //       ? {
   //           id: String(author.id ?? author.pk ?? "unknown"),
-  //           name: author.username ?? author.name ?? "Unknown",
+  //           username: author.username ?? author.username ?? "Unknown",
   //           avatar: author.avatar ?? undefined,
   //           bio: author.bio ?? undefined,
   //           subscriberCount: author.subscriberCount ?? undefined,
   //         }
-  //       : { id: "unknown", name: "Unknown" }
+  //       : { id: "unknown", username: "Unknown" }
 
   //     const video = {
   //       id: String(v.id ?? v.pk ?? ""),

@@ -38,7 +38,7 @@ export function getComments(videoId: string): Comment[] {
           comment.user ||
           ({
             id: comment.userId || "unknown",
-            name: comment.userName || "Unknown User",
+            username: comment.userName || "Unknown User",
             avatar: comment.userAvatar,
           } as User),
         text: comment.text,

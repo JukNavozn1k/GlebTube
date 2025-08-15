@@ -30,13 +30,13 @@ export function ChannelCard({ channel, videos }: ChannelCardProps) {
             {channel.avatar ? (
               <img
                 src={channel.avatar || "/placeholder.svg"}
-                alt={`${channel.name || "Channel"} avatar`}
+                alt={`${channel.username || "Channel"} avatar`}
                 width={48}
                 height={48}
                 className="object-cover w-full h-full"
               />
             ) : (
-              <span className="text-sm font-semibold text-blue-700">{getInitials(channel.name)}</span>
+              <span className="text-sm font-semibold text-blue-700">{getInitials(channel.username)}</span>
             )}
           </div>
         </Link>
@@ -47,7 +47,7 @@ export function ChannelCard({ channel, videos }: ChannelCardProps) {
               to={`/channel/${encodeURIComponent(channel.id || "unknown")}`}
               className="font-medium hover:text-blue-700 line-clamp-1"
             >
-              {channel.name || "Unknown Channel"}
+              {channel.username || "Unknown Channel"}
             </Link>
           </div>
 
@@ -80,11 +80,11 @@ export function ChannelCard({ channel, videos }: ChannelCardProps) {
   )
 }
 
-function getInitials(name?: string): string {
-  if (!name || typeof name !== "string") return "CH"
+function getInitials(username?: string): string {
+  if (!username || typeof username !== "string") return "CH"
 
   return (
-    name
+    username
       .trim()
       .split(" ")
       .map((word) => word.charAt(0))

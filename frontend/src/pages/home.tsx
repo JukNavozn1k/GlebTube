@@ -49,7 +49,7 @@ export function HomePage() {
     return allVideos.filter(
       (v) =>
         v.title.toLowerCase().includes(q) ||
-        v.channel.name.toLowerCase().includes(q) ||
+        v.channel.username.toLowerCase().includes(q) ||
         v.description.toLowerCase().includes(q) ||
         v.tags.some((tag) => tag.toLowerCase().includes(q)),
     )
