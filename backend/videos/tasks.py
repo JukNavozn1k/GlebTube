@@ -2,11 +2,11 @@ from celery import shared_task
 from .semantic_search import encode_titles, tokenizer, model, encode_title
 import torch
 @shared_task
-def remove_video(video_id,author_id):
+def remove_video(video_id,channel_id):
     from .models import Video
     from profiles.tasks import refresh_user_stats
-    Video.objects.filter(id=video_id,author_id=author_id).delete()
-    refresh_user_stats.delay(author_id)
+    Video.objects.filter(id=video_id,channel_id=channel_id).delete()
+    refresh_user_stats.delay(channel_id)
 
 @shared_task
 def refresh_rates(video_id):
@@ -15,8 +15,8 @@ def refresh_rates(video_id):
     video = Video.objects.get(id=video_id)
     video.baseStars = UserVideoRelation.objects.filter(grade=1,video__id=video_id).count()
     video.save()
-    # refresh_total_rates.delay(video.author_id)
-    refresh_user_stats.delay(video.author_id)
+    # refresh_total_rates.delay(video.channel_id)
+    refresh_user_stats.delay(video.channel_id)
 
 
 

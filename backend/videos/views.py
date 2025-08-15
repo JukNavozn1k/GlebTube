@@ -36,7 +36,7 @@ def search_my_videos(request):
 
 def my_videos(request):
     if not request.user.is_authenticated: return redirect(reverse('signIn'))
-    videos = Video.objects.filter(author_id=request.user.id)
+    videos = Video.objects.filter(channel_id=request.user.id)
     context = {'author_buttons':True,'title':'Мои видео','videos': videos}
     return render(request,'main.html',context=context)
 

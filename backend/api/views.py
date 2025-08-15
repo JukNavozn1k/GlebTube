@@ -38,7 +38,7 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
             prefetched_data = Prefetch('video', Video.objects.all().annotate(starred=Exists(subquery)) .select_related('channel'))
             queryset = queryset.prefetch_related(prefetched_data)
         else:
-            queryset = queryset.select_related('video__author')
+            queryset = queryset.select_related('video__channel')
 
      
         queryset = [entry.video for entry in queryset]   
@@ -49,7 +49,7 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
 
     @action(detail=True,methods=['get'])
     def user_videos(self,request,pk):
-        queryset = Video.objects.filter(author_id=pk).select_related('channel')
+        queryset = Video.objects.filter(channel_id=pk).select_related('channel')
         if request.user.is_authenticated:
             subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('pk'), grade=1)  
             queryset = queryset.annotate(starred=Exists(subquery))                         
@@ -78,7 +78,7 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
 
     @action(detail=True,methods=['get'])
     def user_subcribers(self,request,pk):
-        subs = Subscription.objects.filter(author_id=pk,active=1)
+        subs = Subscription.objects.filter(channel_id=pk,active=1)
         subs = serializers.UserSerializer(subs,many=True)
         return Response(subs.data)
     

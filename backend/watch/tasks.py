@@ -31,10 +31,10 @@ def refresh_views(video_id):
     video.save()
 
 @shared_task
-def update_video_rate(video_id,author_id):
+def update_video_rate(video_id,channel_id):
     from videos.models import UserVideoRelation
     from videos.tasks import refresh_rates
-    user_video_relation = UserVideoRelation.objects.get(video_id=video_id, user_id=author_id)
+    user_video_relation = UserVideoRelation.objects.get(video_id=video_id, user_id=channel_id)
     user_video_relation.grade = not user_video_relation.grade
     user_video_relation.save()
     refresh_rates.delay(video_id)

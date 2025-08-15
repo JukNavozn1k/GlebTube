@@ -4,10 +4,10 @@
         <div class="d-flex flex-column comment-section" style="word-wrap: break-word;">
             <div class="p-2">
                 <div class="d-flex flex-row user-info"><img class="rounded-circle" src="{{comment.channel.avatar | parse_avatar }}" width="50" height="50"
-                  onclick="location.href='{% url 'user_profile' comment.author_id %}';" style="cursor:pointer;"
+                  onclick="location.href='{% url 'user_profile' comment.channel_id %}';" style="cursor:pointer;"
                   >
                     <div class="d-flex flex-column justify-content-start ml-2 mx-3"><span 
-                      onclick="location.href='{% url 'user_profile' comment.author_id %}';" style="cursor:pointer;"
+                      onclick="location.href='{% url 'user_profile' comment.channel_id %}';" style="cursor:pointer;"
                       class="d-block font-weight-bold name"><strong>{{comment.channel}}</strong></span>
                       <span class="date"><i class="fas fa-clock"></i> Дата публикации: {{comment.createdAt|date:"m.d.Y"}} <i class="fas fa-star-of-david"></i> Количество звёзд: 
                         {% if comment.baseStars %}

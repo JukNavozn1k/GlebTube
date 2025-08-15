@@ -47,7 +47,7 @@ class ProfileEdit(views.View):
 class UserVideos(views.View):
     # Returns query of user videos    
     def get(self,request,user):
-            queryset = Video.objects.filter(author__id = user)
+            queryset = Video.objects.filter(channel__id = user)
             return render(request,'video/video_list.html', context={'videos': queryset})
 # Same as UserVideos   
 class UserLiked(views.View):

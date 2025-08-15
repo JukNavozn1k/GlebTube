@@ -64,8 +64,8 @@
       <p class="card-text" style="width:30rem">
         <span class="d-inline-block">  
           <img class="rounded-circle mx-3" src="{{video.channel.avatar | parse_avatar}}" width="35" height="35"
-          onclick="location.href='{% url 'user_profile' video.author_id %}';" style="cursor:pointer;">
-          <strong onclick="location.href='{% url 'user_profile' video.author_id %}';" style="cursor:pointer;"> 
+          onclick="location.href='{% url 'user_profile' video.channel_id %}';" style="cursor:pointer;">
+          <strong onclick="location.href='{% url 'user_profile' video.channel_id %}';" style="cursor:pointer;"> 
             {{video.channel.username}} 
           </strong>
           {% if video.channel.id != request.user.id %}

@@ -86,7 +86,7 @@ class RateCommentView(View):
 class ViewComments(View):
     def get(self,request,video_id):
         comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').prefetch_related('channel').only(
-            'author__username','author__avatar','content','createdAt').annotate(baseStars=Count(Case(When(comment_rates__grade=1,then=1))))
+            'channel__username','channel__avatar','content','createdAt').annotate(baseStars=Count(Case(When(comment_rates__grade=1,then=1))))
         if request.user.is_authenticated:
             subquery = models.UserCommentRelation.objects.filter(comment_id=OuterRef('pk'), grade=1,user=request.user)
             comments = comments.annotate(starred=Exists(subquery))
@@ -113,7 +113,7 @@ class EditComment(View):
         
         # Updating existing comment with check for validation and permission
         if request.user.is_authenticated and len(comment) > 0:
-            updated_comment = get_object_or_404(models.CommentVideo, id=comment_id,author_id=request.user.id)
+            updated_comment = get_object_or_404(models.CommentVideo, id=comment_id,channel_id=request.user.id)
             updated_comment.content = comment
             updated_comment.save()
             return render(request,'comments/comment_view.html',context={'comment':updated_comment})
