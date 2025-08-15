@@ -1,6 +1,6 @@
 
 import {Link} from "react-router-dom"
-import { formatViews, timeAgo } from "@/utils/format"
+import { formatViews, formatDuration,  timeAgo } from "@/utils/format"
 import type { Video } from "@/types/video"
 
 type VideoCardProps = {
@@ -46,7 +46,7 @@ export function VideoCard({ video, showChannelAvatar = true }: VideoCardProps) {
     className="absolute inset-0 w-full h-full object-contain bg-black"
   />
   <div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/70 text-white text-xs">
-    {video.duration}
+    {formatDuration(video.duration)}
   </div>
 </div>
       </Link>

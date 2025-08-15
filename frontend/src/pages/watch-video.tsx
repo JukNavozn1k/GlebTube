@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom"
 import { StarButton } from "@/components/star-button"
 import { Comments } from "@/components/comments"
 
-import { formatViews, timeAgo } from "@/utils/format"
+import { formatViews, formatDuration, timeAgo } from "@/utils/format"
 import type { Video } from "@/types/video"
 import { addHistory, isSubscribed, toggleSubscription } from "@/utils/storage"
 import { Button } from "@/components/ui/button"
@@ -174,7 +174,7 @@ export function WatchPage() {
                       className="object-cover w-full h-full"
                     />
                     <div className="absolute bottom-1 right-1 px-1 rounded bg-black/70 text-white text-[10px]">
-                      {v.duration}
+                      {formatDuration(v.duration)}
                     </div>
                   </div>
                   <div className="min-w-0 flex-1">
