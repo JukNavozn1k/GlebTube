@@ -18,6 +18,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly,IsAuthenticated
 from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists,Subquery
 
 from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
+from watch import tasks
 from profiles.models import WatchHistory,Subscription
 
 class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateModelMixin,GenericViewSet):
@@ -155,6 +156,13 @@ class VideoView(ModelViewSet):
             subquery = UserVideoRelation.objects.filter(video_id=OuterRef('pk'),user=self.request.user,grade=1)
             queryset = queryset.annotate(starred=Exists(subquery))
         return queryset
+    
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        tasks.refresh_views.delay(instance.id)
+        if request.user.is_authenticated:
+            tasks.refresh_history.delay(instance.id, request.user.id)
+        return super().retrieve(request, *args, **kwargs)
     
     def perform_create(self, serializer):
         serializer.save(channel=self.request.user)

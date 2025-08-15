@@ -1,6 +1,5 @@
 from celery import shared_task
-from .semantic_search import encode_titles, tokenizer, model, encode_title
-import torch
+
 @shared_task
 def remove_video(video_id,channel_id):
     from .models import Video
@@ -125,18 +124,17 @@ def video_encode(duration,video_id):
 def update_video_embedding(video_id):
     from django.core.exceptions import ObjectDoesNotExist
     from .models import Video
-    from .semantic_match import format_video_text
+    from ml.encode import format_video_text
+    from ml.encode import encode_text
+
     try:
         video = Video.objects.select_related('channel').get(id=video_id)
     except ObjectDoesNotExist:
         return
-    search_embedding = encode_title(video.title or '')
-    video.search_embedding = search_embedding
 
     text = format_video_text(video)
-    print(text)
-    full_embedding = encode_title(text)
+    full_embedding = encode_text(text)
     video.video_embedding = full_embedding
 
-    video.save(update_fields=['search_embedding', 'video_embedding'], update_embedding=False)
+    video.save(update_fields=['video_embedding'], update_embedding=False)
 
