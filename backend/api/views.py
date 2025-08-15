@@ -35,7 +35,7 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
         queryset = WatchHistory.objects.filter(viewer_id=pk).order_by('-watch_time')
         if request.user.is_authenticated:
             subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('id'), grade=1)
-            prefetched_data = Prefetch('video', Video.objects.all().annotate(starred=Exists(subquery)) .select_related('author'))
+            prefetched_data = Prefetch('video', Video.objects.all().annotate(starred=Exists(subquery)) .select_related('channel'))
             queryset = queryset.prefetch_related(prefetched_data)
         else:
             queryset = queryset.select_related('video__author')
@@ -49,7 +49,7 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
 
     @action(detail=True,methods=['get'])
     def user_videos(self,request,pk):
-        queryset = Video.objects.filter(author_id=pk).select_related('author')
+        queryset = Video.objects.filter(author_id=pk).select_related('channel')
         if request.user.is_authenticated:
             subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('pk'), grade=1)  
             queryset = queryset.annotate(starred=Exists(subquery))                         
@@ -60,7 +60,7 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
     def user_liked(self,request,pk):
         # List of user liked
         subquery = UserVideoRelation.objects.filter(user_id=pk,grade=1).values('video_id')
-        queryset = Video.objects.filter(id__in=Subquery(subquery)).select_related('author')
+        queryset = Video.objects.filter(id__in=Subquery(subquery)).select_related('channel')
         # Check if viewer rated
         if request.user.is_authenticated:
             subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('pk'),grade=1)
@@ -90,7 +90,7 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
     
 class CommentView(ModelViewSet):
     queryset = CommentVideo.objects.all().annotate(baseStars=Count
-                                    (Case(When(comment_rates__grade = 1,then=1)))).select_related('author','instance')
+                                    (Case(When(comment_rates__grade = 1,then=1)))).select_related('channel','instance')
     serializer_class = serializers.CommentSerializer
     
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
@@ -119,13 +119,13 @@ class CommentView(ModelViewSet):
             queryset = queryset.annotate(starred=Exists(subquery))
         return queryset
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(channel=self.request.user)
     
 
 
 class VideoView(ModelViewSet):
 
-    queryset = Video.objects.all().select_related('author') 
+    queryset = Video.objects.all().select_related('channel') 
     serializer_class = serializers.VideoSerializer
     
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
@@ -157,5 +157,5 @@ class VideoView(ModelViewSet):
         return queryset
     
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(channel=self.request.user)
     

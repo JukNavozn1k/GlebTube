@@ -45,7 +45,7 @@ class Video(models.Model):
     baseStars = models.PositiveBigIntegerField(default=0,verbose_name='Количество звёзд')
 
     createdAt = models.DateTimeField(default=timezone.now,verbose_name="Дата публикации")
-    author = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name="Автор",related_name='user_videos')
+    channel = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name="Автор",related_name='user_videos')
 
     search_embedding = JSONField(null=True, blank=True, verbose_name='Эмбеддинг для поиска')
     video_embedding = JSONField(null=True, blank=True, verbose_name='Эмбеддинг видео')
@@ -83,7 +83,7 @@ class UserVideoRelation(models.Model):
     
 class CommentVideo(models.Model):
     instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='video_comments')
-    author = models.ForeignKey(User,on_delete=models.CASCADE,related_name='user_comments')
+    channel = models.ForeignKey(User,on_delete=models.CASCADE,related_name='user_comments')
     content = models.TextField(null=False,blank=False,verbose_name='Контент')
     
     createdAt = models.DateTimeField(default=timezone.now)
@@ -91,7 +91,7 @@ class CommentVideo(models.Model):
          verbose_name = 'Комментарий-Видео'
          verbose_name_plural = 'Коментарии-Видео'
     def __str__(self) -> str:
-        return f'{self.id} : {self.author} -> {self.instance}'
+        return f'{self.id} : {self.channel} -> {self.instance}'
     
 class UserCommentRelation(models.Model):
     CHOICES = [(0, 'Без оценки'), (1, 'С оценкой')]

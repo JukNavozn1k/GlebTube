@@ -15,7 +15,7 @@
 {% include 'rate_comment/rate_btn.html' %}
 {% endif %}
 
-{% if comment.author == request.user %}
+{% if comment.channel == request.user %}
 
 <button type="button" 
         class="btn btn-info float-end btn-floating" 

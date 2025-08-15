@@ -127,7 +127,7 @@ def update_video_embedding(video_id):
     from .models import Video
     from .semantic_match import format_video_text
     try:
-        video = Video.objects.select_related('author').get(id=video_id)
+        video = Video.objects.select_related('channel').get(id=video_id)
     except ObjectDoesNotExist:
         return
     search_embedding = encode_title(video.title or '')

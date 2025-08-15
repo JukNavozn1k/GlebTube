@@ -63,14 +63,14 @@
       <p class="card-text"><i class="fas fa-clock"></i> Дата выхода: {{video.createdAt|date:"m.d.Y"}}</p>
       <p class="card-text" style="width:30rem">
         <span class="d-inline-block">  
-          <img class="rounded-circle mx-3" src="{{video.author.avatar | parse_avatar}}" width="35" height="35"
+          <img class="rounded-circle mx-3" src="{{video.channel.avatar | parse_avatar}}" width="35" height="35"
           onclick="location.href='{% url 'user_profile' video.author_id %}';" style="cursor:pointer;">
           <strong onclick="location.href='{% url 'user_profile' video.author_id %}';" style="cursor:pointer;"> 
-            {{video.author.username}} 
+            {{video.channel.username}} 
           </strong>
-          {% if video.author.id != request.user.id %}
+          {% if video.channel.id != request.user.id %}
           <i class = "rate_container mx-3"
-            hx-get="{% url 'subscribe_button' video.author.id %}" hx-swap="innerHTML" hx-trigger="load">
+            hx-get="{% url 'subscribe_button' video.channel.id %}" hx-swap="innerHTML" hx-trigger="load">
           </i>
           {% endif %}
         </span>

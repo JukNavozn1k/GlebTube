@@ -19,45 +19,45 @@ export class VideoUseCase extends UseCases<Video> {
   }
 
   // Override list to add debug logging during development.
-  async fetchList() {
-    console.log("VideoUseCase: calling API list()")
-    const res = await this.videoApi.list()
-    console.log("VideoUseCase: API list returned count=", Array.isArray(res) ? res.length : typeof res)
+  // async fetchList() {
+  //   console.log("VideoUseCase: calling API list()")
+  //   const res = await this.videoApi.list()
+  //   console.log("VideoUseCase: API list returned count=", Array.isArray(res) ? res.length : typeof res)
 
-    // Map backend shape to frontend `Video` shape.
-    const mapped = (res || []).map((v: any) => {
-      const author = v.author || v.channel || null
+  //   // Map backend shape to frontend `Video` shape.
+  //   const mapped = (res || []).map((v: any) => {
+  //     const author = v.author || v.channel || null
 
-      const channel = author
-        ? {
-            id: String(author.id ?? author.pk ?? "unknown"),
-            name: author.username ?? author.name ?? "Unknown",
-            avatar: author.avatar ?? undefined,
-            bio: author.bio ?? undefined,
-            subscriberCount: author.subscriberCount ?? undefined,
-          }
-        : { id: "unknown", name: "Unknown" }
+  //     const channel = author
+  //       ? {
+  //           id: String(author.id ?? author.pk ?? "unknown"),
+  //           name: author.username ?? author.name ?? "Unknown",
+  //           avatar: author.avatar ?? undefined,
+  //           bio: author.bio ?? undefined,
+  //           subscriberCount: author.subscriberCount ?? undefined,
+  //         }
+  //       : { id: "unknown", name: "Unknown" }
 
-      const video = {
-        id: String(v.id ?? v.pk ?? ""),
-        title: v.title ?? "",
-        channel,
-        views: v.views ?? 0,
-        createdAt: v.createdAt ?? v.created_at ?? "",
-        duration: v.duration ?? "",
-        src: v.src ?? v.hls ?? "",
-        thumbnail: v.thumbnail ?? "",
-        description: v.description ?? "",
-        baseStars: v.baseStars ?? 0,
-        starred: v.starred ?? false,
-        tags: v.tags ?? [],
-      }
+  //     const video = {
+  //       id: String(v.id ?? v.pk ?? ""),
+  //       title: v.title ?? "",
+  //       channel,
+  //       views: v.views ?? 0,
+  //       createdAt: v.createdAt ?? v.created_at ?? "",
+  //       duration: v.duration ?? "",
+  //       src: v.src ?? v.hls ?? "",
+  //       thumbnail: v.thumbnail ?? "",
+  //       description: v.description ?? "",
+  //       baseStars: v.baseStars ?? 0,
+  //       starred: v.starred ?? false,
+  //       tags: v.tags ?? [],
+  //     }
 
-      return video
-  })
+  //     return video
+  // })
 
-  return mapped as unknown as Video[]
-  }
+  // return mapped as unknown as Video[]
+  // }
 
   /**
    * Create video with required fields
