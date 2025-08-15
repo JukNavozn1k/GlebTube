@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils"
 export function ProfileSettingsPage() {
   const { user, setAvatarFile, setDescription } = useUser()
   const fileRef = useRef<HTMLInputElement>(null)
-  const [desc, setDesc] = useState<string>(user.description ?? "")
+  const [desc, setDesc] = useState<string>(user.bio ?? "")
   const [saving, setSaving] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [previewAvatar, setPreviewAvatar] = useState<string | null>(null)

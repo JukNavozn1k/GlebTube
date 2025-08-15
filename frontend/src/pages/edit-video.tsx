@@ -234,7 +234,7 @@ export function EditVideoPage() {
                 {thumbFile ? (
                   <div className="space-y-2">
                     <ImageIcon className="h-8 w-8 mx-auto text-green-600" />
-                    <div className="font-medium text-green-700">Новое превью: {thumbFile.username}</div>
+                    <div className="font-medium text-green-700">Новое превью: {thumbFile.name}</div>
                     <div className="text-sm text-green-600">{formatFileSize(thumbFile)}</div>
                     <Button
                       type="button"
