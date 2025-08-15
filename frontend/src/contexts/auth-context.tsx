@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react"
 import type { AuthState } from "@/types/user"
-
-const AUTH_KEY = "glebtube:auth"
+import type { LoginCredentials, RegisterCredentials } from "@/types/auth"
+import { AuthUseCase } from "@/use-cases/auth-use-case"
+import { useRef } from "react"
 
 const DEFAULT_AUTH: AuthState = {
   loggedIn: false,
@@ -10,8 +11,8 @@ const DEFAULT_AUTH: AuthState = {
 
 type AuthContextType = {
   auth: AuthState
-  login: (name: string) => void
-  register: (name: string) => void
+  login: (credentials: LoginCredentials) => Promise<void>
+  register: (credentials: RegisterCredentials) => Promise<void>
   logout: () => void
 }
 
@@ -21,53 +22,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [auth, setAuth] = useState<AuthState>(DEFAULT_AUTH)
   const [isInitialized, setIsInitialized] = useState(false)
 
+  const useCaseRef = useRef<AuthUseCase | null>(null)
+
   useEffect(() => {
-    if (typeof window === "undefined") return
+    let mounted = true
 
-    try {
-      const raw = localStorage.getItem(AUTH_KEY)
-      if (raw) {
-        const parsed = JSON.parse(raw) as AuthState
-        setAuth({
-          loggedIn: !!parsed.loggedIn,
-          name: parsed.name || "",
-        })
+    async function init() {
+      try {
+        useCaseRef.current = new AuthUseCase()
+        await useCaseRef.current.initialize()
+        const user = useCaseRef.current.getCurrentUser()
+        if (!mounted) return
+        if (user) {
+          setAuth({ loggedIn: true, name: user.username, currentUser: user })
+        } else {
+          setAuth(DEFAULT_AUTH)
+        }
+      } catch {
+        if (!mounted) return
+        setAuth(DEFAULT_AUTH)
+      } finally {
+        if (!mounted) return
+        setIsInitialized(true)
       }
-    } catch {
-      // ignore parsing errors
-    } finally {
-      setIsInitialized(true)
+    }
+
+    init()
+
+    return () => {
+      mounted = false
     }
   }, [])
 
-  const login = useCallback((name: string) => {
-    const next: AuthState = { loggedIn: true, name: name.trim() || "User" }
-    setAuth(next)
-    if (typeof window !== "undefined") {
-      localStorage.setItem(AUTH_KEY, JSON.stringify(next))
-    }
+  const login = useCallback(async (credentials: LoginCredentials) => {
+    if (!useCaseRef.current) throw new Error('Auth provider not initialized')
+    await useCaseRef.current.login(credentials)
+  const user = useCaseRef.current.getCurrentUser()
+  setAuth({ loggedIn: true, name: user?.username || "User", currentUser: user || null })
   }, [])
 
-  const register = useCallback((name: string) => {
-    const next: AuthState = { loggedIn: true, name: name.trim() || "User" }
-    setAuth(next)
-    if (typeof window !== "undefined") {
-      localStorage.setItem(AUTH_KEY, JSON.stringify(next))
-    }
+  const register = useCallback(async (credentials: RegisterCredentials) => {
+    if (!useCaseRef.current) throw new Error('Auth provider not initialized')
+    await useCaseRef.current.register(credentials)
+  const user = useCaseRef.current.getCurrentUser()
+  setAuth({ loggedIn: true, name: user?.username || "User", currentUser: user || null })
   }, [])
 
   const logout = useCallback(() => {
-    const next: AuthState = { loggedIn: false, name: "" }
-    setAuth(next)
-    if (typeof window !== "undefined") {
-      localStorage.setItem(AUTH_KEY, JSON.stringify(next))
-    }
+    useCaseRef.current?.logout()
+  setAuth(DEFAULT_AUTH)
   }, [])
 
-  // Не рендерим детей пока не инициализировались
-  if (!isInitialized) {
-    return null
-  }
+  if (!isInitialized) return null
 
   return (
     <AuthContext.Provider value={{ auth, login, register, logout }}>

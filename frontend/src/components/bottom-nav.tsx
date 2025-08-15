@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom"
 import { Home, Upload, UserRound, ListVideo, Users, LogIn } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useAuth } from "@/hooks/use-auth"
+import { useAuth } from "@/contexts/auth-context"
 import { useState } from "react"
 import { AuthDialog } from "@/components/auth-dialog"
 

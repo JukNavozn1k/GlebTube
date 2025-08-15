@@ -81,7 +81,13 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
         subs = Subscription.objects.filter(author_id=pk,active=1)
         subs = serializers.UserSerializer(subs,many=True)
         return Response(subs.data)
+    
 
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def me(self, request):
+        serializer = self.get_serializer(request.user, many=False)
+        return Response(serializer.data)
+    
 class CommentView(ModelViewSet):
     queryset = CommentVideo.objects.all().annotate(stars_count=Count
                                     (Case(When(comment_rates__grade = 1,then=1)))).select_related('author','instance')

@@ -212,16 +212,16 @@ REST_FRAMEWORK = {
     # 'PAGE_SIZE': 10,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
     ]
 }
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'GlebTube',
     'VERSION': '1.0.0',
-    'DESCRIPTION': 'Документация для проекта с Djoser и JWT',
+    'DESCRIPTION': 'Документация GlebTube API',
 }
 
 CHANNEL_LAYERS = {
