@@ -3,8 +3,6 @@ import { cn } from "@/lib/utils"
 import { useEffect, useMemo, useState } from "react"
 import { useSearchParams, useLocation } from "react-router-dom" // заменили на react-router-dom
 import { VideoCard } from "@/components/video-card"
-import { getUploads } from "@/lib/glebtube-storage"
-import type { UploadedVideo } from "@/types/video"
 import { BottomNav } from "@/components/bottom-nav"
 import { VideoUseCase } from "@/use-cases/video-use-case"
 import type { Video } from "@/types/video"
@@ -12,14 +10,13 @@ import type { Video } from "@/types/video"
 export function HomePage() {
   const [searchParams] = useSearchParams() // в react-router-dom возвращается массив [params, setParams]
   const q = (searchParams.get("q") || "").toLowerCase().trim()
-  const [uploads, setUploads] = useState<UploadedVideo[]>([])
   const [apiVideos, setApiVideos] = useState<Video[]>([])
   const videoUseCase = useMemo(() => new VideoUseCase(), [])
 
   const location = useLocation()
 
   useEffect(() => {
-    setUploads(getUploads())
+  // Prefer API videos only. No local stubs or uploads merged into the main list.
 
     let mounted = true
     ;(async () => {
@@ -43,17 +40,9 @@ export function HomePage() {
   }, [videoUseCase, location.pathname])
 
   const allVideos = useMemo(() => {
-    // If API returned videos, prefer them and merge local uploads by id.
-    if (apiVideos.length) {
-      const map = new Map<string, Video>()
-      apiVideos.forEach((v) => map.set(v.id, v))
-      uploads.forEach((u) => map.set(u.id, u as unknown as Video))
-      return Array.from(map.values())
-    }
-
-    // If API returned nothing, show uploads only (no builtins/stubs).
-    return uploads
-  }, [apiVideos, uploads])
+  // Only use API videos. If API returned nothing, the list will be empty.
+  return apiVideos
+  }, [apiVideos])
 
   const filtered = useMemo(() => {
     if (!q) return allVideos
