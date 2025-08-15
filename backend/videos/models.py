@@ -31,7 +31,7 @@ class Video(models.Model):
     description = models.TextField(max_length=1024,verbose_name="Описание",blank=True,null=True)
 
     thumbnail = models.ImageField(upload_to="thumbnails",null=True,blank=True,verbose_name='Превью')
-    video = models.FileField(upload_to='videos',null=True,
+    src = models.FileField(upload_to='videos',null=True,
         validators=[FileExtensionValidator(allowed_extensions=['mp4'])],verbose_name="Видео")
     
     

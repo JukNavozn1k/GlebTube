@@ -36,7 +36,7 @@ def video_encode(duration,video_id):
             obj.status = 'Processing'
             obj.is_running = True
             obj.save()
-            input_video_path = obj.video.path
+            input_video_path = obj.src.path
             output_directory = os.path.join(os.path.dirname(input_video_path), 'hls_output')
             os.makedirs(output_directory, exist_ok=True)
             output_filename = os.path.splitext(os.path.basename(input_video_path))[0] + '_hls.m3u8'

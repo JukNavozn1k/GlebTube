@@ -42,7 +42,7 @@ def serve_hls_segment(request, video_id, segment_name):
             hls_directory = CACHE
         else:
             video = get_object_or_404(models.Video, pk=video_id)
-            hls_directory = os.path.join(os.path.dirname(video.video.path), 'hls_output')
+            hls_directory = os.path.join(os.path.dirname(video.src.path), 'hls_output')
             cache.set(KEY,hls_directory,timeout=settings.CACHE_HLS_TIMEOUT)
         segment_path = os.path.join(hls_directory, segment_name)
 
