@@ -2,14 +2,16 @@ import { useEffect, useMemo, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { StarButton } from "@/components/star-button"
 import { Comments } from "@/components/comments"
-import { videos as builtins } from "@/data/videos"
+
 import { formatViews, timeAgo } from "@/utils/format"
 import type { Video } from "@/types/video"
-import { getUploads, addHistory, isSubscribed, toggleSubscription } from "@/utils/storage"
+import { addHistory, isSubscribed, toggleSubscription } from "@/utils/storage"
 import { Button } from "@/components/ui/button"
 import { BottomNav } from "@/components/bottom-nav"
 import { CustomPlayer } from "@/components/custom-player"
 import { ChevronDown, ChevronUp } from "lucide-react"
+
+import { VideoUseCase } from "@/use-cases/video-use-case"
 
 function channelSlug(channelId: string) {
   return encodeURIComponent(channelId || "unknown")
@@ -31,23 +33,33 @@ function getInitials(username?: string): string {
 export function WatchPage() {
   const { id = "" } = useParams<{ id: string }>()
   const [video, setVideo] = useState<Video | null>(null)
+  const [recommended, setRecommended] = useState<Video[]>([])
   const [sub, setSub] = useState(false)
   const [theater, setTheater] = useState(false)
-
-  const uploads = getUploads()
-  const allVideos = [...uploads, ...builtins]
+  const videoUseCase = useMemo(() => new VideoUseCase(), [])
 
   useEffect(() => {
-    const v = allVideos.find((x) => x.id === id) || null
-    setVideo(v)
-    if (v?.channel?.id) setSub(isSubscribed(v.channel.id))
+    const loadData = async () => {
+      try {
+        const [v, list] = await Promise.all([
+          videoUseCase.fetchById(id),
+          videoUseCase.fetchList()
+        ]);
+        setVideo(v);
+        setRecommended(list.filter((item) => item.id !== id).slice(0, 6));
+        if (v?.channel?.id) setSub(isSubscribed(v.channel.id));
+      } catch (error) {
+        console.error("Failed to load video or recommendations:", error);
+        setVideo(null);
+        setRecommended([]);
+      }
+    };
+    loadData();
   }, [id])
 
   useEffect(() => {
     if (video) addHistory(video.id)
   }, [video])
-
-  const recommended = useMemo(() => allVideos.filter((v) => v.id !== id).slice(0, 6), [id])
 
   if (!video || !video.channel) {
     return (
