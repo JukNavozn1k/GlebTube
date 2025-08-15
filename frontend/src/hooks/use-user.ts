@@ -11,18 +11,26 @@ export function useUser() {
   const { auth } = useAuth()
   const [user, setUser] = useState<User>(defaultUser)
 
-  useEffect(() => {
-    if (typeof window === "undefined") return
-    const savedAvatar = localStorage.getItem(AVATAR_KEY)
-    const savedDesc = localStorage.getItem(DESC_KEY)
-    setUser((u) => ({
-      ...u,
-      name: auth.name || u.name, // синхронизируем имя с auth
-      avatar: savedAvatar || u.avatar,
-      description: savedDesc ?? u.description ?? "",
-    }))
-  }, [auth.name]) // добавляем зависимость от auth.name
 
+    useEffect(() => {
+      if (typeof window === "undefined") return
+      const savedAvatar = localStorage.getItem(AVATAR_KEY)
+      const savedDesc = localStorage.getItem(DESC_KEY)
+
+      // If auth.currentUser is present, prefer fields from it. Otherwise fall back to auth.name and local storage.
+      const profile = auth.currentUser
+
+      setUser((u) => ({
+        ...u,
+        id: profile ? String(profile.id) : u.id,
+        name: profile?.username || auth.name || u.name,
+        username: profile?.username || u.username,
+        avatar: profile?.avatar ?? savedAvatar ?? u.avatar,
+        description: profile?.profile_description ?? savedDesc ?? u.description ?? "",
+        stars_count: profile?.stars_count ?? u.stars_count,
+        subs_count: profile?.subs_count ?? u.subs_count,
+      }))
+    }, [auth.name, auth.currentUser])
   async function setAvatarFile(file: File) {
     const dataUrl = await fileToDataUrl(file)
     localStorage.setItem(AVATAR_KEY, dataUrl)

@@ -5,7 +5,7 @@ const BASE_URL = typeof process !== "undefined" && process.env && process.env.RE
 export const AUTH_ENDPOINTS = {
     LOGIN: '/auth/jwt/create/',
     REGISTER: '/auth/users/',
-    PROFILE: '/auth/users/me/'
+    PROFILE: '/user/me/'
 } as const;
 
 export const LOCAL_STORAGE_KEYS = {

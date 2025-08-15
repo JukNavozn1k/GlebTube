@@ -34,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const user = useCaseRef.current.getCurrentUser()
         if (!mounted) return
         if (user) {
-          setAuth({ loggedIn: true, name: user.username })
+          setAuth({ loggedIn: true, name: user.username, currentUser: user })
         } else {
           setAuth(DEFAULT_AUTH)
         }
@@ -57,20 +57,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (credentials: LoginCredentials) => {
     if (!useCaseRef.current) throw new Error('Auth provider not initialized')
     await useCaseRef.current.login(credentials)
-    const user = useCaseRef.current.getCurrentUser()
-    setAuth({ loggedIn: true, name: user?.username || "User" })
+  const user = useCaseRef.current.getCurrentUser()
+  setAuth({ loggedIn: true, name: user?.username || "User", currentUser: user || null })
   }, [])
 
   const register = useCallback(async (credentials: RegisterCredentials) => {
     if (!useCaseRef.current) throw new Error('Auth provider not initialized')
     await useCaseRef.current.register(credentials)
-    const user = useCaseRef.current.getCurrentUser()
-    setAuth({ loggedIn: true, name: user?.username || "User" })
+  const user = useCaseRef.current.getCurrentUser()
+  setAuth({ loggedIn: true, name: user?.username || "User", currentUser: user || null })
   }, [])
 
   const logout = useCallback(() => {
     useCaseRef.current?.logout()
-    setAuth(DEFAULT_AUTH)
+  setAuth(DEFAULT_AUTH)
   }, [])
 
   if (!isInitialized) return null

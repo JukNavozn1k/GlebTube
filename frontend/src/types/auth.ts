@@ -20,7 +20,11 @@ export interface RegisterResponse {
 }
 
 export interface UserProfile {
-  email: string;
+  email?: string;
   id: number;
   username: string;
+  avatar?: string | null;
+  profile_description?: string;
+  stars_count?: number;
+  subs_count?: number;
 }
