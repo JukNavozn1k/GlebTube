@@ -12,7 +12,6 @@ from django.shortcuts import redirect
 
 from . import tasks
 
-import torch
 from .models import Video
 from ml.search import semantic_search_videos
 import torch.nn.functional as F
