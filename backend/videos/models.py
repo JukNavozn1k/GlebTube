@@ -4,7 +4,6 @@ from django.core.validators import FileExtensionValidator
 from django.utils import timezone
 
 from auths.models import User
-from . import tasks
 
 from django.core.exceptions import ValidationError
 from django.db.models import JSONField
@@ -47,7 +46,6 @@ class Video(models.Model):
     createdAt = models.DateTimeField(default=timezone.now,verbose_name="Дата публикации")
     channel = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name="Автор",related_name='user_videos')
 
-    search_embedding = JSONField(null=True, blank=True, verbose_name='Эмбеддинг для поиска')
     video_embedding = JSONField(null=True, blank=True, verbose_name='Эмбеддинг видео')
 
 

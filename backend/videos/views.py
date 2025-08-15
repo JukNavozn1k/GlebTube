@@ -14,7 +14,7 @@ from . import tasks
 
 import torch
 from .models import Video
-from .semantic_search import semantic_search_videos
+from ml.search import semantic_search_videos
 import torch.nn.functional as F
 
 def search_videos(request):
@@ -23,7 +23,7 @@ def search_videos(request):
         videos = Video.objects.none()
         context = {'videos': videos}
         return render(request, 'main.html', context=context)
-    videos_qs = Video.objects.exclude(search_embedding__isnull=True).order_by('-baseStars', '-id')
+    videos_qs = Video.objects.exclude(video_embedding__isnull=True).order_by('-baseStars', '-id')
     results = semantic_search_videos(query, videos_qs, k=10)
     context = {'videos': results}
     return render(request, 'main.html', context=context)
