@@ -36,16 +36,19 @@ export function VideoCard({ video, showChannelAvatar = true }: VideoCardProps) {
     <div className="group rounded-lg border border-blue-100 bg-white hover:shadow-sm transition-shadow">
       <Link to={`/watch/${video.id}`} className="block relative overflow-hidden rounded-t-lg">
         <div className="relative aspect-video bg-blue-50">
-          <img
-            src={video.thumbnail || "/placeholder.svg?height=720&width=1280&query=blue%20white%20video%20thumbnail"}
-            alt={`Thumbnail ${video.title}`}
-            sizes="(max-width: 640px) 100vw, 33vw"
-            className="object-cover"
-          />
-          <div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/70 text-white text-xs">
-            {video.duration}
-          </div>
-        </div>
+  <img
+    src={
+      video.thumbnail ||
+      "/placeholder.svg?height=720&width=1280&query=blue%20white%20video%20thumbnail"
+    }
+    alt={`Thumbnail ${video.title}`}
+    sizes="(max-width: 640px) 100vw, 33vw"
+    className="absolute inset-0 w-full h-full object-contain bg-black"
+  />
+  <div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/70 text-white text-xs">
+    {video.duration}
+  </div>
+</div>
       </Link>
 
       <div className="flex gap-3 p-3">
