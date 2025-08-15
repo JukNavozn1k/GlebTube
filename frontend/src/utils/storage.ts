@@ -1,10 +1,11 @@
+"use client"
+
 import type { User } from "@/types/user"
 import type { UploadedVideo } from "@/types/video"
 import type { Comment } from "@/types/comment"
+import { getChannelByName } from "@/data/channels"
 
-const STAR_KEY = "glebtube:stars"
 const COMMENTS_PREFIX = "glebtube:comments:"
-const COMMENT_STARS_KEY = "glebtube:comment-stars"
 const HISTORY_KEY = "glebtube:history"
 const UPLOADS_KEY = "glebtube:uploads"
 const SUBS_KEY = "glebtube:subs"
@@ -17,30 +18,36 @@ function safeParse<T>(val: string | null, fallback: T): T {
   }
 }
 
-/* Video stars (1-star toggle per video) */
-export function getStarred(): string[] {
-  if (typeof window === "undefined") return []
-  return safeParse(localStorage.getItem(STAR_KEY), [])
-}
-
-export function isStarred(videoId: string): boolean {
-  return getStarred().includes(videoId)
-}
-
-export function toggleStar(videoId: string): boolean {
-  if (typeof window === "undefined") return false
-  const set = new Set(getStarred())
-  if (set.has(videoId)) set.delete(videoId)
-  else set.add(videoId)
-  const arr = Array.from(set)
-  localStorage.setItem(STAR_KEY, JSON.stringify(arr))
-  return arr.includes(videoId)
-}
-
-/* Comments with replies */
+/* Comments with simplified rating system */
 export function getComments(videoId: string): Comment[] {
   if (typeof window === "undefined") return []
-  return safeParse(localStorage.getItem(COMMENTS_PREFIX + videoId), [])
+  const comments = safeParse<any[]>(localStorage.getItem(COMMENTS_PREFIX + videoId), [])
+
+  // Migrate old comment format to new format
+  return comments.map((comment) => {
+    if (comment.user && typeof comment.starred === "boolean") {
+      // Already in new format
+      return comment as Comment
+    } else {
+      // Migrate from old format
+      return {
+        id: comment.id,
+        videoId: comment.videoId,
+        parentId: comment.parentId,
+        user:
+          comment.user ||
+          ({
+            id: comment.userId || "unknown",
+            username: comment.userName || "Unknown User",
+            avatar: comment.userAvatar,
+          } as User),
+        text: comment.text,
+        createdAt: comment.createdAt,
+        stars: comment.stars || 0,
+        starred: false, // Default value for migrated comments
+      } as Comment
+    }
+  })
 }
 
 export function addComment(videoId: string, text: string, user: User, parentId?: string): Comment {
@@ -48,13 +55,11 @@ export function addComment(videoId: string, text: string, user: User, parentId?:
     id: `${videoId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     videoId,
     parentId,
-    userId: user.id,
-    userName: user.name,
-    userHandle: user.handle,
-    userAvatar: user.avatar,
+    user,
     text,
     createdAt: new Date().toISOString(),
     stars: 0,
+    starred: false,
   }
   const list = getComments(videoId)
   list.unshift(c)
@@ -79,34 +84,28 @@ export function removeComment(videoId: string, commentId: string) {
   localStorage.setItem(COMMENTS_PREFIX + videoId, JSON.stringify(list))
 }
 
-/* Comment stars (per-user 1-star) */
-function getMyCommentStars(): string[] {
-  if (typeof window === "undefined") return []
-  return safeParse(localStorage.getItem(COMMENT_STARS_KEY), [])
-}
-
-export function hasStarredComment(commentId: string): boolean {
-  return getMyCommentStars().includes(commentId)
-}
-
+/* Simplified comment rating system */
 export function toggleCommentStar(videoId: string, commentId: string): boolean {
   if (typeof window === "undefined") return false
-  const mine = new Set(getMyCommentStars())
   const list = getComments(videoId)
   const idx = list.findIndex((c) => c.id === commentId)
-  if (idx === -1) return hasStarredComment(commentId)
+  if (idx === -1) return false
 
-  const currently = mine.has(commentId)
-  if (currently) {
-    mine.delete(commentId)
-    list[idx].stars = Math.max(0, (list[idx].stars || 0) - 1)
+  const comment = list[idx]
+  const wasStarred = comment.starred
+
+  // Toggle starred state
+  comment.starred = !wasStarred
+
+  // Update stars count
+  if (comment.starred) {
+    comment.stars = (comment.stars || 0) + 1
   } else {
-    mine.add(commentId)
-    list[idx].stars = (list[idx].stars || 0) + 1
+    comment.stars = Math.max(0, (comment.stars || 0) - 1)
   }
-  localStorage.setItem(COMMENT_STARS_KEY, JSON.stringify(Array.from(mine)))
+
   localStorage.setItem(COMMENTS_PREFIX + videoId, JSON.stringify(list))
-  return !currently
+  return comment.starred
 }
 
 /* History: array of { id, at } sorted by latest */
@@ -128,14 +127,21 @@ export function clearHistory() {
   localStorage.removeItem(HISTORY_KEY)
 }
 
-/* Uploads */
+/* Uploads with simplified rating */
 export function getUploads(): UploadedVideo[] {
   if (typeof window === "undefined") return []
-  return safeParse(localStorage.getItem(UPLOADS_KEY), [])
+  const uploads = safeParse<any[]>(localStorage.getItem(UPLOADS_KEY), [])
+
+  // Ensure all uploads have proper channel objects and starred field
+  return uploads.map((upload) => ({
+    ...upload,
+    channel: typeof upload.channel === "string" ? getChannelByName(upload.channel) : upload.channel,
+    starred: upload.starred ?? false, // Default to false if not set
+  }))
 }
 
 export function addUpload(
-  v: Omit<UploadedVideo, "id" | "views" | "createdAt" | "baseStars" | "isUploaded">,
+  v: Omit<UploadedVideo, "id" | "views" | "createdAt" | "baseStars" | "isUploaded" | "starred">,
 ): UploadedVideo {
   const id = `upl-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`
   const item: UploadedVideo = {
@@ -144,7 +150,9 @@ export function addUpload(
     views: 0,
     createdAt: new Date().toISOString(),
     baseStars: 0,
+    starred: false,
     isUploaded: true,
+    channel: typeof v.channel === "string" ? getChannelByName(v.channel) : v.channel,
   }
   const list = getUploads()
   list.unshift(item)
@@ -169,24 +177,54 @@ export function deleteUpload(id: string) {
   localStorage.setItem(UPLOADS_KEY, JSON.stringify(list))
 }
 
-/* Subscriptions: store channel names */
+/* Simplified video rating system */
+export function toggleVideoStar(videoId: string): boolean {
+  if (typeof window === "undefined") return false
+
+  // For built-in videos, we'll store starred state separately
+  const starredVideos = safeParse<string[]>(localStorage.getItem("glebtube:starred-videos"), [])
+  const isCurrentlyStarred = starredVideos.includes(videoId)
+
+  if (isCurrentlyStarred) {
+    const filtered = starredVideos.filter((id) => id !== videoId)
+    localStorage.setItem("glebtube:starred-videos", JSON.stringify(filtered))
+    return false
+  } else {
+    starredVideos.push(videoId)
+    localStorage.setItem("glebtube:starred-videos", JSON.stringify(starredVideos))
+    return true
+  }
+}
+
+export function isVideoStarred(videoId: string): boolean {
+  if (typeof window === "undefined") return false
+  const starredVideos = safeParse<string[]>(localStorage.getItem("glebtube:starred-videos"), [])
+  return starredVideos.includes(videoId)
+}
+
+export function getStarredVideoIds(): string[] {
+  if (typeof window === "undefined") return []
+  return safeParse<string[]>(localStorage.getItem("glebtube:starred-videos"), [])
+}
+
+/* Subscriptions: store channel IDs */
 export function getSubscriptions(): string[] {
   if (typeof window === "undefined") return []
   return safeParse(localStorage.getItem(SUBS_KEY), [])
 }
 
-export function isSubscribed(channel: string): boolean {
-  return getSubscriptions().includes(channel)
+export function isSubscribed(channelId: string): boolean {
+  return getSubscriptions().includes(channelId)
 }
 
-export function toggleSubscription(channel: string): boolean {
+export function toggleSubscription(channelId: string): boolean {
   if (typeof window === "undefined") return false
   const set = new Set(getSubscriptions())
-  if (set.has(channel)) set.delete(channel)
-  else set.add(channel)
+  if (set.has(channelId)) set.delete(channelId)
+  else set.add(channelId)
   const arr = Array.from(set)
   localStorage.setItem(SUBS_KEY, JSON.stringify(arr))
-  return arr.includes(channel)
+  return arr.includes(channelId)
 }
 
 export { HISTORY_KEY } // in case it's useful elsewhere

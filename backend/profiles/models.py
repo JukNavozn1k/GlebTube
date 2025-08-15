@@ -29,18 +29,18 @@ class Subscription(models.Model):
             Unsubscription is performed by deleting records
       '''
       subscriber = models.ForeignKey(User,on_delete=models.CASCADE,related_name='subscriptions',verbose_name='Подписчик')
-      author = models.ForeignKey(User,on_delete=models.CASCADE,related_name='subscribers',verbose_name='Автор')
+      channel = models.ForeignKey(User,on_delete=models.CASCADE,related_name='subscribers',verbose_name='Автор')
       active = models.BooleanField(verbose_name='Подписка активна',default=False)
       class Meta:
             constraints = [
-                  models.UniqueConstraint(fields=['subscriber', 'author'], name='unique_users_sub')
+                  models.UniqueConstraint(fields=['subscriber', 'channel'], name='unique_users_sub')
             ]
             verbose_name = 'Подписка'
             verbose_name_plural = 'Подписки'
       
       def __str__(self) -> str:
-          return f'{self.subscriber} -> {self.author}'
+          return f'{self.subscriber} -> {self.channel}'
       def clean(self):
-        if self.author == self.subscriber:
+        if self.channel == self.subscriber:
             raise ValidationError("User and linked user cannot be the same.")
 

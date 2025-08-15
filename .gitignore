@@ -164,7 +164,7 @@ cython_debug/
 media/
 # migrations/
 
-**/migrations/
+# **/migrations/
 *.safetensors
 
 # ---> Node

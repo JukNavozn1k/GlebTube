@@ -1,7 +1,9 @@
+import type { User } from "@/types/user"
+
 export type Video = {
   id: string
   title: string
-  channel: string
+  channel: User
   views: number
   createdAt: string
   duration: string
@@ -9,6 +11,7 @@ export type Video = {
   thumbnail: string
   description: string
   baseStars: number
+  starred: boolean // Новое поле для упрощения рейтинга
   tags: string[]
 }
 

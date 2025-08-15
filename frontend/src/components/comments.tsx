@@ -1,23 +1,15 @@
 
-
 import { useEffect, useMemo, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import {
-  addComment,
-  getComments,
-  removeComment,
-  updateComment,
-  toggleCommentStar,
-  hasStarredComment,
-} from "@/utils/storage"
+import { addComment, getComments, removeComment, updateComment, toggleCommentStar } from "@/utils/storage"
 import type { Comment } from "@/types/comment"
-import { currentUser } from "@/data/user"
 import { formatCommentTime } from "@/utils/format"
 import { useUser } from "@/hooks/use-user"
+import { useAuth } from "@/contexts/auth-context"
 import {
   Star,
   ChevronDown,
@@ -49,6 +41,7 @@ export function Comments({ videoId }: CommentsProps) {
   const [editText, setEditText] = useState<string>("")
   const [sortBy, setSortBy] = useState<SortOption>("newest")
   const { user } = useUser()
+  const { auth } = useAuth()
 
   useEffect(() => {
     setItems(getComments(videoId))
@@ -60,7 +53,15 @@ export function Comments({ videoId }: CommentsProps) {
     setEditText("")
   }, [videoId])
 
-  const me = useMemo(() => ({ ...currentUser, avatar: user.avatar }), [user.avatar])
+  // Create current user object
+  const currentUser = useMemo(
+    () => ({
+      id: user.id || "me",
+      username: auth.username || user.username || "User",
+      avatar: user.avatar,
+    }),
+    [user, auth.username],
+  )
 
   const roots = useMemo(() => {
     const rootComments = items.filter((c) => !c.parentId)
@@ -95,7 +96,7 @@ export function Comments({ videoId }: CommentsProps) {
   function submitRoot() {
     const val = text.trim()
     if (!val) return
-    const c = addComment(videoId, val, me)
+    const c = addComment(videoId, val, currentUser)
     setItems((prev) => [c, ...prev])
     setText("")
   }
@@ -103,7 +104,7 @@ export function Comments({ videoId }: CommentsProps) {
   function submitReply(parentId: string) {
     const val = replyText.trim()
     if (!val) return
-    const c = addComment(videoId, val, me, parentId)
+    const c = addComment(videoId, val, currentUser, parentId)
     setItems((prev) => [c, ...prev])
     setReplyText("")
     setReplyTo(null)
@@ -195,7 +196,7 @@ export function Comments({ videoId }: CommentsProps) {
       {/* Create comment */}
       <div className="flex items-start gap-3 min-w-0">
         <Avatar className="h-9 w-9 border border-blue-200 flex-shrink-0">
-          <AvatarImage src={me.avatar || "/placeholder.svg"} alt={me.name} />
+          <AvatarImage src={currentUser.avatar || "/placeholder.svg"} alt={currentUser.username} />
           <AvatarFallback>GL</AvatarFallback>
         </Avatar>
         <div className="flex-1 grid gap-2 min-w-0">
@@ -226,21 +227,19 @@ export function Comments({ videoId }: CommentsProps) {
       <div className="grid gap-4 min-w-0">
         {roots.map((c) => {
           const replies = repliesByParent.get(c.id) || []
-          const meRoot = c.userId === me.id
-          const starred = hasStarredComment(c.id)
+          const meRoot = c.user.id === currentUser.id
           const isOpen = openReplies[c.id] || false
           const isEditing = editingComment === c.id
           return (
             <div key={c.id} className="flex items-start gap-3 min-w-0">
               <Avatar className="h-9 w-9 border border-blue-200 flex-shrink-0">
-                <AvatarImage src={c.userAvatar || "/placeholder.svg"} alt={c.userName} />
+                <AvatarImage src={c.user.avatar || "/placeholder.svg"} alt={c.user.username} />
                 <AvatarFallback>US</AvatarFallback>
               </Avatar>
               <div className="grid gap-1 flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm flex-wrap min-w-0">
-                    <span className="font-medium break-words">{c.userName}</span>
-                    {c.userHandle ? <span className="text-muted-foreground break-words">{c.userHandle}</span> : null}
+                    <span className="font-medium break-words">{c.user.username}</span>
                     <span className="text-muted-foreground">• {formatCommentTime(c.createdAt)}</span>
                   </div>
 
@@ -308,19 +307,19 @@ export function Comments({ videoId }: CommentsProps) {
                       {c.text}
                     </div>
                     <div className="flex flex-wrap gap-2 mt-1 items-center">
-                      {/* Кнопка звезды вынесена из dropdown */}
+                      {/* Упрощенная кнопка звезды */}
                       <Button
                         variant="ghost"
                         size="sm"
                         className={cn(
                           "h-8 px-2 transition-colors",
-                          starred
+                          c.starred
                             ? "text-blue-700 hover:bg-blue-50"
                             : "text-gray-600 hover:bg-gray-100 hover:text-blue-700",
                         )}
                         onClick={() => onToggleCommentStar(c.id)}
                       >
-                        <Star className={cn("h-4 w-4 mr-1", starred ? "fill-blue-600 text-blue-600" : "")} />
+                        <Star className={cn("h-4 w-4 mr-1", c.starred ? "fill-blue-600 text-blue-600" : "")} />
                         <span className="text-xs">{(c.stars || 0).toLocaleString("ru-RU")}</span>
                       </Button>
 
@@ -356,7 +355,7 @@ export function Comments({ videoId }: CommentsProps) {
                 {replyTo === c.id && (
                   <div className="mt-2 flex items-start gap-2 min-w-0">
                     <Avatar className="h-7 w-7 border border-blue-200 flex-shrink-0">
-                      <AvatarImage src={me.avatar || "/placeholder.svg"} alt={me.name} />
+                      <AvatarImage src={currentUser.avatar || "/placeholder.svg"} alt={currentUser.username} />
                       <AvatarFallback>GL</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 grid gap-2 min-w-0">
@@ -393,26 +392,22 @@ export function Comments({ videoId }: CommentsProps) {
                 {replies.length > 0 && isOpen && (
                   <div className="mt-2 pl-10 grid gap-3 min-w-0">
                     {replies.map((r) => {
-                      const rMe = r.userId === me.id
-                      const rStarred = hasStarredComment(r.id)
+                      const rMe = r.user.id === currentUser.id
                       const rIsEditing = editingComment === r.id
                       return (
                         <div key={r.id} className="flex items-start gap-3 min-w-0">
                           <Avatar className="h-7 w-7 border border-blue-200 flex-shrink-0">
-                            <AvatarImage src={r.userAvatar || "/placeholder.svg"} alt={r.userName} />
+                            <AvatarImage src={r.user.avatar || "/placeholder.svg"} alt={r.user.username} />
                             <AvatarFallback>US</AvatarFallback>
                           </Avatar>
                           <div className="grid gap-1 flex-1 min-w-0">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2 text-sm flex-wrap min-w-0">
-                                <span className="font-medium break-words">{r.userName}</span>
-                                {r.userHandle ? (
-                                  <span className="text-muted-foreground break-words">{r.userHandle}</span>
-                                ) : null}
+                                <span className="font-medium break-words">{r.user.username}</span>
                                 <span className="text-muted-foreground">• {formatCommentTime(r.createdAt)}</span>
                               </div>
 
-                              {/* Actions Dropdown для реплаев - только для редактирования и удаления */}
+                              {/* Actions Dropdown для реплаев */}
                               {rMe && (
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
@@ -478,21 +473,21 @@ export function Comments({ videoId }: CommentsProps) {
                                 >
                                   {r.text}
                                 </div>
-                                {/* Кнопка звезды для реплаев тоже вынесена */}
+                                {/* Упрощенная кнопка звезды для реплаев */}
                                 <div className="flex flex-wrap gap-2 mt-1 items-center">
                                   <Button
                                     variant="ghost"
                                     size="sm"
                                     className={cn(
                                       "h-8 px-2 transition-colors",
-                                      rStarred
+                                      r.starred
                                         ? "text-blue-700 hover:bg-blue-50"
                                         : "text-gray-600 hover:bg-gray-100 hover:text-blue-700",
                                     )}
                                     onClick={() => onToggleCommentStar(r.id)}
                                   >
                                     <Star
-                                      className={cn("h-4 w-4 mr-1", rStarred ? "fill-blue-600 text-blue-600" : "")}
+                                      className={cn("h-4 w-4 mr-1", r.starred ? "fill-blue-600 text-blue-600" : "")}
                                     />
                                     <span className="text-xs">{(r.stars || 0).toLocaleString("ru-RU")}</span>
                                   </Button>

@@ -1,7 +1,7 @@
 
 {% csrf_token %}
 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-  {% if request.user == video.author %}
+  {% if request.user == video.channel %}
   <li><a class="dropdown-item" href="{% url 'edit_video' video.id %}"><i class="fas fa-pen"></i> Редактировать</a></li>
   {% endif %}
     <li><a class="dropdown-item" href="{% url 'download_video' video.id %}"><i class="fas fa-download"></i> Скачать</a></li>

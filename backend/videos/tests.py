@@ -24,7 +24,7 @@ class VideoEncodeTaskTest(TestCase):
         temp_video = self.download_test_video(video_url)
         with open(temp_video.name, 'rb') as video_file:
             video = Video.objects.create(
-                caption="Test Video",
+                title="Test Video",
                 video=File(video_file, name=os.path.basename(temp_video.name)),
                 status="Pending"
             )

@@ -42,7 +42,7 @@ def serve_hls_segment(request, video_id, segment_name):
             hls_directory = CACHE
         else:
             video = get_object_or_404(models.Video, pk=video_id)
-            hls_directory = os.path.join(os.path.dirname(video.video.path), 'hls_output')
+            hls_directory = os.path.join(os.path.dirname(video.src.path), 'hls_output')
             cache.set(KEY,hls_directory,timeout=settings.CACHE_HLS_TIMEOUT)
         segment_path = os.path.join(hls_directory, segment_name)
 
@@ -55,7 +55,7 @@ def home(request):
     user = request.user
 
     if not user.is_authenticated or not user.user_embeddings:
-        videos = models.Video.objects.all().order_by('-stars_count', '-id')
+        videos = models.Video.objects.all().order_by('-baseStars', '-id')
         return render(request, 'main.html', {'title': 'Главная', 'videos': videos})
 
     all_videos = list(models.Video.objects.all())
@@ -90,7 +90,7 @@ def home(request):
     # Можно убрать добавление "популярных" видео, либо оставить как запасной вариант
     # если рекомендованных видео совсем нет, тогда добавим
     if not recommended_videos:
-        extra = models.Video.objects.order_by('-stars_count', '-id')[:20]
+        extra = models.Video.objects.order_by('-baseStars', '-id')[:20]
         recommended_videos.extend(extra)
 
     context = {

@@ -1,9 +1,9 @@
 
 import { useEffect, useMemo, useState } from "react"
-import { getStarred } from "@/utils/storage"
-import { videos as builtins } from "@/data/videos"
-import { type Video, type UploadedVideo } from "@/types/video"
-import { getUploads } from "@/utils/storage"
+import { getStarredVideoIds } from "@/utils/storage"
+import { videos as builtins} from "@/data/videos"
+import { getUploads, } from "@/utils/storage"
+import { type UploadedVideo, type Video} from "@/types/video" 
 import { VideoCard } from "@/components/video-card"
 import { BottomNav } from "@/components/bottom-nav"
 import { Star } from "lucide-react"
@@ -11,18 +11,18 @@ import { useProtectedRoute } from "@/hooks/use-protected-route"
 
 export function StarredPage() {
   const isAuthorized = useProtectedRoute("/starred")
-  const [starred, setStarred] = useState<string[]>([])
+  const [starredIds, setStarredIds] = useState<string[]>([])
   const [uploads, setUploads] = useState<UploadedVideo[]>([])
 
   useEffect(() => {
     if (isAuthorized) {
-      setStarred(getStarred())
+      setStarredIds(getStarredVideoIds())
       setUploads(getUploads())
     }
   }, [isAuthorized])
 
   const all = useMemo<Video[]>(() => [...uploads, ...builtins], [uploads])
-  const starredVideos = useMemo(() => all.filter((v) => starred.includes(v.id)), [starred, all])
+  const starredVideos = useMemo(() => all.filter((v) => starredIds.includes(v.id)), [starredIds, all])
 
   if (!isAuthorized) {
     return null

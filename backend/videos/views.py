@@ -23,20 +23,20 @@ def search_videos(request):
         videos = Video.objects.none()
         context = {'videos': videos}
         return render(request, 'main.html', context=context)
-    videos_qs = Video.objects.exclude(search_embedding__isnull=True).order_by('-stars_count', '-id')
+    videos_qs = Video.objects.exclude(search_embedding__isnull=True).order_by('-baseStars', '-id')
     results = semantic_search_videos(query, videos_qs, k=10)
     context = {'videos': results}
     return render(request, 'main.html', context=context)
 
 def search_my_videos(request):
     if not request.user.is_authenticated: return redirect(reverse('signIn'))
-    videos = Video.objects.filter(caption__icontains=request.GET['search_query'],author=request.user).order_by('-stars_count','-id')
+    videos = Video.objects.filter(title__icontains=request.GET['search_query'],channel=request.user).order_by('-baseStars','-id')
     context={'videos':videos,'author_buttons':True}
     return render(request,'main.html',context=context)
 
 def my_videos(request):
     if not request.user.is_authenticated: return redirect(reverse('signIn'))
-    videos = Video.objects.filter(author_id=request.user.id)
+    videos = Video.objects.filter(channel_id=request.user.id)
     context = {'author_buttons':True,'title':'Мои видео','videos': videos}
     return render(request,'main.html',context=context)
 
@@ -60,7 +60,7 @@ class UploadVideo(View):
         form = forms.UploadForm(request.POST,request.FILES)
         if form.is_valid():
             video  = form.save()
-            video.author = request.user
+            video.channel = request.user
             video.save()
             return render(request,'gt_form.html',context={'form':forms.UploadForm(),'success_alert':{'description':f'Видео успешно загружено.','title':'Новое видео'}})
         else: return render(request,'gt_form.html',context={'form':forms.UploadForm(),'error_alert':{'description':f'{form.errors}','title':'Новое видео'}})
@@ -68,13 +68,13 @@ class UploadVideo(View):
 class EditVideo(View):
     def get(self,request,video_id):
        if not request.user.is_authenticated: return HttpResponse("",status=401)
-       video = get_object_or_404(Video,author=request.user,id=video_id)
+       video = get_object_or_404(Video,channel=request.user,id=video_id)
        form = forms.EditForm(instance=video)
        return render(request,'edit_video.html',context={'form':form,'title':'Редактировать видео','video_id':video_id})
      
     def post(self,request,video_id):
         if not request.user.is_authenticated: return HttpResponse("",status=401)
-        video = get_object_or_404(Video,author=request.user,id=video_id)
+        video = get_object_or_404(Video,channel=request.user,id=video_id)
         form = forms.EditForm(request.POST,request.FILES,instance=video)
         if form.is_valid():
             form.save()

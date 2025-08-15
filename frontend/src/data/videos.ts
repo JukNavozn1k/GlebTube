@@ -1,10 +1,11 @@
 import type { Video } from "@/types/video"
+import { getChannelByName } from "@/data/channels"
 
 export const videos: Video[] = [
   {
     id: "vercel-frontend-cloud",
     title: "Introducing the Frontend Cloud",
-    channel: "Vercel",
+    channel: getChannelByName("Vercel"),
     views: 1200345,
     createdAt: "2024-06-15T10:00:00.000Z",
     duration: "12:41",
@@ -13,12 +14,13 @@ export const videos: Video[] = [
     description:
       "Learn how the Frontend Cloud accelerates modern web development with edge-first infrastructure, frameworks, and tooling.",
     baseStars: 2312,
+    starred: false,
     tags: ["frontend", "cloud", "vercel"],
   },
   {
     id: "nextjs-app-router",
     title: "Mastering Next.js App Router",
-    channel: "Next.js",
+    channel: getChannelByName("Next.js"),
     views: 853212,
     createdAt: "2024-08-02T12:00:00.000Z",
     duration: "18:05",
@@ -27,12 +29,13 @@ export const videos: Video[] = [
     description:
       "Deep dive into the App Router architecture, Server Actions, and streaming UI to build blazingly fast apps.",
     baseStars: 1278,
+    starred: false,
     tags: ["nextjs", "react", "router"],
   },
   {
     id: "edge-functions",
     title: "Edge Functions: From Zero to Production",
-    channel: "Edge Academy",
+    channel: getChannelByName("Edge Academy"),
     views: 402199,
     createdAt: "2024-11-10T08:30:00.000Z",
     duration: "09:57",
@@ -41,12 +44,13 @@ export const videos: Video[] = [
     description:
       "Build latency-sensitive experiences with Edge Functions, understanding cold starts, isolation, and caching.",
     baseStars: 734,
+    starred: false,
     tags: ["edge", "functions", "performance"],
   },
   {
     id: "react-performance",
     title: "React Performance: Practical Patterns",
-    channel: "React Labs",
+    channel: getChannelByName("React Labs"),
     views: 991245,
     createdAt: "2025-03-22T15:45:00.000Z",
     duration: "22:14",
@@ -55,12 +59,13 @@ export const videos: Video[] = [
     description:
       "Profiler-driven techniques, memoization strategies, and concurrent features to keep React apps snappy.",
     baseStars: 3134,
+    starred: false,
     tags: ["react", "performance"],
   },
   {
     id: "tailwind-recipes",
     title: "Tailwind CSS Recipes for Real Apps",
-    channel: "CSS Pro",
+    channel: getChannelByName("CSS Pro"),
     views: 210934,
     createdAt: "2025-05-05T09:00:00.000Z",
     duration: "14:02",
@@ -68,6 +73,7 @@ export const videos: Video[] = [
     thumbnail: "/tailwind-components-gallery-blue-white.png",
     description: "Build responsive, accessible components fast with Tailwind CSS and utility-first patterns.",
     baseStars: 512,
+    starred: false,
     tags: ["css", "tailwind"],
   },
 ]

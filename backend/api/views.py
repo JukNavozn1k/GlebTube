@@ -35,10 +35,10 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
         queryset = WatchHistory.objects.filter(viewer_id=pk).order_by('-watch_time')
         if request.user.is_authenticated:
             subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('id'), grade=1)
-            prefetched_data = Prefetch('video', Video.objects.all().annotate(user_rated=Exists(subquery)) .select_related('author'))
+            prefetched_data = Prefetch('video', Video.objects.all().annotate(starred=Exists(subquery)) .select_related('channel'))
             queryset = queryset.prefetch_related(prefetched_data)
         else:
-            queryset = queryset.select_related('video__author')
+            queryset = queryset.select_related('video__channel')
 
      
         queryset = [entry.video for entry in queryset]   
@@ -49,10 +49,10 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
 
     @action(detail=True,methods=['get'])
     def user_videos(self,request,pk):
-        queryset = Video.objects.filter(author_id=pk).select_related('author')
+        queryset = Video.objects.filter(channel_id=pk).select_related('channel')
         if request.user.is_authenticated:
             subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('pk'), grade=1)  
-            queryset = queryset.annotate(user_rated=Exists(subquery))                         
+            queryset = queryset.annotate(starred=Exists(subquery))                         
         response_data = serializers.VideoSerializer(queryset,many=True)
         return Response(response_data.data)
 
@@ -60,11 +60,11 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
     def user_liked(self,request,pk):
         # List of user liked
         subquery = UserVideoRelation.objects.filter(user_id=pk,grade=1).values('video_id')
-        queryset = Video.objects.filter(id__in=Subquery(subquery)).select_related('author')
+        queryset = Video.objects.filter(id__in=Subquery(subquery)).select_related('channel')
         # Check if viewer rated
         if request.user.is_authenticated:
             subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('pk'),grade=1)
-            queryset = queryset.annotate(user_rated=Exists(subquery))                                             
+            queryset = queryset.annotate(starred=Exists(subquery))                                             
         response_data = serializers.VideoSerializer(queryset,many=True)
         
         return Response(response_data.data)
@@ -78,7 +78,7 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
 
     @action(detail=True,methods=['get'])
     def user_subcribers(self,request,pk):
-        subs = Subscription.objects.filter(author_id=pk,active=1)
+        subs = Subscription.objects.filter(channel_id=pk,active=1)
         subs = serializers.UserSerializer(subs,many=True)
         return Response(subs.data)
     
@@ -89,14 +89,14 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
         return Response(serializer.data)
     
 class CommentView(ModelViewSet):
-    queryset = CommentVideo.objects.all().annotate(stars_count=Count
-                                    (Case(When(comment_rates__grade = 1,then=1)))).select_related('author','instance')
+    queryset = CommentVideo.objects.all().annotate(baseStars=Count
+                                    (Case(When(comment_rates__grade = 1,then=1)))).select_related('channel','instance')
     serializer_class = serializers.CommentSerializer
     
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     
     filter_backends = [OrderingFilter,DjangoFilterBackend]
-    ordering_fields = ['stars_count']
+    ordering_fields = ['baseStars']
     filterset_fields = ['instance']
 
     
@@ -110,30 +110,30 @@ class CommentView(ModelViewSet):
       
         rate_obj.save()
 
-        return Response({'user_rated': bool(rate_obj.grade)})
+        return Response({'starred': bool(rate_obj.grade)})
 
     def get_queryset(self):
         queryset = super().get_queryset()
         if self.request.user.is_authenticated:
             subquery = UserCommentRelation.objects.filter(comment_id=OuterRef('pk'),user=self.request.user,grade=1)
-            queryset = queryset.annotate(user_rated=Exists(subquery))
+            queryset = queryset.annotate(starred=Exists(subquery))
         return queryset
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(channel=self.request.user)
     
 
 
 class VideoView(ModelViewSet):
 
-    queryset = Video.objects.all().select_related('author') 
+    queryset = Video.objects.all().select_related('channel') 
     serializer_class = serializers.VideoSerializer
     
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     
     filter_backends = [SearchFilter,OrderingFilter]
     
-    search_fields = ['caption']
-    ordering_fields = ['stars_count','views']
+    search_fields = ['title']
+    ordering_fields = ['baseStars','views']
     
     @action(methods=['post'],detail=True)
     def rate(self,request,pk):
@@ -146,16 +146,16 @@ class VideoView(ModelViewSet):
         rate_obj.save()
         
         
-        return Response({'user_rated': bool(rate_obj.grade)})
+        return Response({'starred': bool(rate_obj.grade)})
 
     def get_queryset(self):
         queryset = super().get_queryset()
        
         if self.request.user.is_authenticated:
             subquery = UserVideoRelation.objects.filter(video_id=OuterRef('pk'),user=self.request.user,grade=1)
-            queryset = queryset.annotate(user_rated=Exists(subquery))
+            queryset = queryset.annotate(starred=Exists(subquery))
         return queryset
     
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(channel=self.request.user)
     

@@ -37,3 +37,18 @@ export function formatCommentTime(iso: string) {
   const days = Math.floor(hours / 24)
   return `${days} дн назад`
 }
+
+export function formatDuration(duration: string | number): string {
+  const seconds = typeof duration === "number" ? duration : Number(duration)
+  if (!Number.isFinite(seconds) || seconds <= 0) return "0:00"
+
+  const totalSeconds = Math.floor(seconds)
+  const s = (totalSeconds % 60).toString().padStart(2, "0")
+  const m = (Math.floor(totalSeconds / 60) % 60).toString().padStart(2, "0")
+  const h = Math.floor(totalSeconds / 3600) % 24
+  const d = Math.floor(totalSeconds / 86400)
+
+  if (d > 0) return `${d}:${h.toString().padStart(2, "0")}:${m}:${s}`
+  if (h > 0) return `${h}:${m}:${s}`
+  return `${Math.floor(totalSeconds / 60)}:${s}`
+}

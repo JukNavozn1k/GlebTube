@@ -8,7 +8,7 @@
 {% block comment_buttons %}
                   
 {% if request.user.is_authenticated %} 
-{% if comment.author == request.user %}
+{% if comment.channel == request.user %}
 
 
 <button type="button" class="btn btn-danger btn-floating float-end mx-2 my-1"

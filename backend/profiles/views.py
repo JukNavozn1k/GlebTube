@@ -22,9 +22,9 @@ class Profile(views.View):
         user = get_object_or_404(User,id=user)
         
         isOwner = request.user.id == user.id
-        stars_count = user.stars_count
-        subscribers_count = user.subs_count
-        context = {'isOwner':isOwner,'user': user,'stars_count':stars_count,'subscribers_count':subscribers_count}
+        baseStars = user.baseStars
+        subscribers_count = user.subscriberCount
+        context = {'isOwner':isOwner,'user': user,'baseStars':baseStars,'subscribers_count':subscribers_count}
         return render(request,'profile/profile.html',context=context)
 
 class ProfileEdit(views.View):
@@ -47,7 +47,7 @@ class ProfileEdit(views.View):
 class UserVideos(views.View):
     # Returns query of user videos    
     def get(self,request,user):
-            queryset = Video.objects.filter(author__id = user)
+            queryset = Video.objects.filter(channel__id = user)
             return render(request,'video/video_list.html', context={'videos': queryset})
 # Same as UserVideos   
 class UserLiked(views.View):
@@ -69,14 +69,14 @@ class SubscribeButtonView(views.View):
         user = get_object_or_404(User,id=user)
         
         if request.user.is_authenticated:
-            subscription,created = models.Subscription.objects.get_or_create(subscriber = request.user,author=user)
+            subscription,created = models.Subscription.objects.get_or_create(subscriber = request.user,channel=user)
             context = {'user' : user}
             return self.get_response_data(request,context,subscription.active)
         return HttpResponse("",status=401)
     def put(self,request,user):
         if request.user.is_authenticated:
             user = get_object_or_404(User,id=user)
-            subscription,created = models.Subscription.objects.get_or_create(subscriber = request.user,author=user)
+            subscription,created = models.Subscription.objects.get_or_create(subscriber = request.user,channel=user)
             models.Subscription.objects.filter(pk=subscription.pk).update(active=~F('active'))
             # subscription.refresh_from_db()
             
@@ -101,7 +101,7 @@ class History(views.View):
 class SubList(views.View):
     def get(self, request, user_id):
 
-        queryset = models.Subscription.objects.filter(active=True,subscriber_id=user_id).select_related('author')
+        queryset = models.Subscription.objects.filter(active=True,subscriber_id=user_id).select_related('channel')
         context = {'queryset': queryset}
         return render(request, 'sub_list/sub_list.html', context = context)
         

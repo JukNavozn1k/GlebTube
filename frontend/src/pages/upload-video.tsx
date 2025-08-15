@@ -74,7 +74,7 @@ export function UploadPage() {
     setSubmitting(true)
     const v = addUpload({
       title: title.trim(),
-      channel: currentUser.name,
+      channel: currentUser.username,
       duration: "00:00",
       src,
       thumbnail,

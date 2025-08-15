@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils"
 export function ProfileSettingsPage() {
   const { user, setAvatarFile, setDescription } = useUser()
   const fileRef = useRef<HTMLInputElement>(null)
-  const [desc, setDesc] = useState<string>(user.description ?? "")
+  const [desc, setDesc] = useState<string>(user.bio ?? "")
   const [saving, setSaving] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [previewAvatar, setPreviewAvatar] = useState<string | null>(null)
@@ -100,7 +100,7 @@ export function ProfileSettingsPage() {
             <Label>Аватар профиля</Label>
             <div className="flex flex-col sm:flex-row items-center gap-6">
               <Avatar className="h-24 w-24 border-2 border-blue-200">
-                <AvatarImage src={currentAvatar || "/placeholder.svg"} alt={user.name} />
+                <AvatarImage src={currentAvatar || "/placeholder.svg"} alt={user.username} />
                 <AvatarFallback className="text-lg">GL</AvatarFallback>
               </Avatar>
 
