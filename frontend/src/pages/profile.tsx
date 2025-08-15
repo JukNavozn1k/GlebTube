@@ -1,9 +1,16 @@
 
 import {Link} from "react-router-dom"
 import { useEffect, useMemo, useState } from "react"
-import { getHistory, getStarred, getUploads, getSubscriptions, clearHistory } from "@/utils/storage"
-import { videos as builtins} from "@/data/videos"
-import { type Video, type UploadedVideo } from "@/types/video"
+import {
+  getHistory,
+  getStarredVideoIds,
+  getUploads,
+  getSubscriptions,
+  
+  clearHistory,
+} from "@/utils/storage"
+import { videos as builtins } from "@/data/videos"
+import {type UploadedVideo, type Video} from "@/types/video"
 import { formatViews } from "@/utils/format"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { VideoCard } from "@/components/video-card"
@@ -30,14 +37,14 @@ export function ProfilePage() {
   const { user } = useUser()
   const { logout } = useAuth()
   const isAuthorized = useProtectedRoute("/profile")
-  const [starred, setStarred] = useState<string[]>([])
+  const [starredIds, setStarredIds] = useState<string[]>([])
   const [history, setHistory] = useState<{ id: string; at: string }[]>([])
   const [uploads, setUploads] = useState<UploadedVideo[]>([])
   const [subs, setSubs] = useState<string[]>([])
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false)
 
   const all = useMemo<Video[]>(() => [...uploads, ...builtins], [uploads])
-  const starredVideos = useMemo(() => all.filter((v) => starred.includes(v.id)), [starred, all])
+  const starredVideos = useMemo(() => all.filter((v) => starredIds.includes(v.id)), [starredIds, all])
   const historyVideos = useMemo(() => {
     const map = new Map(all.map((v) => [v.id, v]))
     return history.map((h) => map.get(h.id)).filter(Boolean) as Video[]
@@ -53,7 +60,7 @@ export function ProfilePage() {
 
   useEffect(() => {
     if (isAuthorized) {
-      setStarred(getStarred())
+      setStarredIds(getStarredVideoIds())
       setHistory(getHistory())
       setUploads(getUploads())
       setSubs(getSubscriptions())
@@ -77,7 +84,7 @@ export function ProfilePage() {
             </Avatar>
             <div className="flex-1 min-w-0">
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold break-words">{user.name}</h1>
-              {user.description ? (
+              {user.bio ? (
                 <div
                   className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-700 line-clamp-2"
                   style={{
@@ -87,7 +94,7 @@ export function ProfilePage() {
                     hyphens: "auto",
                   }}
                 >
-                  {user.description}
+                  {user.bio}
                 </div>
               ) : (
                 <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">
@@ -310,22 +317,28 @@ export function ProfilePage() {
               </div>
             ) : (
               <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
-                {subs.map((c) => (
-                  <Link
-                    key={c}
-                    to={`/channel/${encodeURIComponent(c.toLowerCase())}`}
-                    className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border border-blue-100 hover:bg-blue-50 transition-colors"
-                  >
-                    <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border border-blue-200">
-                      <AvatarImage src="/blue-channel-avatar.png" alt={c} />
-                      <AvatarFallback className="text-xs sm:text-sm">{initials(c)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium line-clamp-1 text-sm sm:text-base">{c}</h3>
-                      <p className="text-xs sm:text-sm text-muted-foreground">Канал</p>
-                    </div>
-                  </Link>
-                ))}
+                {subs.map((channelId) => {
+                  // Найдем канал по ID
+                  const channel = all.find((v) => v.channel.id === channelId)?.channel
+                  if (!channel) return null
+
+                  return (
+                    <Link
+                      key={channelId}
+                      to={`/channel/${encodeURIComponent(channelId)}`}
+                      className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border border-blue-100 hover:bg-blue-50 transition-colors"
+                    >
+                      <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border border-blue-200">
+                        <AvatarImage src={channel.avatar || "/blue-channel-avatar.png"} alt={channel.name} />
+                        <AvatarFallback className="text-xs sm:text-sm">{initials(channel.name || "")}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium line-clamp-1 text-sm sm:text-base">{channel.name}</h3>
+                        <p className="text-xs sm:text-sm text-muted-foreground">Канал</p>
+                      </div>
+                    </Link>
+                  )
+                })}
               </div>
             )}
           </TabsContent>

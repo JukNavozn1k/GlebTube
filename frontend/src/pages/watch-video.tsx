@@ -1,25 +1,35 @@
-
 import { useEffect, useMemo, useState } from "react"
-import {Link} from "react-router-dom"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import { StarButton } from "@/components/star-button"
 import { Comments } from "@/components/comments"
 import { videos as builtins } from "@/data/videos"
 import { formatViews, timeAgo } from "@/utils/format"
 import type { Video } from "@/types/video"
-import { getUploads, addHistory, isSubscribed, toggleSubscription } from "@/lib/glebtube-storage"
+import { getUploads, addHistory, isSubscribed, toggleSubscription } from "@/utils/storage"
 import { Button } from "@/components/ui/button"
 import { BottomNav } from "@/components/bottom-nav"
 import { CustomPlayer } from "@/components/custom-player"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
-function channelSlug(name: string) {
-  return encodeURIComponent(name.toLowerCase())
+function channelSlug(channelId: string) {
+  return encodeURIComponent(channelId || "unknown")
+}
+
+function getInitials(name?: string): string {
+  if (!name || typeof name !== "string") return "CH"
+  return (
+    name
+      .trim()
+      .split(" ")
+      .map((word) => word.charAt(0))
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) || "CH"
+  )
 }
 
 export function WatchPage() {
-  const params = useParams<{ id: string }>()
-  const id = params?.id || ""
+  const { id = "" } = useParams<{ id: string }>()
   const [video, setVideo] = useState<Video | null>(null)
   const [sub, setSub] = useState(false)
   const [theater, setTheater] = useState(false)
@@ -30,7 +40,7 @@ export function WatchPage() {
   useEffect(() => {
     const v = allVideos.find((x) => x.id === id) || null
     setVideo(v)
-    if (v) setSub(isSubscribed(v.channel))
+    if (v?.channel?.id) setSub(isSubscribed(v.channel.id))
   }, [id])
 
   useEffect(() => {
@@ -39,7 +49,7 @@ export function WatchPage() {
 
   const recommended = useMemo(() => allVideos.filter((v) => v.id !== id).slice(0, 6), [id])
 
-  if (!video) {
+  if (!video || !video.channel) {
     return (
       <div className="min-h-dvh bg-white overflow-x-hidden">
         <main className="mx-auto max-w-4xl px-3 sm:px-4 py-8">
@@ -75,16 +85,29 @@ export function WatchPage() {
               {video.title}
             </h1>
 
-            {/* Channel info with subscription button aligned */}
             <div className="flex items-start gap-3 min-w-0">
-              <div className="h-10 w-10 rounded-full bg-blue-100 border border-blue-200 flex-shrink-0" aria-hidden />
+              <Link to={`/channel/${channelSlug(video.channel.id)}`} className="flex-shrink-0">
+                <div className="h-10 w-10 rounded-full overflow-hidden border border-blue-200 bg-blue-50 flex items-center justify-center">
+                  {video.channel.avatar ? (
+                    <img
+                      src={video.channel.avatar || "/placeholder.svg"}
+                      alt={`${video.channel.name || "Channel"} avatar`}
+                      width={40}
+                      height={40}
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (
+                    <span className="text-xs font-semibold text-blue-700">{getInitials(video.channel.name)}</span>
+                  )}
+                </div>
+              </Link>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-1 flex-wrap">
                   <Link
-                    to={`/channel/${channelSlug(video.channel)}`}
+                    to={`/channel/${channelSlug(video.channel.id)}`}
                     className="font-medium text-blue-700 hover:underline break-words"
                   >
-                    {video.channel}
+                    <span>{video.channel.name || "Unknown Channel"}</span>
                   </Link>
                   <Button
                     size="sm"
@@ -94,7 +117,7 @@ export function WatchPage() {
                         ? "bg-blue-600 text-white hover:bg-blue-700 flex-shrink-0"
                         : "border-blue-200 text-blue-700 hover:bg-blue-50 flex-shrink-0"
                     }
-                    onClick={() => setSub(toggleSubscription(video.channel))}
+                    onClick={() => setSub(toggleSubscription(video.channel.id))}
                   >
                     {sub ? "Вы подписаны" : "Подписаться"}
                   </Button>
@@ -111,7 +134,6 @@ export function WatchPage() {
             <ExpandableDescription text={video.description} />
           </div>
 
-          {/* Comments: toggle visible on <lg (phones/tablets) */}
           <div className="lg:hidden min-w-0">
             <ToggleComments videoId={video.id} />
           </div>
@@ -123,30 +145,40 @@ export function WatchPage() {
         <aside className="grid gap-4 self-start min-w-0">
           <div className="text-sm font-semibold">Рекомендованные</div>
           <div className="grid gap-3">
-            {recommended.map((v) => (
-              <Link key={v.id} to={`/watch/${v.id}`} className="flex gap-3 group min-w-0">
-                <div className="relative aspect-video w-40 min-w-40 rounded-md overflow-hidden bg-blue-50 flex-shrink-0">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={v.thumbnail || "/placeholder.svg?height=90&width=160&query=video%20thumb%20blue%20white"}
-                    alt={`Thumbnail ${v.title}`}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute bottom-1 right-1 px-1 rounded bg-black/70 text-white text-[10px]">
-                    {v.duration}
+            {recommended.map((v) => {
+              if (!v.channel) return null
+
+              return (
+                <Link key={v.id} to={`/watch/${v.id}`} className="flex gap-3 group min-w-0">
+                  <div className="relative aspect-video w-40 min-w-40 rounded-md overflow-hidden bg-blue-50 flex-shrink-0">
+                    <img
+                      src={
+                        v.thumbnail ||
+                        "/placeholder.svg?height=90&width=160&query=video%20thumb%20blue%20white"
+                      }
+                      alt={`Thumbnail ${v.title}`}
+                      width={160}
+                      height={90}
+                      className="object-cover w-full h-full"
+                    />
+                    <div className="absolute bottom-1 right-1 px-1 rounded bg-black/70 text-white text-[10px]">
+                      {v.duration}
+                    </div>
                   </div>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="line-clamp-2 text-sm font-medium group-hover:text-blue-700 break-words hyphens-auto">
-                    {v.title}
+                  <div className="min-w-0 flex-1">
+                    <div className="line-clamp-2 text-sm font-medium group-hover:text-blue-700 break-words hyphens-auto">
+                      {v.title}
+                    </div>
+                    <div className="text-xs text-muted-foreground break-words">
+                      <span>{v.channel.name || "Unknown Channel"}</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {formatViews(v.views)} просмотров • {timeAgo(v.createdAt)}
+                    </div>
                   </div>
-                  <div className="text-xs text-muted-foreground break-words">{v.channel}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {formatViews(v.views)} просмотров • {timeAgo(v.createdAt)}
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              )
+            })}
           </div>
         </aside>
       </main>
@@ -173,7 +205,7 @@ function ToggleComments({ videoId }: { videoId: string }) {
 
 function ExpandableDescription({ text }: { text: string }) {
   const [expanded, setExpanded] = useState(false)
-  const isLong = text.length > 150 // Уменьшил лимит для более заметной разницы
+  const isLong = text.length > 150
   const shouldTruncate = isLong && !expanded
 
   return (
@@ -182,7 +214,7 @@ function ExpandableDescription({ text }: { text: string }) {
       <div
         className={
           shouldTruncate
-            ? "text-sm text-gray-700 break-words hyphens-auto overflow-wrap-anywhere line-clamp-2" // Изменил на 2 строки
+            ? "text-sm text-gray-700 break-words hyphens-auto overflow-wrap-anywhere line-clamp-2"
             : "text-sm text-gray-700 whitespace-pre-wrap break-words hyphens-auto overflow-wrap-anywhere"
         }
       >

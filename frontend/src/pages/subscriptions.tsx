@@ -1,15 +1,17 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { BottomNav } from "@/components/bottom-nav"
-import { getSubscriptions, getUploads, type UploadedVideo } from "@/lib/glebtube-storage"
-import { videos as builtins, type Video } from "@/lib/glebtube-data"
+import { getSubscriptions, getUploads } from "@/utils/storage"
+import { videos as builtins } from "@/lib/glebtube-data"
 import { ChannelCard } from "@/components/channel-card"
 import { useProtectedRoute } from "@/hooks/use-protected-route"
-
-export  function SubscriptionsPage() {
+import { getChannelById } from "@/data/channels"
+import type { User } from "@/types/user"
+import type {Video} from "@/types/video"
+export function SubscriptionsPage() {
   const isAuthorized = useProtectedRoute("/subscriptions")
   const [subs, setSubs] = useState<string[]>([])
-  const [uploads, setUploads] = useState<UploadedVideo[]>([])
+  const [uploads, setUploads] = useState<Video[]>([])
 
   useEffect(() => {
     if (isAuthorized) {
@@ -21,13 +23,20 @@ export  function SubscriptionsPage() {
   const all: Video[] = useMemo(() => [...uploads, ...builtins], [uploads])
 
   const channels = useMemo(() => {
-    const map = new Map<string, Video[]>()
+    const map = new Map<string, { channel: User; videos: Video[] }>()
+
     for (const v of all) {
-      if (!subs.includes(v.channel)) continue
-      if (!map.has(v.channel)) map.set(v.channel, [])
-      map.get(v.channel)!.push(v)
+      if (!v.channel?.id || !subs.includes(v.channel.id)) continue
+
+      const channelId = v.channel.id
+      if (!map.has(channelId)) {
+        const channelData = getChannelById(channelId) || v.channel
+        map.set(channelId, { channel: channelData, videos: [] })
+      }
+      map.get(channelId)!.videos.push(v)
     }
-    return Array.from(map.entries()).map(([channel, videos]) => ({ channel, videos }))
+
+    return Array.from(map.values())
   }, [subs, all])
 
   if (!isAuthorized) {
@@ -43,7 +52,7 @@ export  function SubscriptionsPage() {
         ) : (
           <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
             {channels.map((ch) => (
-              <ChannelCard key={ch.channel} channel={ch.channel} videos={ch.videos} />
+              <ChannelCard key={ch.channel.id} channel={ch.channel} videos={ch.videos} />
             ))}
           </div>
         )}

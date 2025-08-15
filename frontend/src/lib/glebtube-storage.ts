@@ -1,25 +1,9 @@
+"use client"
 
-
-import type { User } from "./glebtube-user"
-import type { Video } from "./glebtube-data"
-
-export type Comment = {
-  id: string
-  videoId: string
-  parentId?: string
-  userId: string
-  userName: string
-  userHandle: string
-  userAvatar: string
-  text: string
-  createdAt: string
-  stars?: number
-}
-
-export type UploadedVideo = Video & {
-  uploaderId: string
-  isUploaded: true
-}
+import type { User } from "@/types/user"
+import type { UploadedVideo } from "@/types/video"
+import type { Comment } from "@/types/comment"
+import { getChannelByName } from "@/data/channels"
 
 const STAR_KEY = "glebtube:stars"
 const COMMENTS_PREFIX = "glebtube:comments:"
@@ -81,6 +65,17 @@ export function addComment(videoId: string, text: string, user: User, parentId?:
   return c
 }
 
+export function updateComment(videoId: string, commentId: string, newText: string): boolean {
+  if (typeof window === "undefined") return false
+  const list = getComments(videoId)
+  const idx = list.findIndex((c) => c.id === commentId)
+  if (idx === -1) return false
+
+  list[idx].text = newText
+  localStorage.setItem(COMMENTS_PREFIX + videoId, JSON.stringify(list))
+  return true
+}
+
 export function removeComment(videoId: string, commentId: string) {
   // remove the comment and its direct replies
   const list = getComments(videoId).filter((c) => c.id !== commentId && c.parentId !== commentId)
@@ -139,7 +134,13 @@ export function clearHistory() {
 /* Uploads */
 export function getUploads(): UploadedVideo[] {
   if (typeof window === "undefined") return []
-  return safeParse(localStorage.getItem(UPLOADS_KEY), [])
+  const uploads = safeParse<any[]>(localStorage.getItem(UPLOADS_KEY), [])
+
+  // Ensure all uploads have proper channel objects
+  return uploads.map((upload) => ({
+    ...upload,
+    channel: typeof upload.channel === "string" ? getChannelByName(upload.channel) : upload.channel,
+  }))
 }
 
 export function addUpload(
@@ -153,6 +154,7 @@ export function addUpload(
     createdAt: new Date().toISOString(),
     baseStars: 0,
     isUploaded: true,
+    channel: typeof v.channel === "string" ? getChannelByName(v.channel) : v.channel,
   }
   const list = getUploads()
   list.unshift(item)
@@ -177,7 +179,7 @@ export function deleteUpload(id: string) {
   localStorage.setItem(UPLOADS_KEY, JSON.stringify(list))
 }
 
-/* Subscriptions: store channel names */
+/* Subscriptions: store channel names for backward compatibility */
 export function getSubscriptions(): string[] {
   if (typeof window === "undefined") return []
   return safeParse(localStorage.getItem(SUBS_KEY), [])
@@ -197,4 +199,4 @@ export function toggleSubscription(channel: string): boolean {
   return arr.includes(channel)
 }
 
-export { HISTORY_KEY } // in case it’s useful elsewhere
+export { HISTORY_KEY } // in case it's useful elsewhere

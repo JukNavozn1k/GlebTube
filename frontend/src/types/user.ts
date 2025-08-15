@@ -1,14 +1,16 @@
 export type User = {
   id: string
   name: string
-  // original api uses `username` for name and `profile_description` for description
-  username?: string
-  avatar?: string | null
-  description?: string
-  // optional stats from profile
-  stars_count?: number
-  subs_count?: number
+  email?: string
+  avatar?: string
+  bio?: string
+  subscriberCount?: number
+  videoCount?: number
+  joinedAt?: string
+  location?: string
+  website?: string
 }
+
 
 export type AuthState = {
   loggedIn: boolean
