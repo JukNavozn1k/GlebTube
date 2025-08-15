@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from "react"
 import { BottomNav } from "@/components/bottom-nav"
 import { Input } from "@/components/ui/input"
 import { videos as builtins } from "@/lib/glebtube-data"
-import { type Video, type UploadedVideo } from "@/types/video"
 import { getUploads } from "@/lib/glebtube-storage"
+import { type Video, type UploadedVideo } from "@/types/video"
 import { ChannelCard } from "@/components/channel-card"
 import { useSearchParams, useNavigate, useLocation } from "react-router-dom"
 import { Button } from "@/components/ui/button"
@@ -17,7 +17,7 @@ export function ChannelsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
   const location = useLocation()
-  const pathname = location.pathname
+
   const qParam = (searchParams.get("q") || "").trim()
   const [q, setQ] = useState(qParam)
 
@@ -51,9 +51,8 @@ export function ChannelsPage() {
       const qc = q.toLowerCase()
       channelList = channelList.filter(
         (item) =>
-          item.channel.name.toLowerCase().includes(qc) ||
-          item.channel.handle.toLowerCase().includes(qc) ||
-          (item.channel.bio && item.channel.bio.toLowerCase().includes(qc)),
+          (item.channel.name && item.channel.name.toLowerCase().includes(qc)) ||
+          (item.channel.bio && item.channel.bio.toLowerCase().includes(qc))
       )
     }
 
@@ -73,13 +72,13 @@ export function ChannelsPage() {
     if (target) {
       setSearchParams({ q: target })
     } else {
-      navigate(pathname)
+      setSearchParams({})
     }
   }
 
   function onClear() {
     setQ("")
-    navigate(pathname)
+    setSearchParams({})
   }
 
   return (
@@ -127,7 +126,9 @@ export function ChannelsPage() {
                 />
               </svg>
             </div>
-            <p className="text-sm text-muted-foreground">{q ? "Каналы не найдены." : "Нет каналов для отображения."}</p>
+            <p className="text-sm text-muted-foreground">
+              {q ? "Каналы не найдены." : "Нет каналов для отображения."}
+            </p>
           </div>
         ) : (
           <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
