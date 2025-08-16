@@ -356,3 +356,5 @@ cover/
 # Translations
 *.mo
 *.pot
+
+**/ml/models
