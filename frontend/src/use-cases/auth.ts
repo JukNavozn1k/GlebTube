@@ -4,7 +4,7 @@ import { LOCAL_STORAGE_KEYS } from "@/lib/constants";
 import api from "@/api/client";
 import { parseAxiosError } from "@/types/http";
 
-export class AuthUseCase {
+export class AuthUseCases {
   private authApi: AuthApi;
   private currentUser: UserProfile | null = null;
 

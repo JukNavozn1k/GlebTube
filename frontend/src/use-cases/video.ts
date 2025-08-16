@@ -1,4 +1,4 @@
-import { UseCases } from "@/use-cases/use-case";
+import { UseCases } from "@/use-cases/use-cases";
 import api from "@/api/client";
 import { VideoApi } from "@/api/video";
 import type { Video } from "@/types/video";

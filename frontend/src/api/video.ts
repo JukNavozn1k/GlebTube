@@ -12,7 +12,7 @@ export class VideoApi extends Api<Video> {
    * Accepts only the required fields for POST: title, description, thumbnail, src
    */
   async createVideo(data: { title: string; description: string; thumbnail: string; src: string }): Promise<Video> {
-    const res = await this.apiClient.post<Video>(`${this.prefix}/`, data);
+    const res = await this.apiClient.post<Video>(`/`, data);
     return res.data;
   }
 
@@ -20,7 +20,7 @@ export class VideoApi extends Api<Video> {
    * Update an existing video (partial fields allowed): title, description, thumbnail
    */
   async updateVideo(id: string, data: { title?: string; description?: string; thumbnail?: string }): Promise<Video> {
-    const res = await this.apiClient.put<Video>(`${this.prefix}/${id}`, data);
+    const res = await this.apiClient.put<Video>(`$/${id}`, data);
     return res.data;
   }
 
