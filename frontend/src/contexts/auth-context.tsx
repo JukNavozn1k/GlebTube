@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react"
 import type { AuthState } from "@/types/user"
 import type { LoginCredentials, RegisterCredentials } from "@/types/auth"
-import { AuthUseCases } from "@/use-cases/auth"
+import { AuthUseCases, authUseCases } from "@/use-cases/auth"
 import { useRef } from "react"
 
 const DEFAULT_AUTH: AuthState = {
@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     async function init() {
       try {
-        useCaseRef.current = new AuthUseCases()
+        useCaseRef.current = authUseCases
         await useCaseRef.current.initialize()
         const user = useCaseRef.current.getCurrentUser()
         if (!mounted) return
