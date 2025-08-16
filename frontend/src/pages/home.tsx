@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react"
 import { useSearchParams, useLocation } from "react-router-dom" // заменили на react-router-dom
 import { VideoCard } from "@/components/video-card"
 import { BottomNav } from "@/components/bottom-nav"
-import { VideoUseCase } from "@/use-cases/video-use-case"
+import { VideoUseCase } from "@/use-cases/video"
 import type { Video } from "@/types/video"
 
 export function HomePage() {

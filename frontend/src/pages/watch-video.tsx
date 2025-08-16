@@ -11,7 +11,7 @@ import { BottomNav } from "@/components/bottom-nav"
 import { CustomPlayer } from "@/components/custom-player"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
-import { VideoUseCase } from "@/use-cases/video-use-case"
+import { VideoUseCase } from "@/use-cases/video"
 
 function channelSlug(channelId: string) {
   return encodeURIComponent(channelId || "unknown")

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react"
 import type { AuthState } from "@/types/user"
 import type { LoginCredentials, RegisterCredentials } from "@/types/auth"
-import { AuthUseCase } from "@/use-cases/auth-use-case"
+import { AuthUseCase } from "@/use-cases/auth"
 import { useRef } from "react"
 
 const DEFAULT_AUTH: AuthState = {
