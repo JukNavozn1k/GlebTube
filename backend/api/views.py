@@ -15,7 +15,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from . import permissions
 from rest_framework.permissions import IsAuthenticatedOrReadOnly,IsAuthenticated
-from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists,Subquery
+from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists,Subquery,Value,BooleanField
 
 from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
 from watch import tasks
@@ -29,6 +29,17 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
     
     filter_backends = [SearchFilter]
     search_fields = ['username']
+
+    def get_queryset(self):
+        qs = User.objects.all()
+        user = self.request.user
+        if user.is_authenticated:
+            sub_q = Subscription.objects.filter(subscriber_id=user.id, channel_id=OuterRef('pk'), active=True)
+            qs = qs.annotate(subscribed=Exists(sub_q))
+        else:
+            # для анонимов — просто False (чтобы поле всегда присутствовало)
+            qs = qs.annotate(subscribed=Value(False, output_field=BooleanField()))
+        return qs
     
     @action(detail=True,methods=['get'])
     # ToDo add pagination to actions ... 
