@@ -165,7 +165,7 @@ media/
 # migrations/
 
 # **/migrations/
-*.safetensors
+
 
 # ---> Node
 # Logs
