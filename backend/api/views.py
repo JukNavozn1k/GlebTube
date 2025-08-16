@@ -84,11 +84,21 @@ class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateMode
         return Response(subs.data)
     
 
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
-    def me(self, request):
-        serializer = self.get_serializer(request.user, many=False)
-        return Response(serializer.data)
     
+    @action(detail=False, methods=['get', 'put'], permission_classes=[IsAuthenticated])
+    def me(self, request):
+        if request.method == 'GET':
+            serializer = self.get_serializer(request.user, many=False)
+            return Response(serializer.data)
+        
+        elif request.method == 'PUT':
+            serializer = self.get_serializer(request.user, data=request.data, partial=True)  # Use partial=True if you want partial updates like PATCH
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+
+
+
 class CommentView(ModelViewSet):
     queryset = CommentVideo.objects.all().annotate(baseStars=Count
                                     (Case(When(comment_rates__grade = 1,then=1)))).select_related('channel','instance')
