@@ -11,7 +11,7 @@ import { BottomNav } from "@/components/bottom-nav"
 import { CustomPlayer } from "@/components/custom-player"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
-import { VideoUseCase } from "@/use-cases/video"
+import { VideoUseCases } from "@/use-cases/video"
 
 function channelSlug(channelId: string) {
   return encodeURIComponent(channelId || "unknown")
@@ -36,7 +36,7 @@ export function WatchPage() {
   const [recommended, setRecommended] = useState<Video[]>([])
   const [sub, setSub] = useState(false)
   const [theater, setTheater] = useState(false)
-  const videoUseCase = useMemo(() => new VideoUseCase(), [])
+  const videoUseCase = useMemo(() => new VideoUseCases(), [])
 
   useEffect(() => {
     const loadData = async () => {

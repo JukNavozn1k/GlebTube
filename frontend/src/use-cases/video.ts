@@ -3,7 +3,7 @@ import api from "@/api/client";
 import { VideoApi } from "@/api/video";
 import type { Video } from "@/types/video";
 
-export class VideoUseCase extends UseCases<Video> {
+export class VideoUseCases extends UseCases<Video> {
   private videoApi: VideoApi;
 
   constructor() {
