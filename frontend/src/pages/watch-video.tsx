@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { StarButton } from "@/components/star-button"
 import { Comments } from "@/components/comments"
@@ -11,7 +11,7 @@ import { BottomNav } from "@/components/bottom-nav"
 import { CustomPlayer } from "@/components/custom-player"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
-import { VideoUseCase } from "@/use-cases/video-use-case"
+import { videoUseCase } from "@/use-cases/video-use-case"
 
 function channelSlug(channelId: string) {
   return encodeURIComponent(channelId || "unknown")
@@ -36,7 +36,7 @@ export function WatchPage() {
   const [recommended, setRecommended] = useState<Video[]>([])
   const [sub, setSub] = useState(false)
   const [theater, setTheater] = useState(false)
-  const videoUseCase = useMemo(() => new VideoUseCase(), [])
+  // const videoUseCase = useMemo(() => new VideoUseCase(), [])
 
   useEffect(() => {
     const loadData = async () => {

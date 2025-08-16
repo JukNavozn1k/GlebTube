@@ -26,4 +26,7 @@ export type AuthState = {
   } | null
 }
 
-export type UserUpdateData = Partial<Pick<User, "bio" | "avatar">>
+export type UserUpdateData = {
+  bio?: string
+  avatarFile?: File
+}

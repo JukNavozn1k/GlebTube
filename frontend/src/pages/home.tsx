@@ -4,14 +4,14 @@ import { useEffect, useMemo, useState } from "react"
 import { useSearchParams, useLocation } from "react-router-dom" // заменили на react-router-dom
 import { VideoCard } from "@/components/video-card"
 import { BottomNav } from "@/components/bottom-nav"
-import { VideoUseCase } from "@/use-cases/video-use-case"
+import { videoUseCase } from "@/use-cases/video-use-case"
 import type { Video } from "@/types/video"
 
 export function HomePage() {
   const [searchParams] = useSearchParams() // в react-router-dom возвращается массив [params, setParams]
   const q = (searchParams.get("q") || "").toLowerCase().trim()
   const [apiVideos, setApiVideos] = useState<Video[]>([])
-  const videoUseCase = useMemo(() => new VideoUseCase(), [])
+  // const videoUseCase = useMemo(() => new VideoUseCase(), [])
 
   const location = useLocation()
 
