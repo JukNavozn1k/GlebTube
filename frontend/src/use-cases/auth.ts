@@ -1,15 +1,14 @@
 import type { LoginCredentials, RegisterCredentials, AuthTokens, RegisterResponse, UserProfile } from "@/types/auth";
-import { AuthApi } from "@/api/auth";
+import { authApi,AuthApi } from "@/api/auth";
 import { LOCAL_STORAGE_KEYS } from "@/lib/constants";
-import api from "@/api/client";
 import { parseAxiosError } from "@/types/http";
 
-export class AuthUseCase {
+export class AuthUseCases {
   private authApi: AuthApi;
   private currentUser: UserProfile | null = null;
 
-  constructor() {
-    this.authApi = new AuthApi(api);
+  constructor(authApi: AuthApi) {
+    this.authApi = authApi;
   }
 
   /**
@@ -17,12 +16,12 @@ export class AuthUseCase {
    * If profile fetch fails, perform logout to clear tokens.
    */
   async initialize(): Promise<void> {
-    if (!this.isAuthenticated()) return
+    if (!this.isAuthenticated()) return;
     try {
-      await this.loadUserProfile()
+      await this.loadUserProfile();
     } catch {
       // If initializing fails (expired token etc) clear stored tokens
-      this.logout()
+      this.logout();
     }
   }
 
@@ -34,8 +33,8 @@ export class AuthUseCase {
       await this.loadUserProfile();
       return tokens;
     } catch (error) {
-  console.error("Login error:", error);
-  throw parseAxiosError(error)
+      console.error("Login error:", error);
+      throw parseAxiosError(error);
     }
   }
 
@@ -46,8 +45,8 @@ export class AuthUseCase {
       await this.login(credentials);
       return response;
     } catch (error) {
-  console.error("Registration error:", error);
-  throw parseAxiosError(error)
+      console.error("Registration error:", error);
+      throw parseAxiosError(error);
     }
   }
 
@@ -75,3 +74,5 @@ export class AuthUseCase {
     localStorage.removeItem(LOCAL_STORAGE_KEYS.REFRESH_TOKEN);
   }
 }
+
+export const authUseCases = new AuthUseCases(authApi);

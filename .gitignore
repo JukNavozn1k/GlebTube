@@ -165,7 +165,7 @@ media/
 # migrations/
 
 # **/migrations/
-*.safetensors
+
 
 # ---> Node
 # Logs
@@ -356,3 +356,5 @@ cover/
 # Translations
 *.mo
 *.pot
+
+**/ml/models

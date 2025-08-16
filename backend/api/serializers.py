@@ -6,11 +6,11 @@ import profiles.models as profile_models
 
 
 class UserSerializer(serializers.ModelSerializer):
-
+    subscribed = serializers.BooleanField(read_only=True, default=False)
     class Meta:
         model = auth_models.User
-        fields = ("id","username", "avatar", "bio",'baseStars', 'subscriberCount')
-        read_only_fields = ['baseStars', 'subscriberCount','user_videos','username']
+        fields = ("id","username", "avatar", "bio",'baseStars', 'subscriberCount', 'subscribed')
+        read_only_fields = ['baseStars', 'subscriberCount','user_videos','username', 'subscribed']
 
 
 class CommentSerializer(serializers.ModelSerializer):

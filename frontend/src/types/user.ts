@@ -25,3 +25,5 @@ export type AuthState = {
     subscriberCount?: number
   } | null
 }
+
+export type UserUpdateData = Partial<Pick<User, "bio" | "avatar">>
