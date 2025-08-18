@@ -24,6 +24,19 @@ export class UserApi extends Api<User> {
     const res = await this.apiClient.put<User>(`/${this.prefix}/me/`, form)
     return res.data
   }
+
+  /**
+   * List users with optional filters. For subscriptions page we use: { subscribed: true, username?: prefix }
+   */
+  async listByFilter(params: { username?: string; subscribed?: boolean }): Promise<User[]> {
+    const query = new URLSearchParams()
+    if (typeof params.username === "string") query.append("username", params.username)
+    if (typeof params.subscribed === "boolean") query.append("subscribed", String(params.subscribed))
+    const qs = query.toString()
+    const url = qs ? `/${this.prefix}/?${qs}` : `/${this.prefix}/`
+    const res = await this.apiClient.get<User[]>(url)
+    return res.data
+  }
 }
 
 export const userApi = new UserApi(api, "user")

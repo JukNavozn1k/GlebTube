@@ -19,6 +19,13 @@ export class UserUseCases extends UseCases<User> {
   async updateMyProfile(data: UpdateUserProfilePayload): Promise<User> {
     return this.userApi.updateMyProfile(data)
   }
+
+  /**
+   * Fetch users that the current user is subscribed to. Optionally filter by username prefix.
+   */
+  async fetchSubscriptions(username?: string): Promise<User[]> {
+    return this.userApi.listByFilter({ subscribed: true, username })
+  }
 }
 
 export const userUseCases = new UserUseCases(userApi)
