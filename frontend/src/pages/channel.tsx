@@ -1,8 +1,7 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router-dom" // <-- заменено
 import { videos as builtins, formatViews } from "@/lib/glebtube-data"
 import { getUploads, isSubscribed, toggleSubscription } from "@/utils/storage"
-import { getChannelById, getChannelByName } from "@/data/channels"
 import { Button } from "@/components/ui/button"
 import { VideoCard } from "@/components/video-card"
 import { BottomNav } from "@/components/bottom-nav"
@@ -12,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Calendar, Users, VideoIcon, BarChart3 } from "lucide-react"
 import type { User } from "@/types/user"
 import type { Video } from "@/types/video"
+import { userUseCases } from "@/use-cases/user"
 
 function nameFromSlug(slug: string) {
   return decodeURIComponent(String(slug))
@@ -29,21 +29,39 @@ export function ChannelPage() {
   const uploads = getUploads()
   const all: Video[] = useMemo(() => [...uploads, ...builtins], [uploads])
 
-  // Try to find channel by ID first, then by username
-  const channelIdentifier = nameFromSlug(slug || "")
-  let channel: User | undefined = getChannelById(channelIdentifier)
+  const [channel, setChannel] = useState<User | null>(null)
 
-  if (!channel) {
-    channel = getChannelByName(channelIdentifier)
-  }
+  // Fetch channel by ID using user use-cases; slug is treated as ID
+  useEffect(() => {
+    const id = nameFromSlug(slug || "")
+    if (!id) {
+      setChannel(null)
+      return
+    }
+    let cancelled = false
+    ;(async () => {
+      try {
+        const user = await userUseCases.fetchById(id)
+        if (!cancelled) setChannel(user)
+      } catch (e) {
+        if (!cancelled) setChannel(null)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [slug])
 
   const channelVideos = all.filter(
     (v) =>
       v.channel?.id === channel?.id ||
-      v.channel?.username?.toLowerCase() === channelIdentifier.toLowerCase(),
+      (!!channel?.username && v.channel?.username?.toLowerCase() === channel.username.toLowerCase()),
   )
 
-  const [sub, setSub] = useState(isSubscribed(channel?.id || ""))
+  const [sub, setSub] = useState(false)
+  useEffect(() => {
+    setSub(isSubscribed(channel?.id || ""))
+  }, [channel?.id])
 
   const sortedVideos = useMemo(() => {
     return [...channelVideos].sort(
@@ -76,13 +94,13 @@ export function ChannelPage() {
         <section className="mb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
             <Avatar className="h-20 w-20 sm:h-24 sm:w-24 border-2 border-blue-200 flex-shrink-0">
-              <AvatarImage src={channel.avatar || "/blue-channel-avatar.png"} alt={channel.username || "Channel"} />
-              <AvatarFallback className="text-lg">{initials(channel.username)}</AvatarFallback>
+              <AvatarImage src={channel?.avatar || "/blue-channel-avatar.png"} alt={channel?.username || "Channel"} />
+              <AvatarFallback className="text-lg">{initials(channel?.username || "")}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl sm:text-3xl font-bold break-words hyphens-auto overflow-wrap-anywhere">
-                  {channel.username || "Unknown Channel"}
+                  {channel?.username || "Unknown Channel"}
                 </h1>
               </div>
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
