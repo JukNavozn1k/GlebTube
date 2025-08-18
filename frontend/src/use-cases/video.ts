@@ -23,6 +23,20 @@ export class VideoUseCases extends UseCases<Video> {
   async updateVideo(id: string, payload: { title?: string; description?: string; thumbnail?: string }) {
     return this.videoApi.updateVideo(id, payload);
   }
+
+  /**
+   * Fetch watch history
+   */
+  async fetchHistory() {
+    return this.videoApi.fetchHistory();
+  }
+
+  /**
+   * Clear watch history
+   */
+  async clearHistory() {
+    return this.videoApi.clearHistory();
+  }
 }
 
 export const videoUseCases = new VideoUseCases(videoApi);

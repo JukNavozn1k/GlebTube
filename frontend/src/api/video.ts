@@ -25,6 +25,21 @@ export class VideoApi extends Api<Video> {
     return res.data;
   }
 
+  /**
+   * Fetch watch history
+   */
+  async fetchHistory(): Promise<Video[]> {
+    const res = await this.apiClient.get<Video[]>(`/${this.prefix}/history`);
+    return res.data;
+  }
+
+  /**
+   * Clear watch history
+   */
+  async clearHistory(): Promise<void> {
+    await this.apiClient.delete(`/${this.prefix}/history/`);
+  }
+
   // Keep compatibility with base Api create/update if needed
   async create(data: unknown): Promise<Video> {
     return this.createVideo(data as { title: string; description: string; thumbnail: string; src: string });

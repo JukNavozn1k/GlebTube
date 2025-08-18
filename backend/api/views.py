@@ -119,7 +119,7 @@ class VideoView(ModelViewSet):
             )
             queryset = queryset.prefetch_related(prefetched_data)
             videos = [entry.video for entry in queryset]
-            serializer = serializers.VideoSerializer(videos, many=True)
+            serializer = serializers.VideoSerializer(videos, many=True, context={"request": request})
             return Response(serializer.data)
 
         elif request.method == 'DELETE':
