@@ -60,7 +60,7 @@ export function HistoryPage() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Очистить историю просмотров?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Действие необратимо. Вся история будет удалена на этом устройстве.
+                  Действие необратимо. Вся история будет удалена.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

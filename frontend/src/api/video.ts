@@ -40,6 +40,29 @@ export class VideoApi extends Api<Video> {
     await this.apiClient.delete(`/${this.prefix}/history/`);
   }
 
+  /**
+   * Fetch starred videos
+   * GET /video/?starred=true
+   */
+  async fetchStarred(): Promise<Video[]> {
+    const res = await this.apiClient.get<Video[]>(`/${this.prefix}/`, {
+      params: { starred: true },
+    });
+    return res.data;
+  }
+
+  /**
+   * Fetch videos by channel with optional starred filter
+   * GET /video/?channel=<id>&starred=<true|false|''>
+   */
+  async fetchByChannel(channel: number | string, opts?: { starred?: boolean }): Promise<Video[]> {
+    const starredParam = typeof opts?.starred === "boolean" ? opts.starred : "";
+    const res = await this.apiClient.get<Video[]>(`/${this.prefix}/`, {
+      params: { channel, starred: starredParam },
+    });
+    return res.data;
+  }
+
   // Keep compatibility with base Api create/update if needed
   async create(data: unknown): Promise<Video> {
     return this.createVideo(data as { title: string; description: string; thumbnail: string; src: string });

@@ -37,6 +37,20 @@ export class VideoUseCases extends UseCases<Video> {
   async clearHistory() {
     return this.videoApi.clearHistory();
   }
+
+  /**
+   * Fetch starred videos
+   */
+  async fetchStarred() {
+    return this.videoApi.fetchStarred();
+  }
+
+  /**
+   * Fetch videos by channel with optional starred filter
+   */
+  async fetchByChannel(channel: number | string, opts?: { starred?: boolean }) {
+    return this.videoApi.fetchByChannel(channel, opts);
+  }
 }
 
 export const videoUseCases = new VideoUseCases(videoApi);
