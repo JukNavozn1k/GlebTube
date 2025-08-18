@@ -1,6 +1,7 @@
 import type { User, UserUpdateData } from "@/types/user"
 import { userApi, type UserApi } from "@/api/user"
 import { UseCases } from "@/use-cases/use-cases"
+import type { UpdateUserProfilePayload } from "@/types/upload"
 
 export class UserUseCases extends UseCases<User> {
   private userApi: UserApi
@@ -13,6 +14,10 @@ export class UserUseCases extends UseCases<User> {
   // Specific use-cases
   async updateMe(data: UserUpdateData): Promise<User> {
     return this.userApi.updateMe(data)
+  }
+
+  async updateMyProfile(data: UpdateUserProfilePayload): Promise<User> {
+    return this.userApi.updateMyProfile(data)
   }
 }
 

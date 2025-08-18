@@ -2,6 +2,7 @@ import  {type User, type UserUpdateData} from "@/types/user"
 import type { AxiosInstance } from "axios"
 import { Api } from "@/api/api"
 import api from "@/api/client"
+import type { UpdateUserProfilePayload } from "@/types/upload"
 
 export class UserApi extends Api<User> {
   constructor(apiClient: AxiosInstance, prefix: string = "user") {
@@ -10,6 +11,17 @@ export class UserApi extends Api<User> {
 
   async updateMe(data: UserUpdateData): Promise<User> {
     const res = await this.apiClient.put<User>(`/${this.prefix}/me/`, data)
+    return res.data
+  }
+
+  /**
+   * Update current user via multipart/form-data (bio and/or avatar)
+   */
+  async updateMyProfile(data: UpdateUserProfilePayload): Promise<User> {
+    const form = new FormData()
+    if (typeof data.bio === "string") form.append("bio", data.bio)
+    if (data.avatar) form.append("avatar", data.avatar)
+    const res = await this.apiClient.put<User>(`/${this.prefix}/me/`, form)
     return res.data
   }
 }

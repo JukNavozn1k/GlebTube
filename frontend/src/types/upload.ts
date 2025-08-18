@@ -10,3 +10,14 @@ export type UpdateVideoPayload = {
   description?: string
   thumbnail?: File | null
 }
+
+// User profile upload/update payloads (separate from UserUpdateData in types/user.ts)
+export type UploadUserProfilePayload = {
+  bio?: string
+  avatar?: File | null
+}
+
+export type UpdateUserProfilePayload = {
+  bio?: string
+  avatar?: File | null
+}
