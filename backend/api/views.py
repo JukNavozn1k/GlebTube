@@ -1,190 +1,156 @@
-
-from rest_framework.viewsets import *
-from rest_framework import mixins
-from videos.models import Video,CommentVideo
-from auths.models import User
-from . import serializers
-
+from django.db.models import Count, Case, When, OuterRef, Exists, Value, BooleanField, Prefetch
 from django.shortcuts import get_object_or_404
-
-from rest_framework.response import Response
-from rest_framework.decorators import action,permission_classes
-
-from rest_framework.filters import SearchFilter,OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from .filters import UserFilter, VideoFilter, CommentFilter
+from rest_framework import mixins, status
+from rest_framework.decorators import action, permission_classes
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
-from . import permissions
-from rest_framework.permissions import IsAuthenticatedOrReadOnly,IsAuthenticated
-from django.db.models import Count,Case,When,Prefetch,OuterRef,Exists,Subquery,Value,BooleanField
+from auths.models import User
+from profiles.models import WatchHistory, Subscription
+from videos.models import Video, CommentVideo, UserVideoRelation, UserCommentRelation
 
-from videos.models import UserVideoRelation,CommentVideo,UserCommentRelation
+from . import serializers, permissions
 from watch import tasks
-from profiles.models import WatchHistory,Subscription
 
-class UserView(mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.UpdateModelMixin,GenericViewSet):
+
+class UserView(mixins.ListModelMixin,
+               mixins.RetrieveModelMixin,
+               mixins.UpdateModelMixin,
+               GenericViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
-    
-    permission_classes = [IsAuthenticatedOrReadOnly,permissions.EditUserPermission]
-    
-    filter_backends = [SearchFilter]
+    permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditUserPermission]
+    filter_backends = [SearchFilter, DjangoFilterBackend]
+    filterset_class = UserFilter
     search_fields = ['username']
+    filterset_fields = ['subscribed']
 
     def get_queryset(self):
         qs = User.objects.all()
         user = self.request.user
         if user.is_authenticated:
-            sub_q = Subscription.objects.filter(subscriber_id=user.id, channel_id=OuterRef('pk'), active=True)
+            sub_q = Subscription.objects.filter(
+                subscriber_id=user.id, channel_id=OuterRef('pk'), active=True
+            )
             qs = qs.annotate(subscribed=Exists(sub_q))
         else:
-            # для анонимов — просто False (чтобы поле всегда присутствовало)
             qs = qs.annotate(subscribed=Value(False, output_field=BooleanField()))
         return qs
-    
-    @action(detail=True,methods=['get'])
-    # ToDo add pagination to actions ... 
-    def history(self,request,pk):
-        queryset = WatchHistory.objects.filter(viewer_id=pk).order_by('-watch_time')
-        if request.user.is_authenticated:
-            subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('id'), grade=1)
-            prefetched_data = Prefetch('video', Video.objects.all().annotate(starred=Exists(subquery)) .select_related('channel'))
-            queryset = queryset.prefetch_related(prefetched_data)
-        else:
-            queryset = queryset.select_related('video__channel')
 
-     
-        queryset = [entry.video for entry in queryset]   
-                                                    
-        response_data = serializers.VideoSerializer(queryset,many=True)
-        return Response(response_data.data)
-
-
-    @action(detail=True,methods=['get'])
-    def user_videos(self,request,pk):
-        queryset = Video.objects.filter(channel_id=pk).select_related('channel')
-        if request.user.is_authenticated:
-            subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('pk'), grade=1)  
-            queryset = queryset.annotate(starred=Exists(subquery))                         
-        response_data = serializers.VideoSerializer(queryset,many=True)
-        return Response(response_data.data)
-
-    @action(detail=True,methods=['get'])
-    def user_liked(self,request,pk):
-        # List of user liked
-        subquery = UserVideoRelation.objects.filter(user_id=pk,grade=1).values('video_id')
-        queryset = Video.objects.filter(id__in=Subquery(subquery)).select_related('channel')
-        # Check if viewer rated
-        if request.user.is_authenticated:
-            subquery = UserVideoRelation.objects.filter(user_id=request.user.id,video_id=OuterRef('pk'),grade=1)
-            queryset = queryset.annotate(starred=Exists(subquery))                                             
-        response_data = serializers.VideoSerializer(queryset,many=True)
-        
-        return Response(response_data.data)
-    
-    @action(detail=True,methods=['get'])
-    def user_subscriptions(self,request,pk):
-        subs = Subscription.objects.filter(subscriber_id=pk,active=1)
-        subs = serializers.UserSerializer(subs,many=True)
-        return Response(subs.data)
-    
-
-    @action(detail=True,methods=['get'])
-    def user_subcribers(self,request,pk):
-        subs = Subscription.objects.filter(channel_id=pk,active=1)
-        subs = serializers.UserSerializer(subs,many=True)
-        return Response(subs.data)
-    
-
-    
     @action(detail=False, methods=['get', 'put'], permission_classes=[IsAuthenticated])
     def me(self, request):
         if request.method == 'GET':
-            serializer = self.get_serializer(request.user, many=False)
+            serializer = self.get_serializer(request.user)
             return Response(serializer.data)
-        
+
         elif request.method == 'PUT':
-            serializer = self.get_serializer(request.user, data=request.data, partial=True)  # Use partial=True if you want partial updates like PATCH
+            serializer = self.get_serializer(request.user, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
 
+    # @action(detail=True, methods=['get'])
+    # def user_subscriptions(self, request, pk):
+    #     subs = Subscription.objects.filter(subscriber_id=pk, active=True)
+    #     users = User.objects.filter(id__in=subs.values('channel_id'))
+    #     serializer = serializers.UserSerializer(users, many=True)
+    #     return Response(serializer.data)
 
 
 class CommentView(ModelViewSet):
-    queryset = CommentVideo.objects.all().annotate(baseStars=Count
-                                    (Case(When(comment_rates__grade = 1,then=1)))).select_related('channel','instance')
+    queryset = CommentVideo.objects.all().annotate(
+        baseStars=Count(Case(When(comment_rates__grade=1, then=1)))
+    ).select_related('channel', 'instance')
     serializer_class = serializers.CommentSerializer
-    
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
-    
-    filter_backends = [OrderingFilter,DjangoFilterBackend]
+    filter_backends = [OrderingFilter, DjangoFilterBackend]
     ordering_fields = ['baseStars']
     filterset_fields = ['instance']
-
-    
-    @action(methods=['post'],detail=True)
-    def rate(self,request,pk):
-        rate_obj,created = UserCommentRelation.objects.get_or_create(comment_id=pk,user=request.user)
-        grade = rate_obj.grade
-        if rate_obj.grade == 1: 
-            rate_obj.grade = 0
-        else: rate_obj.grade = 1
-      
-        rate_obj.save()
-
-        return Response({'starred': bool(rate_obj.grade)})
-
+    filterset_class = CommentFilter
     def get_queryset(self):
         queryset = super().get_queryset()
         if self.request.user.is_authenticated:
-            subquery = UserCommentRelation.objects.filter(comment_id=OuterRef('pk'),user=self.request.user,grade=1)
+            subquery = UserCommentRelation.objects.filter(
+                comment_id=OuterRef('pk'), user=self.request.user, grade=1
+            )
             queryset = queryset.annotate(starred=Exists(subquery))
         return queryset
+
     def perform_create(self, serializer):
         serializer.save(channel=self.request.user)
-    
+
+    @action(methods=['post'], detail=True)
+    def rate(self, request, pk):
+        rate_obj, _ = UserCommentRelation.objects.get_or_create(
+            comment_id=pk, user=request.user
+        )
+        rate_obj.grade = 0 if rate_obj.grade == 1 else 1
+        rate_obj.save()
+        return Response({'starred': bool(rate_obj.grade)})
 
 
 class VideoView(ModelViewSet):
-
-    queryset = Video.objects.all().select_related('channel') 
+    queryset = Video.objects.all().select_related('channel')
     serializer_class = serializers.VideoSerializer
-    
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
-    
-    filter_backends = [SearchFilter,OrderingFilter]
-    
+    filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
     search_fields = ['title']
-    ordering_fields = ['baseStars','views']
-    
-    @action(methods=['post'],detail=True)
-    def rate(self,request,pk):
-        rate_obj,created = UserVideoRelation.objects.get_or_create(video_id=pk,user=request.user)
-      
-        if rate_obj.grade == 1: 
-            rate_obj.grade = 0
-        else: rate_obj.grade = 1
-      
-        rate_obj.save()
-        
-        
-        return Response({'starred': bool(rate_obj.grade)})
+    ordering_fields = ['baseStars', 'views']
+    filterset_fields = ['channel', 'starred']
+    filterset_class = VideoFilter
+
+
+    @action(detail=False, methods=['get', 'delete'], permission_classes=[IsAuthenticated])
+    def history(self, request):
+        if request.method == 'GET':
+            queryset = WatchHistory.objects.filter(viewer=request.user).order_by('-watch_time')
+            subquery = UserVideoRelation.objects.filter(
+                user=request.user, video_id=OuterRef('id'), grade=1
+            )
+            prefetched_data = Prefetch(
+                'video',
+                queryset=Video.objects.all()
+                             .annotate(starred=Exists(subquery))
+                             .select_related('channel')
+            )
+            queryset = queryset.prefetch_related(prefetched_data)
+            videos = [entry.video for entry in queryset]
+            serializer = serializers.VideoSerializer(videos, many=True)
+            return Response(serializer.data)
+
+        elif request.method == 'DELETE':
+            deleted_count, _ = WatchHistory.objects.filter(viewer=request.user).delete()
+            return Response(
+                {"detail": f"History cleared. {deleted_count} items deleted."},
+                status=status.HTTP_204_NO_CONTENT
+            )
 
     def get_queryset(self):
         queryset = super().get_queryset()
-       
         if self.request.user.is_authenticated:
-            subquery = UserVideoRelation.objects.filter(video_id=OuterRef('pk'),user=self.request.user,grade=1)
+            subquery = UserVideoRelation.objects.filter(
+                video_id=OuterRef('pk'), user=self.request.user, grade=1
+            )
             queryset = queryset.annotate(starred=Exists(subquery))
         return queryset
-    
+
+    @action(methods=['post'], detail=True)
+    def rate(self, request, pk):
+        rate_obj, _ = UserVideoRelation.objects.get_or_create(video_id=pk, user=request.user)
+        rate_obj.grade = 0 if rate_obj.grade == 1 else 1
+        rate_obj.save()
+        return Response({'starred': bool(rate_obj.grade)})
+
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         tasks.refresh_views.delay(instance.id)
         if request.user.is_authenticated:
             tasks.refresh_history.delay(instance.id, request.user.id)
         return super().retrieve(request, *args, **kwargs)
-    
+
     def perform_create(self, serializer):
         serializer.save(channel=self.request.user)
-    

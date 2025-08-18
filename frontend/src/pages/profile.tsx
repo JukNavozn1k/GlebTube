@@ -108,11 +108,11 @@ export function ProfilePage() {
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <VideoIcon className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span>{uploads.length} видео</span>
+                  <span>{user.videoCount ?? 0} видео</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Users className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span>{subs.length} подписок</span>
+                  <span>{user.subscriberCount ?? 0} подписчиков</span>
                 </div>
                 {totalViews > 0 && (
                   <div className="flex items-center gap-1">

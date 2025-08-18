@@ -8,7 +8,7 @@ import { BottomNav } from "@/components/bottom-nav"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-import { Calendar, Users, VideoIcon, BarChart3 } from "lucide-react"
+import { Calendar, Users, VideoIcon } from "lucide-react"
 import type { User } from "@/types/user"
 import type { Video } from "@/types/video"
 import { userUseCases } from "@/use-cases/user"
@@ -69,8 +69,7 @@ export function ChannelPage() {
     )
   }, [channelVideos])
 
-  const totalViews = channelVideos.reduce((sum, v) => sum + v.views, 0)
-  const subscriberCount = channel?.subscriberCount || Math.floor(Math.random() * 50000) + 1000
+  const subscriberCount = channel?.subscriberCount ?? 0
   const joinYear = channel?.joinedAt ? new Date(channel.joinedAt).getFullYear() : 2023
 
   if (!channel) {
@@ -110,7 +109,7 @@ export function ChannelPage() {
                 </div>
                 <div className="flex items-center gap-1">
                   <VideoIcon className="h-4 w-4 flex-shrink-0" />
-                  <span>{channelVideos.length} видео</span>
+                  <span>{channel?.videoCount ?? 0} видео</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4 flex-shrink-0" />
@@ -135,7 +134,7 @@ export function ChannelPage() {
 
         {/* Tabs */}
         <Tabs defaultValue="videos" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="videos" className="flex items-center gap-1 py-1.5 px-2">
               <VideoIcon className="h-4 w-4 flex-shrink-0" />
               <span className="text-xs hidden md:inline">Видео</span>
@@ -143,10 +142,6 @@ export function ChannelPage() {
             <TabsTrigger value="about" className="flex items-center gap-1 py-1.5 px-2">
               <Users className="h-4 w-4 flex-shrink-0" />
               <span className="text-xs hidden md:inline">О канале</span>
-            </TabsTrigger>
-            <TabsTrigger value="stats" className="flex items-center gap-1 py-1.5 px-2">
-              <BarChart3 className="h-4 w-4 flex-shrink-0" />
-              <span className="text-xs hidden md:inline">Статистика</span>
             </TabsTrigger>
           </TabsList>
 
@@ -178,9 +173,7 @@ export function ChannelPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="stats" className="mt-0">
-            <div>Общая статистика канала</div>
-          </TabsContent>
+          
         </Tabs>
       </main>
       <BottomNav />
