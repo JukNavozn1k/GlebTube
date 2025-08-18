@@ -3,9 +3,9 @@ import { Link, useParams } from "react-router-dom"
 import { StarButton } from "@/components/star-button"
 import { Comments } from "@/components/comments"
 
-import { formatViews, formatDuration, timeAgo } from "@/utils/format"
+import { formatViews, timeAgo } from "@/utils/format"
 import type { Video } from "@/types/video"
-import { addHistory, isSubscribed, toggleSubscription } from "@/utils/storage"
+import { addHistory, isSubscribed, toggleChannelSubscription } from "@/utils/storage"
 import { Button } from "@/components/ui/button"
 import { BottomNav } from "@/components/bottom-nav"
 import { CustomPlayer } from "@/components/custom-player"
@@ -97,6 +97,7 @@ export function WatchPage() {
               {video.title}
             </h1>
 
+            {/* Channel info with subscription button aligned */}
             <div className="flex items-start gap-3 min-w-0">
               <Link to={`/channel/${channelSlug(video.channel.id)}`} className="flex-shrink-0">
                 <div className="h-10 w-10 rounded-full overflow-hidden border border-blue-200 bg-blue-50 flex items-center justify-center">
@@ -129,7 +130,14 @@ export function WatchPage() {
                         ? "bg-blue-600 text-white hover:bg-blue-700 flex-shrink-0"
                         : "border-blue-200 text-blue-700 hover:bg-blue-50 flex-shrink-0"
                     }
-                    onClick={() => setSub(toggleSubscription(video.channel.id))}
+                    onClick={() => {
+                      const newSubscribed = toggleChannelSubscription(video.channel.id)
+                      setSub(newSubscribed)
+                      // Update the video channel object as well
+                      if (video.channel) {
+                        video.channel.subscribed = newSubscribed
+                      }
+                    }}
                   >
                     {sub ? "Вы подписаны" : "Подписаться"}
                   </Button>
@@ -146,6 +154,7 @@ export function WatchPage() {
             <ExpandableDescription text={video.description} />
           </div>
 
+          {/* Comments: toggle visible on <lg (phones/tablets) */}
           <div className="lg:hidden min-w-0">
             <ToggleComments videoId={video.id} />
           </div>
@@ -164,17 +173,14 @@ export function WatchPage() {
                 <Link key={v.id} to={`/watch/${v.id}`} className="flex gap-3 group min-w-0">
                   <div className="relative aspect-video w-40 min-w-40 rounded-md overflow-hidden bg-blue-50 flex-shrink-0">
                     <img
-                      src={
-                        v.thumbnail ||
-                        "/placeholder.svg?height=90&width=160&query=video%20thumb%20blue%20white"
-                      }
+                      src={v.thumbnail || "/placeholder.svg?height=90&width=160&query=video%20thumb%20blue%20white"}
                       alt={`Thumbnail ${v.title}`}
                       width={160}
                       height={90}
                       className="object-cover w-full h-full"
                     />
                     <div className="absolute bottom-1 right-1 px-1 rounded bg-black/70 text-white text-[10px]">
-                      {formatDuration(v.duration)}
+                      {v.duration}
                     </div>
                   </div>
                   <div className="min-w-0 flex-1">

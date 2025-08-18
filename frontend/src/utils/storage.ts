@@ -228,3 +228,65 @@ export function toggleSubscription(channelId: string): boolean {
 }
 
 export { HISTORY_KEY } // in case it's useful elsewhere
+
+/* Simplified subscription system */
+export function getSubscribedChannelIds(): string[] {
+  if (typeof window === "undefined") return []
+  return safeParse(localStorage.getItem(SUBS_KEY), [])
+}
+
+
+export function toggleChannelSubscription(channelId: string): boolean {
+  if (typeof window === "undefined") return false
+  const subscribedIds = new Set(getSubscribedChannelIds())
+
+  if (subscribedIds.has(channelId)) {
+    subscribedIds.delete(channelId)
+  } else {
+    subscribedIds.add(channelId)
+  }
+
+  const arr = Array.from(subscribedIds)
+  localStorage.setItem(SUBS_KEY, JSON.stringify(arr))
+  return arr.includes(channelId)
+}
+
+/* Video starring system using starred field */
+export function updateVideoStarred(videoId: string, starred: boolean): void {
+  if (typeof window === "undefined") return
+
+  // Update in uploads
+  const uploads = getUploads()
+  const uploadIndex = uploads.findIndex((v) => v.id === videoId)
+  if (uploadIndex !== -1) {
+    uploads[uploadIndex].starred = starred
+    localStorage.setItem(UPLOADS_KEY, JSON.stringify(uploads))
+  }
+
+  // For built-in videos, store starred state separately since we can't modify the original data
+  const builtinStars = safeParse<Record<string, boolean>>(localStorage.getItem("glebtube:builtin-stars"), {})
+  builtinStars[videoId] = starred
+  localStorage.setItem("glebtube:builtin-stars", JSON.stringify(builtinStars))
+}
+
+export function getVideoStarred(videoId: string): boolean {
+  if (typeof window === "undefined") return false
+
+  // Check uploads first
+  const uploads = getUploads()
+  const upload = uploads.find((v) => v.id === videoId)
+  if (upload) {
+    return upload.starred
+  }
+
+  // Check built-in videos starred state
+  const builtinStars = safeParse<Record<string, boolean>>(localStorage.getItem("glebtube:builtin-stars"), {})
+  return builtinStars[videoId] || false
+}
+
+export function toggleVideoStarred(videoId: string): boolean {
+  const currentStarred = getVideoStarred(videoId)
+  const newStarred = !currentStarred
+  updateVideoStarred(videoId, newStarred)
+  return newStarred
+}

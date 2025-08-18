@@ -1,4 +1,3 @@
-
 import { useEffect, useMemo, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -24,6 +23,16 @@ import {
   TrendingUp,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 type CommentsProps = {
   videoId: string
@@ -40,6 +49,7 @@ export function Comments({ videoId }: CommentsProps) {
   const [editingComment, setEditingComment] = useState<string | null>(null)
   const [editText, setEditText] = useState<string>("")
   const [sortBy, setSortBy] = useState<SortOption>("newest")
+  const [commentToDelete, setCommentToDelete] = useState<string | null>(null)
   const { user } = useUser()
   const { auth } = useAuth()
 
@@ -57,7 +67,7 @@ export function Comments({ videoId }: CommentsProps) {
   const currentUser = useMemo(
     () => ({
       id: user.id || "me",
-      username: auth.username || user.username || "User",
+      name: auth.username || user.name || "User",
       avatar: user.avatar,
     }),
     [user, auth.username],
@@ -261,7 +271,10 @@ export function Comments({ videoId }: CommentsProps) {
                           <Edit className="h-4 w-4 mr-2" />
                           Редактировать
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onRemove(c.id)} className="text-red-600 focus:text-red-700">
+                        <DropdownMenuItem
+                          onClick={() => setCommentToDelete(c.id)}
+                          className="text-red-600 focus:text-red-700"
+                        >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Удалить
                         </DropdownMenuItem>
@@ -426,7 +439,7 @@ export function Comments({ videoId }: CommentsProps) {
                                       Редактировать
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
-                                      onClick={() => onRemove(r.id)}
+                                      onClick={() => setCommentToDelete(r.id)}
                                       className="text-red-600 focus:text-red-700"
                                     >
                                       <Trash2 className="h-4 w-4 mr-2" />
@@ -508,6 +521,32 @@ export function Comments({ videoId }: CommentsProps) {
           <div className="text-sm text-muted-foreground">Пока нет комментариев. Будьте первым!</div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!commentToDelete} onOpenChange={() => setCommentToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Удалить комментарий?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Действие необратимо. Комментарий и все ответы к нему будут удалены.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Отмена</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={() => {
+                if (commentToDelete) {
+                  onRemove(commentToDelete)
+                  setCommentToDelete(null)
+                }
+              }}
+            >
+              Удалить
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   )
 }

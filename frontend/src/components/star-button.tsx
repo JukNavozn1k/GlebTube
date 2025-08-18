@@ -1,7 +1,8 @@
+
 import { useEffect, useState } from "react"
 import { Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { isVideoStarred, toggleVideoStar } from "@/utils/storage"
+import { getVideoStarred, toggleVideoStarred } from "@/utils/storage"
 
 type StarButtonProps = {
   videoId: string
@@ -21,11 +22,11 @@ export function StarButton({
   const [starred, setStarred] = useState<boolean>(false)
 
   useEffect(() => {
-    setStarred(isVideoStarred(videoId))
+    setStarred(getVideoStarred(videoId))
   }, [videoId])
 
   const handleToggle = () => {
-    const newStarred = toggleVideoStar(videoId)
+    const newStarred = toggleVideoStarred(videoId)
     setStarred(newStarred)
   }
 
@@ -50,3 +51,4 @@ export function StarButton({
     </div>
   )
 }
+

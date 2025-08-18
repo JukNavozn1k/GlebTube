@@ -9,8 +9,8 @@ export type User = {
   joinedAt?: string
   location?: string
   website?: string
+  subscribed: boolean // Новое поле для упрощения подписок
 }
-
 
 export type AuthState = {
   loggedIn: boolean
