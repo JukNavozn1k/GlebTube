@@ -7,21 +7,35 @@ import { videos as builtins } from "@/lib/glebtube-data"
 import { getUploads } from "@/lib/glebtube-storage"
 import { type Video, type UploadedVideo } from "@/types/video"
 import { ChannelCard } from "@/components/channel-card"
-import { useSearchParams, useNavigate, useLocation } from "react-router-dom"
+import { useSearchParams } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
 import type { User } from "@/types/user"
+import { userUseCases } from "@/use-cases/user"
 
 export function ChannelsPage() {
   const [uploads, setUploads] = useState<UploadedVideo[]>([])
+  const [users, setUsers] = useState<User[]>([])
   const [searchParams, setSearchParams] = useSearchParams()
-  const navigate = useNavigate()
-  const location = useLocation()
 
   const qParam = (searchParams.get("q") || "").trim()
   const [q, setQ] = useState(qParam)
 
   useEffect(() => setUploads(getUploads()), [])
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const list = await userUseCases.fetchList()
+        if (!cancelled) setUsers(list)
+      } catch (e) {
+        if (!cancelled) setUsers([])
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
   useEffect(() => {
     setQ(qParam)
   }, [qParam])
@@ -29,22 +43,11 @@ export function ChannelsPage() {
   const all: Video[] = useMemo(() => [...uploads, ...builtins], [uploads])
 
   const grouped = useMemo(() => {
-    const channelMap = new Map<string, { channel: User; videos: Video[] }>()
-
-    for (const video of all) {
-      const channelId = video.channel.id
-
-      if (!channelMap.has(channelId)) {
-        channelMap.set(channelId, {
-          channel: video.channel,
-          videos: [],
-        })
-      }
-
-      channelMap.get(channelId)!.videos.push(video)
-    }
-
-    let channelList = Array.from(channelMap.values())
+    // Build list from real users; attach their videos from available lists
+    let channelList = users.map((u) => ({
+      channel: u,
+      videos: all.filter((v) => v.channel.id === u.id),
+    }))
 
     // Filter by search query
     if (q) {
@@ -64,7 +67,7 @@ export function ChannelsPage() {
     })
 
     return channelList
-  }, [all, q])
+  }, [users, all, q])
 
   function onSubmit(e?: React.FormEvent) {
     e?.preventDefault()
