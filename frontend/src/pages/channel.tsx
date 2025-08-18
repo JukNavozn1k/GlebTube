@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router-dom" // <-- заменено
-import { videos as builtins, formatViews } from "@/lib/glebtube-data"
-import { getUploads, isSubscribed, toggleSubscription } from "@/utils/storage"
+import { formatViews } from "@/utils/format"
+import { isSubscribed, toggleSubscription } from "@/utils/storage"
 import { Button } from "@/components/ui/button"
 import { VideoCard } from "@/components/video-card"
 import { BottomNav } from "@/components/bottom-nav"
@@ -12,6 +12,7 @@ import { Calendar, Users, VideoIcon } from "lucide-react"
 import type { User } from "@/types/user"
 import type { Video } from "@/types/video"
 import { userUseCases } from "@/use-cases/user"
+import { videoUseCases } from "@/use-cases/video"
 
 function nameFromSlug(slug: string) {
   return decodeURIComponent(String(slug))
@@ -26,25 +27,37 @@ function initials(username?: string) {
 
 export function ChannelPage() {
   const { slug } = useParams<{ slug: string }>() // <-- react-router-dom
-  const uploads = getUploads()
-  const all: Video[] = useMemo(() => [...uploads, ...builtins], [uploads])
-
   const [channel, setChannel] = useState<User | null>(null)
+  const [videos, setVideos] = useState<Video[]>([])
+  const [loading, setLoading] = useState(false)
 
   // Fetch channel by ID using user use-cases; slug is treated as ID
   useEffect(() => {
     const id = nameFromSlug(slug || "")
     if (!id) {
       setChannel(null)
+      setVideos([])
       return
     }
     let cancelled = false
+    setLoading(true)
     ;(async () => {
       try {
-        const user = await userUseCases.fetchById(id)
-        if (!cancelled) setChannel(user)
+        const [user, vids] = await Promise.all([
+          userUseCases.fetchById(id),
+          videoUseCases.fetchByChannel(id),
+        ])
+        if (!cancelled) {
+          setChannel(user)
+          setVideos(vids)
+        }
       } catch (e) {
-        if (!cancelled) setChannel(null)
+        if (!cancelled) {
+          setChannel(null)
+          setVideos([])
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
       }
     })()
     return () => {
@@ -52,22 +65,16 @@ export function ChannelPage() {
     }
   }, [slug])
 
-  const channelVideos = all.filter(
-    (v) =>
-      v.channel?.id === channel?.id ||
-      (!!channel?.username && v.channel?.username?.toLowerCase() === channel.username.toLowerCase()),
-  )
-
   const [sub, setSub] = useState(false)
   useEffect(() => {
     setSub(isSubscribed(channel?.id || ""))
   }, [channel?.id])
 
   const sortedVideos = useMemo(() => {
-    return [...channelVideos].sort(
+    return [...videos].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     )
-  }, [channelVideos])
+  }, [videos])
 
   const subscriberCount = channel?.subscriberCount ?? 0
   const joinYear = channel?.joinedAt ? new Date(channel.joinedAt).getFullYear() : 2023
@@ -146,7 +153,9 @@ export function ChannelPage() {
           </TabsList>
 
           <TabsContent value="videos" className="mt-0">
-            {sortedVideos.length === 0 ? (
+            {loading ? (
+              <div className="text-sm text-muted-foreground">Загрузка...</div>
+            ) : sortedVideos.length === 0 ? (
               <div className="text-center py-12">
                 <VideoIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Нет видео</h3>
