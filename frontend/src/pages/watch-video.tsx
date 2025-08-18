@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom"
 import { StarButton } from "@/components/star-button"
 import { Comments } from "@/components/comments"
 
-import { formatViews, timeAgo } from "@/utils/format"
+import { formatViews, timeAgo, formatDuration } from "@/utils/format"
 import type { Video } from "@/types/video"
 import { addHistory, isSubscribed, toggleChannelSubscription } from "@/utils/storage"
 import { Button } from "@/components/ui/button"
@@ -35,6 +35,7 @@ export function WatchPage() {
   const [video, setVideo] = useState<Video | null>(null)
   const [recommended, setRecommended] = useState<Video[]>([])
   const [sub, setSub] = useState(false)
+
   const [theater, setTheater] = useState(false)
   const videoUseCase = useMemo(() => new VideoUseCases(), [])
 
@@ -47,6 +48,7 @@ export function WatchPage() {
         ]);
         setVideo(v);
         setRecommended(list.filter((item) => item.id !== id).slice(0, 6));
+       
         if (v?.channel?.id) setSub(isSubscribed(v.channel.id));
       } catch (error) {
         console.error("Failed to load video or recommendations:", error);
@@ -147,7 +149,7 @@ export function WatchPage() {
                 </div>
               </div>
               <div className="flex-shrink-0">
-                <StarButton videoId={video.id} baseCount={video.baseStars} />
+                <StarButton videoId={video.id} starred={video.starred} baseCount={video.baseStars} />
               </div>
             </div>
 
@@ -180,7 +182,7 @@ export function WatchPage() {
                       className="object-cover w-full h-full"
                     />
                     <div className="absolute bottom-1 right-1 px-1 rounded bg-black/70 text-white text-[10px]">
-                      {v.duration}
+                      {formatDuration(v.duration)}
                     </div>
                   </div>
                   <div className="min-w-0 flex-1">
