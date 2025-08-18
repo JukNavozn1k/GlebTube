@@ -1,10 +1,11 @@
 import type { AxiosInstance } from "axios";
 import type { Video } from "@/types/video";
 import { Api } from "@/api/api";
+import api from "@/api/client";
 
 export class VideoApi extends Api<Video> {
-  constructor(apiClient: AxiosInstance) {
-    super("video", apiClient);
+  constructor(apiClient: AxiosInstance, prefix: string = "video") {
+    super(prefix, apiClient);
   }
 
   /**
@@ -12,7 +13,7 @@ export class VideoApi extends Api<Video> {
    * Accepts only the required fields for POST: title, description, thumbnail, src
    */
   async createVideo(data: { title: string; description: string; thumbnail: string; src: string }): Promise<Video> {
-    const res = await this.apiClient.post<Video>(`/`, data);
+    const res = await this.apiClient.post<Video>(`/${this.prefix}/`, data);
     return res.data;
   }
 
@@ -20,7 +21,7 @@ export class VideoApi extends Api<Video> {
    * Update an existing video (partial fields allowed): title, description, thumbnail
    */
   async updateVideo(id: string, data: { title?: string; description?: string; thumbnail?: string }): Promise<Video> {
-    const res = await this.apiClient.put<Video>(`$/${id}`, data);
+    const res = await this.apiClient.put<Video>(`/${this.prefix}/${id}`, data);
     return res.data;
   }
 
@@ -33,3 +34,5 @@ export class VideoApi extends Api<Video> {
     return this.updateVideo(id, data as { title?: string; description?: string; thumbnail?: string });
   }
 }
+
+export const videoApi = new VideoApi(api, "video");

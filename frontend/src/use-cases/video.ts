@@ -1,23 +1,33 @@
-import { UseCases } from "@/use-cases/use-cases";
-import api from "@/api/client";
-import { VideoApi } from "@/api/video";
+import { videoApi, type VideoApi } from "@/api/video";
 import type { Video } from "@/types/video";
 
-export class VideoUseCases extends UseCases<Video> {
+export class VideoUseCases {
   private videoApi: VideoApi;
 
-  constructor() {
-    const videoApi = new VideoApi(api);
-    super({
-      list: () => videoApi.list(),
-      get: (id: string) => videoApi.get(id),
-      create: (data: unknown) => videoApi.create(data),
-      update: (id: string, data: unknown) => videoApi.update(id, data),
-      delete: (id: string) => videoApi.delete(id),
-    });
+  constructor(videoApi: VideoApi) {
     this.videoApi = videoApi;
   }
 
+  // CRUD passthroughs
+  async list(): Promise<Video[]> {
+    return this.videoApi.list();
+  }
+
+  async get(id: string): Promise<Video> {
+    return this.videoApi.get(id);
+  }
+
+  async create(data: unknown): Promise<Video> {
+    return this.videoApi.create(data);
+  }
+
+  async update(id: string, data: unknown): Promise<Video> {
+    return this.videoApi.update(id, data);
+  }
+
+  async delete(id: string): Promise<Record<string, unknown>> {
+    return this.videoApi.delete(id);
+  }
 
   /**
    * Create video with required fields
@@ -33,3 +43,5 @@ export class VideoUseCases extends UseCases<Video> {
     return this.videoApi.updateVideo(id, payload);
   }
 }
+
+export const videoUseCases = new VideoUseCases(videoApi);
