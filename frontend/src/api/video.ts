@@ -1,5 +1,6 @@
 import type { AxiosInstance } from "axios";
 import type { Video } from "@/types/video";
+import type { UploadVideoPayload, UpdateVideoPayload } from "@/types/upload";
 import { Api } from "@/api/api";
 import api from "@/api/client";
 
@@ -9,19 +10,27 @@ export class VideoApi extends Api<Video> {
   }
 
   /**
-   * Create a new video.
-   * Accepts only the required fields for POST: title, description, thumbnail, src
+   * Create a new video via multipart/form-data
    */
-  async createVideo(data: { title: string; description: string; thumbnail: string; src: string }): Promise<Video> {
-    const res = await this.apiClient.post<Video>(`/${this.prefix}/`, data);
+  async createVideo(data: UploadVideoPayload): Promise<Video> {
+    const form = new FormData();
+    form.append("title", data.title);
+    form.append("description", data.description);
+    form.append("src", data.src);
+    if (data.thumbnail) form.append("thumbnail", data.thumbnail);
+    const res = await this.apiClient.post<Video>(`/${this.prefix}/`, form);
     return res.data;
   }
 
   /**
-   * Update an existing video (partial fields allowed): title, description, thumbnail
+   * Update an existing video via multipart/form-data (partial fields allowed)
    */
-  async updateVideo(id: string, data: { title?: string; description?: string; thumbnail?: string }): Promise<Video> {
-    const res = await this.apiClient.put<Video>(`/${this.prefix}/${id}`, data);
+  async updateVideo(id: string, data: UpdateVideoPayload): Promise<Video> {
+    const form = new FormData();
+    if (typeof data.title === "string") form.append("title", data.title);
+    if (typeof data.description === "string") form.append("description", data.description);
+    if (data.thumbnail) form.append("thumbnail", data.thumbnail);
+    const res = await this.apiClient.put<Video>(`/${this.prefix}/${id}/`, form);
     return res.data;
   }
 
@@ -65,11 +74,11 @@ export class VideoApi extends Api<Video> {
 
   // Keep compatibility with base Api create/update if needed
   async create(data: unknown): Promise<Video> {
-    return this.createVideo(data as { title: string; description: string; thumbnail: string; src: string });
+    return this.createVideo(data as UploadVideoPayload);
   }
 
   async update(id: string, data: unknown): Promise<Video> {
-    return this.updateVideo(id, data as { title?: string; description?: string; thumbnail?: string });
+    return this.updateVideo(id, data as UpdateVideoPayload);
   }
 }
 

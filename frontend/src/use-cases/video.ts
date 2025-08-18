@@ -1,5 +1,6 @@
 import { videoApi, type VideoApi } from "@/api/video";
 import type { Video } from "@/types/video";
+import type { UploadVideoPayload, UpdateVideoPayload } from "@/types/upload";
 import { UseCases } from "@/use-cases/use-cases";
 
 export class VideoUseCases extends UseCases<Video> {
@@ -13,14 +14,14 @@ export class VideoUseCases extends UseCases<Video> {
   /**
    * Create video with required fields
    */
-  async createVideo(payload: { title: string; description: string; thumbnail: string; src: string }) {
+  async createVideo(payload: UploadVideoPayload) {
     return this.videoApi.createVideo(payload);
   }
 
   /**
    * Update video with allowed fields
    */
-  async updateVideo(id: string, payload: { title?: string; description?: string; thumbnail?: string }) {
+  async updateVideo(id: string, payload: UpdateVideoPayload) {
     return this.videoApi.updateVideo(id, payload);
   }
 
