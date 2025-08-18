@@ -5,6 +5,7 @@ export type User = {
   avatar?: string
   bio?: string
   subscriberCount?: number
+  baseStars?: number
   videoCount?: number
   joinedAt?: string
   location?: string

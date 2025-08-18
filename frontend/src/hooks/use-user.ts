@@ -5,7 +5,7 @@ import {type User} from "@/types/user"
 import { useAuth } from "@/contexts/auth-context"
 
 const AVATAR_KEY = "glebtube:user:avatar"
-const DESC_KEY = "glebtube:user:desc"
+const BIO_KEY = "glebtube:user:bio"
 
 export function useUser() {
   const { auth } = useAuth()
@@ -15,7 +15,7 @@ export function useUser() {
     useEffect(() => {
       if (typeof window === "undefined") return
       const savedAvatar = localStorage.getItem(AVATAR_KEY)
-      const savedDesc = localStorage.getItem(DESC_KEY)
+      const savedBio = localStorage.getItem(BIO_KEY)
 
       // If auth.currentUser is present, prefer fields from it. Otherwise fall back to auth.username and local storage.
       const profile = auth.currentUser
@@ -24,9 +24,8 @@ export function useUser() {
         ...u,
         id: profile ? String(profile.id) : u.id,
         username: profile?.username || auth.username || u.username,
-        username: profile?.username || u.username,
         avatar: profile?.avatar ?? savedAvatar ?? u.avatar,
-        description: profile?.bio ?? savedDesc ?? u.description ?? "",
+        bio: profile?.bio ?? savedBio ?? u.bio ?? "",
         baseStars: profile?.baseStars ?? u.baseStars,
         subscriberCount: profile?.subscriberCount ?? u.subscriberCount,
       }))
@@ -37,12 +36,12 @@ export function useUser() {
     setUser((u) => ({ ...u, avatar: dataUrl }))
   }
 
-  function setDescription(desc: string) {
-    localStorage.setItem(DESC_KEY, desc)
-    setUser((u) => ({ ...u, description: desc }))
+  function setBio(bio: string) {
+    localStorage.setItem(BIO_KEY, bio)
+    setUser((u) => ({ ...u, bio: bio }))
   }
 
-  return { user, setAvatarFile, setDescription }
+  return { user, setAvatarFile, setBio }
 }
 
 function fileToDataUrl(file: File): Promise<string> {
