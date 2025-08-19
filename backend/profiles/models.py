@@ -18,10 +18,14 @@ class WatchHistory(models.Model):
         verbose_name='Время просмотра',
         auto_now_add=True
     )
+      def __str__(self):
+            return f"{self.viewer} смотрел '{self.video.title}' в {self.watch_time.strftime('%Y-%m-%d %H:%M')}"
       class Meta:
         verbose_name = 'Просмотр'
         verbose_name_plural = 'История просмотров'
         unique_together = ('viewer', 'video')
+
+      
 
 class Subscription(models.Model):
       '''
