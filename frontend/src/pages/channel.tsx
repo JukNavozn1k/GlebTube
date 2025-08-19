@@ -13,7 +13,7 @@ import type { User } from "@/types/user"
 import type { Video } from "@/types/video"
 import { userUseCases } from "@/use-cases/user"
 import { videoUseCases } from "@/use-cases/video"
-
+import { useUser } from "@/hooks/use-user"
 function nameFromSlug(slug: string) {
   return decodeURIComponent(String(slug))
 }
@@ -30,6 +30,7 @@ export function ChannelPage() {
   const [channel, setChannel] = useState<User | null>(null)
   const [videos, setVideos] = useState<Video[]>([])
   const [loading, setLoading] = useState(false)
+  const { user } = useUser()
 
   // Fetch channel by ID using user use-cases; slug is treated as ID
   useEffect(() => {
@@ -126,26 +127,25 @@ export function ChannelPage() {
                 </div>
               </div>
             </div>
+            {String(user.id) !== String(channel?.id) && (
             <Button
-              size="lg"
+              size="sm"
               variant={sub ? "default" : "outline"}
               className={
-                sub
-                  ? "bg-blue-600 text-white hover:bg-blue-700 flex-shrink-0"
-                  : "border-blue-200 text-blue-700 hover:bg-blue-50 flex-shrink-0"
+                sub ? "bg-blue-600 text-white hover:bg-blue-700" : "border-blue-200 text-blue-700 hover:bg-blue-50"
               }
               onClick={async () => {
-                if (!channel?.id) return
                 try {
-                  const res = await userUseCases.subscribe(channel.id)
+                  const res = await userUseCases.subscribe(channel!.id)
                   setSub(res.subscribed)
                 } catch (e) {
                   console.error("Failed to toggle subscription:", e)
                 }
               }}
             >
-              {sub ? "Вы подписаны" : "Подписаться"}
+              {sub ? "Подписан" : "Подписаться"}
             </Button>
+          )}
           </div>
         </section>
 

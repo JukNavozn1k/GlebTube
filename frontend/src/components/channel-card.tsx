@@ -7,6 +7,7 @@ import { useState } from "react"
 import { Users, VideoIcon } from "lucide-react"
 import { formatViews } from "@/utils/format"
 import { userUseCases } from "@/use-cases/user"
+import { useUser } from "@/hooks/use-user"
 
 type ChannelCardProps = {
   channel: User | null
@@ -15,6 +16,7 @@ type ChannelCardProps = {
 
 export function ChannelCard({ channel, videos }: ChannelCardProps) {
   const [sub, setSub] = useState(() => (!!channel?.subscribed))
+  const { user } = useUser()
 
   // Защита от undefined channel
   if (!channel) {
@@ -64,23 +66,25 @@ export function ChannelCard({ channel, videos }: ChannelCardProps) {
           {channel.bio && <p className="text-sm text-muted-foreground line-clamp-2">{channel.bio}</p>}
         </div>
 
-        <Button
-          size="sm"
-          variant={sub ? "default" : "outline"}
-          className={
-            sub ? "bg-blue-600 text-white hover:bg-blue-700" : "border-blue-200 text-blue-700 hover:bg-blue-50"
-          }
-          onClick={async () => {
-            try {
-              const res = await userUseCases.subscribe(channel.id)
-              setSub(res.subscribed)
-            } catch (e) {
-              console.error("Failed to toggle subscription:", e)
+        {String(user.id) !== String(channel.id) && (
+          <Button
+            size="sm"
+            variant={sub ? "default" : "outline"}
+            className={
+              sub ? "bg-blue-600 text-white hover:bg-blue-700" : "border-blue-200 text-blue-700 hover:bg-blue-50"
             }
-          }}
-        >
-          {sub ? "Подписан" : "Подписаться"}
-        </Button>
+            onClick={async () => {
+              try {
+                const res = await userUseCases.subscribe(channel.id)
+                setSub(res.subscribed)
+              } catch (e) {
+                console.error("Failed to toggle subscription:", e)
+              }
+            }}
+          >
+            {sub ? "Подписан" : "Подписаться"}
+          </Button>
+        )}
       </div>
     </div>
   )
