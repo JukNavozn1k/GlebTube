@@ -97,14 +97,16 @@ class CommentVideo(models.Model):
     class Meta:
          verbose_name = 'Комментарий-Видео'
          verbose_name_plural = 'Коментарии-Видео'
-    def save(self, *args, **kwargs):
+    def clean(self):
         if self.parent:
-            # Проверка, чтобы родительский комментарий был того же видео
             if self.parent.instance_id != self.instance_id:
                 raise ValidationError("Родительский комментарий должен быть того же видео.")
-            # Ограничение уровня вложенности: родитель не должен быть ответом на другой комментарий
             if self.parent.parent is not None:
                 raise ValidationError("Можно создавать только один уровень вложенности комментариев.")
+
+    def save(self, *args, **kwargs):
+        # при сохранении в коде вне админки, лучше всё равно вызывать clean()
+        self.full_clean()
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
