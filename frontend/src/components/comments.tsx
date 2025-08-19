@@ -74,7 +74,7 @@ export function Comments({ videoId }: CommentsProps) {
   )
 
   const roots = useMemo(() => {
-    const rootComments = items.filter((c) => !c.parentId)
+    const rootComments = items.filter((c) => !c.parent)
 
     // Сортируем корневые комментарии
     switch (sortBy) {
@@ -92,9 +92,9 @@ export function Comments({ videoId }: CommentsProps) {
   const repliesByParent = useMemo(() => {
     const map = new Map<string, Comment[]>()
     for (const c of items) {
-      if (!c.parentId) continue
-      if (!map.has(c.parentId)) map.set(c.parentId, [])
-      map.get(c.parentId)!.push(c)
+      if (!c.parent) continue
+      if (!map.has(c.parent)) map.set(c.parent, [])
+      map.get(c.parent)!.push(c)
     }
     // Ответы всегда сортируем по дате (новые сначала)
     for (const arr of map.values()) {
@@ -111,14 +111,14 @@ export function Comments({ videoId }: CommentsProps) {
     setText("")
   }
 
-  function submitReply(parentId: string) {
+  function submitReply(parent: string) {
     const val = replyText.trim()
     if (!val) return
-    const c = addComment(videoId, val, currentUser, parentId)
+    const c = addComment(videoId, val, currentUser, parent)
     setItems((prev) => [c, ...prev])
     setReplyText("")
     setReplyTo(null)
-    setOpenReplies((s) => ({ ...s, [parentId]: true }))
+    setOpenReplies((s) => ({ ...s, [parent]: true }))
   }
 
   function startEdit(comment: Comment) {
@@ -144,7 +144,7 @@ export function Comments({ videoId }: CommentsProps) {
 
   function onRemove(id: string) {
     removeComment(videoId, id)
-    setItems((prev) => prev.filter((c) => c.id !== id && c.parentId !== id))
+    setItems((prev) => prev.filter((c) => c.id !== id && c.parent !== id))
   }
 
   function onToggleCommentStar(id: string) {
@@ -152,7 +152,7 @@ export function Comments({ videoId }: CommentsProps) {
     setItems(getComments(videoId))
   }
 
-  const count = items.filter((c) => !c.parentId).length
+  const count = items.filter((c) => !c.parent).length
 
   const sortOptions = [
     { value: "newest" as const, label: "Сначала новые", icon: Clock },

@@ -46,11 +46,11 @@ export function getComments(videoId: string): Comment[] {
   return safeParse(localStorage.getItem(COMMENTS_PREFIX + videoId), [])
 }
 
-export function addComment(videoId: string, text: string, user: User, parentId?: string): Comment {
+export function addComment(videoId: string, text: string, user: User, parent?: string): Comment {
   const c: Comment = {
     id: `${videoId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     videoId,
-    parentId,
+    parent,
     userId: user.id,
     userName: user.username,
     userHandle: user.handle,
@@ -78,7 +78,7 @@ export function updateComment(videoId: string, commentId: string, newText: strin
 
 export function removeComment(videoId: string, commentId: string) {
   // remove the comment and its direct replies
-  const list = getComments(videoId).filter((c) => c.id !== commentId && c.parentId !== commentId)
+  const list = getComments(videoId).filter((c) => c.id !== commentId && c.parent !== commentId)
   localStorage.setItem(COMMENTS_PREFIX + videoId, JSON.stringify(list))
 }
 
