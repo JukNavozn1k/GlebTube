@@ -57,7 +57,7 @@ class CommentFilter(filters.FilterSet):
 
     class Meta:
         model = CommentVideo
-        fields = ['instance', 'starred']
+        fields = ['video', 'starred']
 
     def filter_starred(self, queryset, name, value):
         user = self.request.user

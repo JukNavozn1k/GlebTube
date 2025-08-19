@@ -85,7 +85,7 @@ class RateCommentView(View):
     
 class ViewComments(View):
     def get(self,request,video_id):
-        comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').prefetch_related('channel').only(
+        comments = models.CommentVideo.objects.all().filter(video__id=video_id).order_by('-id').prefetch_related('channel').only(
             'channel__username','channel__avatar','content','createdAt', 'baseStars')
         if request.user.is_authenticated:
             subquery = models.UserCommentRelation.objects.filter(comment_id=OuterRef('pk'), grade=1,user=request.user)
@@ -121,7 +121,7 @@ class EditComment(View):
     def post(self,request,video_id):
         comment = request.POST.get('comment')
         if request.user.is_authenticated and len(comment) > 0:
-            new_comment = models.CommentVideo(channel=request.user,instance_id=video_id,content=comment)
+            new_comment = models.CommentVideo(channel=request.user,video_id=video_id,content=comment)
             new_comment.save()
             return render(request,'comments/comment_view.html',context={'comment':new_comment})
         return render(request,'alerts/error.html',context={'desc' : 'Невозможно добавить комментарий'})

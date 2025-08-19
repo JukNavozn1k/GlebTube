@@ -87,7 +87,7 @@ class CommentView(ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     filter_backends = [OrderingFilter, DjangoFilterBackend]
     ordering_fields = ['baseStars', 'createdAt']
-    filterset_fields = ['instance', 'parent']
+    filterset_fields = ['video', 'parent']
     
     def perform_create(self, serializer):
         serializer.save(channel=self.request.user)
@@ -224,10 +224,10 @@ class VideoView(ModelViewSet):
         })
 
     def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        tasks.refresh_views.delay(instance.id)
+        video = self.get_object()
+        tasks.refresh_views.delay(video.id)
         if request.user.is_authenticated:
-            tasks.refresh_history.delay(instance.id, request.user.id)
+            tasks.refresh_history.delay(video.id, request.user.id)
         return super().retrieve(request, *args, **kwargs)
 
     def perform_create(self, serializer):

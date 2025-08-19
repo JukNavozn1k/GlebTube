@@ -82,7 +82,7 @@ class UserVideoRelation(models.Model):
 
     
 class CommentVideo(models.Model):
-    instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='video_comments')
+    video = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='video_comments')
     channel = models.ForeignKey(User,on_delete=models.CASCADE,related_name='user_comments')
     content = models.TextField(null=False,blank=False,verbose_name='Контент')
     baseStars = models.PositiveBigIntegerField(default=0,verbose_name='Количество звёзд')
@@ -102,7 +102,7 @@ class CommentVideo(models.Model):
          verbose_name_plural = 'Коментарии-Видео'
     def clean(self):
         if self.parent:
-            if self.parent.instance_id != self.instance_id:
+            if self.parent.video_id != self.video_id:
                 raise ValidationError("Родительский комментарий должен быть того же видео.")
             if self.parent.parent is not None:
                 raise ValidationError("Можно создавать только один уровень вложенности комментариев.")
@@ -113,7 +113,7 @@ class CommentVideo(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return f'{self.id} : {self.channel} -> {self.instance}'
+        return f'{self.id} : {self.channel} -> {self.video}'
     
 class UserCommentRelation(models.Model):
     CHOICES = [(0, 'Без оценки'), (1, 'С оценкой')]
