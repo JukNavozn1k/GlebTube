@@ -55,6 +55,31 @@ class UserView(mixins.ListModelMixin,
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+        
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def subscribe(self, request, pk=None):
+        """
+        Подписка/отписка на пользователя (канал).
+        """
+        channel = get_object_or_404(User, pk=pk)
+
+        if channel == request.user:
+            return Response({"detail": "Нельзя подписаться на самого себя."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        sub, _ = Subscription.objects.get_or_create(
+            subscriber=request.user, channel=channel
+        )
+
+        # переключаем статус
+        sub.active = not sub.active
+        sub.save()
+
+        return Response({
+            "channel_id": channel.id,
+            "subscribed": sub.active
+        })
 
     # @action(detail=True, methods=['get'])
     # def user_subscriptions(self, request, pk):
