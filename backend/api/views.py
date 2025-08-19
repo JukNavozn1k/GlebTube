@@ -89,6 +89,17 @@ class CommentView(ModelViewSet):
     ordering_fields = ['baseStars']
     filterset_fields = ['instance', 'parent']
     
+    def perform_create(self, serializer):
+        serializer.save(channel=self.request.user)
+
+    @action(methods=['post'], detail=True)
+    def rate(self, request, pk):
+        rate_obj, _ = UserCommentRelation.objects.get_or_create(
+            comment_id=pk, user=request.user
+        )
+        rate_obj.grade = 0 if rate_obj.grade == 1 else 1
+        rate_obj.save()
+        return Response({'starred': bool(rate_obj.grade)})
 
     def get_queryset(self):
         queryset = super().get_queryset()
