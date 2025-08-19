@@ -59,6 +59,13 @@ export class VideoUseCases extends UseCases<Video> {
   async search(query: string) {
     return this.videoApi.search(query);
   }
+
+  /**
+   * Toggle star for a video and return { video_id, starred }
+   */
+  async rate(id: string) {
+    return this.videoApi.rate(id);
+  }
 }
 
 export const videoUseCases = new VideoUseCases(videoApi);

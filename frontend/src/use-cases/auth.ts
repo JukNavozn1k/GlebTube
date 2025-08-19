@@ -102,4 +102,4 @@ setInterval(async () => {
       console.warn("Failed to refresh token:", error);
     }
   }
-}, 300_000); // 5 минут в миллисекундах
+}, 60_60); // 5 минут в миллисекундах
