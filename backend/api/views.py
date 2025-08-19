@@ -86,7 +86,7 @@ class CommentView(ModelViewSet):
     serializer_class = serializers.CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     filter_backends = [OrderingFilter, DjangoFilterBackend]
-    ordering_fields = ['baseStars']
+    ordering_fields = ['baseStars', 'createdAt']
     filterset_fields = ['instance', 'parent']
     
     def perform_create(self, serializer):
