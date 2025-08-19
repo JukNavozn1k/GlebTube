@@ -8,7 +8,7 @@ def remove_video(video_id,channel_id):
     refresh_user_stats.delay(channel_id)
 
 @shared_task
-def refresh_rates(video_id):
+def refresh_video_rates(video_id):
     from .models import Video,UserVideoRelation
     from profiles.tasks import refresh_user_stats
     video = Video.objects.get(id=video_id)
@@ -17,6 +17,19 @@ def refresh_rates(video_id):
     # refresh_total_rates.delay(video.channel_id)
     refresh_user_stats.delay(video.channel_id)
 
+
+@shared_task
+def refresh_comment_rates(comment_id):
+    from .models import CommentVideo,UserCommentRelation
+    try:
+        comment = CommentVideo.objects.get(id=comment_id)
+        # Считаем рейтинг комментария (например, количество лайков)
+        comment.baseStars = UserCommentRelation.objects.filter(comment_id=comment_id, grade=1).count()
+        comment.save(update_fields=['baseStars'])
+        # Обновляем статистику пользователя/автора комментария
+        
+    except CommentVideo.DoesNotExist:
+        pass  # если комментарий удалён, игнорируем
 
 
 @shared_task

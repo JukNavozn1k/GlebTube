@@ -90,9 +90,7 @@ class UserView(mixins.ListModelMixin,
 
 
 class CommentView(ModelViewSet):
-    queryset = CommentVideo.objects.all().annotate(
-        baseStars=Count(Case(When(comment_rates__grade=1, then=1)))
-    ).select_related('channel', 'instance')
+    queryset = CommentVideo.objects.all().select_related('channel', 'instance')
     serializer_class = serializers.CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     filter_backends = [OrderingFilter, DjangoFilterBackend]

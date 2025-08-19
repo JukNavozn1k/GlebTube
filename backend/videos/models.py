@@ -9,6 +9,8 @@ from django.core.exceptions import ValidationError
 from django.db.models import JSONField
 
 
+from . import tasks
+
 def validate_probability(value):
     if not (0 <= value <= 1):
         raise ValidationError('Probability must be between 0 and 1')
@@ -83,6 +85,7 @@ class CommentVideo(models.Model):
     instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='video_comments')
     channel = models.ForeignKey(User,on_delete=models.CASCADE,related_name='user_comments')
     content = models.TextField(null=False,blank=False,verbose_name='Контент')
+    baseStars = models.PositiveBigIntegerField(default=0,verbose_name='Количество звёзд')
     parent = models.ForeignKey(
         'self',  # ссылка на ту же модель
         null=True,
@@ -118,6 +121,13 @@ class UserCommentRelation(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,verbose_name="Пользователь")
     grade = models.BooleanField(default=0,choices=CHOICES,verbose_name="Оценка")
     comment = models.ForeignKey(CommentVideo,on_delete=models.CASCADE,verbose_name="Комментарий",related_name='comment_rates')
+
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Вызываем таску для пересчёта рейтинга комментария
+        tasks.refresh_comment_rates.delay(self.comment_id)
+
     def __str__(self) -> str:
         return f'{self.id} : {self.user} -> {self.CHOICES[self.grade][1]}'
     class Meta:
