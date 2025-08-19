@@ -99,7 +99,10 @@ class CommentView(ModelViewSet):
         )
         rate_obj.grade = 0 if rate_obj.grade == 1 else 1
         rate_obj.save()
-        return Response({'starred': bool(rate_obj.grade)})
+        return Response({
+            "comment_id": pk,
+            "starred": bool(rate_obj.grade)
+        })
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -215,7 +218,10 @@ class VideoView(ModelViewSet):
         rate_obj, _ = UserVideoRelation.objects.get_or_create(video_id=pk, user=request.user)
         rate_obj.grade = 0 if rate_obj.grade == 1 else 1
         rate_obj.save()
-        return Response({'starred': bool(rate_obj.grade)})
+        return Response({
+            "video_id": pk,
+            "starred": bool(rate_obj.grade)
+        })
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
