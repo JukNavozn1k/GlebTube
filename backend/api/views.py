@@ -60,12 +60,12 @@ class UserView(mixins.ListModelMixin,
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def subscribe(self, request, pk=None):
         """
-        Подписка/отписка на пользователя (канал).
+        Subscribe / unsubscribe channel
         """
         channel = get_object_or_404(User, pk=pk)
 
         if channel == request.user:
-            return Response({"detail": "Нельзя подписаться на самого себя."},
+            return Response({"detail": "Can't subscribe yourself."},
                             status=status.HTTP_400_BAD_REQUEST)
 
         sub, _ = Subscription.objects.get_or_create(
