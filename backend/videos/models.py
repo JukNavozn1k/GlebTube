@@ -83,11 +83,30 @@ class CommentVideo(models.Model):
     instance = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='video_comments')
     channel = models.ForeignKey(User,on_delete=models.CASCADE,related_name='user_comments')
     content = models.TextField(null=False,blank=False,verbose_name='Контент')
+    parent = models.ForeignKey(
+        'self',  # ссылка на ту же модель
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='replies',
+        verbose_name='Родительский комментарий'
+    )
+    
     
     createdAt = models.DateTimeField(default=timezone.now)
     class Meta:
          verbose_name = 'Комментарий-Видео'
          verbose_name_plural = 'Коментарии-Видео'
+    def save(self, *args, **kwargs):
+        if self.parent:
+            # Проверка, чтобы родительский комментарий был того же видео
+            if self.parent.instance_id != self.instance_id:
+                raise ValidationError("Родительский комментарий должен быть того же видео.")
+            # Ограничение уровня вложенности: родитель не должен быть ответом на другой комментарий
+            if self.parent.parent is not None:
+                raise ValidationError("Можно создавать только один уровень вложенности комментариев.")
+        super().save(*args, **kwargs)
+
     def __str__(self) -> str:
         return f'{self.id} : {self.channel} -> {self.instance}'
     
