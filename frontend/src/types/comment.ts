@@ -2,7 +2,7 @@ import type { User } from "@/types/user"
 
 export type Comment = {
   id: string
-  videoId: string
+  video: string
   parent?: string
   user: User
   text: string

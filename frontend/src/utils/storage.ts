@@ -19,9 +19,9 @@ function safeParse<T>(val: string | null, fallback: T): T {
 }
 
 /* Comments with simplified rating system */
-export function getComments(videoId: string): Comment[] {
+export function getComments(video: string): Comment[] {
   if (typeof window === "undefined") return []
-  const comments = safeParse<any[]>(localStorage.getItem(COMMENTS_PREFIX + videoId), [])
+  const comments = safeParse<any[]>(localStorage.getItem(COMMENTS_PREFIX + video), [])
 
   // Migrate old comment format to new format
   return comments.map((comment) => {
@@ -32,7 +32,7 @@ export function getComments(videoId: string): Comment[] {
       // Migrate from old format
       return {
         id: comment.id,
-        videoId: comment.videoId,
+        video: comment.video,
         parent: comment.parent,
         user:
           comment.user ||
@@ -50,10 +50,10 @@ export function getComments(videoId: string): Comment[] {
   })
 }
 
-export function addComment(videoId: string, text: string, user: User, parent?: string): Comment {
+export function addComment(video: string, text: string, user: User, parent?: string): Comment {
   const c: Comment = {
-    id: `${videoId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    videoId,
+    id: `${video}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    video,
     parent,
     user,
     text,
@@ -61,33 +61,33 @@ export function addComment(videoId: string, text: string, user: User, parent?: s
     stars: 0,
     starred: false,
   }
-  const list = getComments(videoId)
+  const list = getComments(video)
   list.unshift(c)
-  localStorage.setItem(COMMENTS_PREFIX + videoId, JSON.stringify(list))
+  localStorage.setItem(COMMENTS_PREFIX + video, JSON.stringify(list))
   return c
 }
 
-export function updateComment(videoId: string, commentId: string, newText: string): boolean {
+export function updateComment(video: string, commentId: string, newText: string): boolean {
   if (typeof window === "undefined") return false
-  const list = getComments(videoId)
+  const list = getComments(video)
   const idx = list.findIndex((c) => c.id === commentId)
   if (idx === -1) return false
 
   list[idx].text = newText
-  localStorage.setItem(COMMENTS_PREFIX + videoId, JSON.stringify(list))
+  localStorage.setItem(COMMENTS_PREFIX + video, JSON.stringify(list))
   return true
 }
 
-export function removeComment(videoId: string, commentId: string) {
+export function removeComment(video: string, commentId: string) {
   // remove the comment and its direct replies
-  const list = getComments(videoId).filter((c) => c.id !== commentId && c.parent !== commentId)
-  localStorage.setItem(COMMENTS_PREFIX + videoId, JSON.stringify(list))
+  const list = getComments(video).filter((c) => c.id !== commentId && c.parent !== commentId)
+  localStorage.setItem(COMMENTS_PREFIX + video, JSON.stringify(list))
 }
 
 /* Simplified comment rating system */
-export function toggleCommentStar(videoId: string, commentId: string): boolean {
+export function toggleCommentStar(video: string, commentId: string): boolean {
   if (typeof window === "undefined") return false
-  const list = getComments(videoId)
+  const list = getComments(video)
   const idx = list.findIndex((c) => c.id === commentId)
   if (idx === -1) return false
 
@@ -104,16 +104,16 @@ export function toggleCommentStar(videoId: string, commentId: string): boolean {
     comment.stars = Math.max(0, (comment.stars || 0) - 1)
   }
 
-  localStorage.setItem(COMMENTS_PREFIX + videoId, JSON.stringify(list))
+  localStorage.setItem(COMMENTS_PREFIX + video, JSON.stringify(list))
   return comment.starred
 }
 
 /* History: array of { id, at } sorted by latest */
-export function addHistory(videoId: string) {
+export function addHistory(video: string) {
   if (typeof window === "undefined") return
   const list = safeParse<{ id: string; at: string }[]>(localStorage.getItem(HISTORY_KEY), [])
-  const filtered = list.filter((x) => x.id !== videoId)
-  filtered.unshift({ id: videoId, at: new Date().toISOString() })
+  const filtered = list.filter((x) => x.id !== video)
+  filtered.unshift({ id: video, at: new Date().toISOString() })
   localStorage.setItem(HISTORY_KEY, JSON.stringify(filtered.slice(0, 200)))
 }
 
@@ -178,31 +178,31 @@ export function deleteUpload(id: string) {
 }
 
 /* Simplified video rating system */
-export function toggleVideoStar(videoId: string): boolean {
+export function toggleVideoStar(video: string): boolean {
   if (typeof window === "undefined") return false
 
   // For built-in videos, we'll store starred state separately
   const starredVideos = safeParse<string[]>(localStorage.getItem("glebtube:starred-videos"), [])
-  const isCurrentlyStarred = starredVideos.includes(videoId)
+  const isCurrentlyStarred = starredVideos.includes(video)
 
   if (isCurrentlyStarred) {
-    const filtered = starredVideos.filter((id) => id !== videoId)
+    const filtered = starredVideos.filter((id) => id !== video)
     localStorage.setItem("glebtube:starred-videos", JSON.stringify(filtered))
     return false
   } else {
-    starredVideos.push(videoId)
+    starredVideos.push(video)
     localStorage.setItem("glebtube:starred-videos", JSON.stringify(starredVideos))
     return true
   }
 }
 
-export function isVideoStarred(videoId: string): boolean {
+export function isVideoStarred(video: string): boolean {
   if (typeof window === "undefined") return false
   const starredVideos = safeParse<string[]>(localStorage.getItem("glebtube:starred-videos"), [])
-  return starredVideos.includes(videoId)
+  return starredVideos.includes(video)
 }
 
-export function getStarredVideoIds(): string[] {
+export function getStarredvideos(): string[] {
   if (typeof window === "undefined") return []
   return safeParse<string[]>(localStorage.getItem("glebtube:starred-videos"), [])
 }
@@ -252,12 +252,12 @@ export function toggleChannelSubscription(channelId: string): boolean {
 }
 
 /* Video starring system using starred field */
-export function updateVideoStarred(videoId: string, starred: boolean): void {
+export function updateVideoStarred(video: string, starred: boolean): void {
   if (typeof window === "undefined") return
 
   // Update in uploads
   const uploads = getUploads()
-  const uploadIndex = uploads.findIndex((v) => v.id === videoId)
+  const uploadIndex = uploads.findIndex((v) => v.id === video)
   if (uploadIndex !== -1) {
     uploads[uploadIndex].starred = starred
     localStorage.setItem(UPLOADS_KEY, JSON.stringify(uploads))
@@ -265,28 +265,28 @@ export function updateVideoStarred(videoId: string, starred: boolean): void {
 
   // For built-in videos, store starred state separately since we can't modify the original data
   const builtinStars = safeParse<Record<string, boolean>>(localStorage.getItem("glebtube:builtin-stars"), {})
-  builtinStars[videoId] = starred
+  builtinStars[video] = starred
   localStorage.setItem("glebtube:builtin-stars", JSON.stringify(builtinStars))
 }
 
-export function getVideoStarred(videoId: string): boolean {
+export function getVideoStarred(video: string): boolean {
   if (typeof window === "undefined") return false
 
   // Check uploads first
   const uploads = getUploads()
-  const upload = uploads.find((v) => v.id === videoId)
+  const upload = uploads.find((v) => v.id === video)
   if (upload) {
     return upload.starred
   }
 
   // Check built-in videos starred state
   const builtinStars = safeParse<Record<string, boolean>>(localStorage.getItem("glebtube:builtin-stars"), {})
-  return builtinStars[videoId] || false
+  return builtinStars[video] || false
 }
 
-export function toggleVideoStarred(videoId: string): boolean {
-  const currentStarred = getVideoStarred(videoId)
+export function toggleVideoStarred(video: string): boolean {
+  const currentStarred = getVideoStarred(video)
   const newStarred = !currentStarred
-  updateVideoStarred(videoId, newStarred)
+  updateVideoStarred(video, newStarred)
   return newStarred
 }

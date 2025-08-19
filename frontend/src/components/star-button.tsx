@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { videoUseCases } from "@/use-cases/video"
 
 type StarButtonProps = {
-  videoId: string
+  video: string
   baseCount?: number
   showCount?: boolean
   size?: "default" | "sm" | "lg"
@@ -14,7 +14,7 @@ type StarButtonProps = {
 }
 
 export function StarButton({
-  videoId,
+  video,
   baseCount = 0,
   showCount = true,
   size = "default",
@@ -25,7 +25,7 @@ export function StarButton({
 
   const handleToggle = async () => {
     try {
-      const res = await videoUseCases.rate(videoId)
+      const res = await videoUseCases.rate(video)
       setisStarred(res.starred)
     } catch (e) {
       console.error("Failed to rate video:", e)

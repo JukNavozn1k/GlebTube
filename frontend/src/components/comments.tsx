@@ -35,12 +35,12 @@ import {
 } from "@/components/ui/alert-dialog"
 
 type CommentsProps = {
-  videoId: string
+  video: string
 }
 
 type SortOption = "newest" | "oldest" | "popular"
 
-export function Comments({ videoId }: CommentsProps) {
+export function Comments({ video }: CommentsProps) {
   const [items, setItems] = useState<Comment[]>([])
   const [text, setText] = useState<string>("")
   const [replyTo, setReplyTo] = useState<string | null>(null)
@@ -54,14 +54,14 @@ export function Comments({ videoId }: CommentsProps) {
   const { auth } = useAuth()
 
   useEffect(() => {
-    setItems(getComments(videoId))
+    setItems(getComments(video))
     setReplyTo(null)
     setReplyText("")
     setText("")
     setOpenReplies({})
     setEditingComment(null)
     setEditText("")
-  }, [videoId])
+  }, [video])
 
   // Create current user object
   const currentUser = useMemo(
@@ -106,7 +106,7 @@ export function Comments({ videoId }: CommentsProps) {
   function submitRoot() {
     const val = text.trim()
     if (!val) return
-    const c = addComment(videoId, val, currentUser)
+    const c = addComment(video, val, currentUser)
     setItems((prev) => [c, ...prev])
     setText("")
   }
@@ -114,7 +114,7 @@ export function Comments({ videoId }: CommentsProps) {
   function submitReply(parent: string) {
     const val = replyText.trim()
     if (!val) return
-    const c = addComment(videoId, val, currentUser, parent)
+    const c = addComment(video, val, currentUser, parent)
     setItems((prev) => [c, ...prev])
     setReplyText("")
     setReplyTo(null)
@@ -135,21 +135,21 @@ export function Comments({ videoId }: CommentsProps) {
     const newText = editText.trim()
     if (!newText) return
 
-    if (updateComment(videoId, commentId, newText)) {
-      setItems(getComments(videoId))
+    if (updateComment(video, commentId, newText)) {
+      setItems(getComments(video))
       setEditingComment(null)
       setEditText("")
     }
   }
 
   function onRemove(id: string) {
-    removeComment(videoId, id)
+    removeComment(video, id)
     setItems((prev) => prev.filter((c) => c.id !== id && c.parent !== id))
   }
 
   function onToggleCommentStar(id: string) {
-    toggleCommentStar(videoId, id)
-    setItems(getComments(videoId))
+    toggleCommentStar(video, id)
+    setItems(getComments(video))
   }
 
   const count = items.filter((c) => !c.parent).length

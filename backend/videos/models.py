@@ -84,7 +84,7 @@ class UserVideoRelation(models.Model):
 class CommentVideo(models.Model):
     video = models.ForeignKey(Video,on_delete=models.CASCADE,verbose_name="Видео",related_name='video_comments')
     channel = models.ForeignKey(User,on_delete=models.CASCADE,related_name='user_comments')
-    content = models.TextField(null=False,blank=False,verbose_name='Контент')
+    text = models.TextField(null=False,blank=False,verbose_name='Контент')
     baseStars = models.PositiveBigIntegerField(default=0,verbose_name='Количество звёзд')
     parent = models.ForeignKey(
         'self',  # ссылка на ту же модель
