@@ -23,7 +23,7 @@ def search_videos(request):
         context = {'videos': videos}
         return render(request, 'main.html', context=context)
     videos_qs = Video.objects.exclude(video_embedding__isnull=True).order_by('-baseStars', '-id')
-    results = semantic_search_videos(query, videos_qs, k=10)
+    results = semantic_search_videos(query, videos_qs)
     context = {'videos': results}
     return render(request, 'main.html', context=context)
 

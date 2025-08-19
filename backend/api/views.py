@@ -16,6 +16,8 @@ from videos.models import Video, CommentVideo, UserVideoRelation, UserCommentRel
 from . import serializers, permissions
 from watch import tasks
 
+from ml.search import semantic_search_videos
+
 
 class UserView(mixins.ListModelMixin,
                mixins.RetrieveModelMixin,
@@ -40,6 +42,7 @@ class UserView(mixins.ListModelMixin,
         else:
             qs = qs.annotate(subscribed=Value(False, output_field=BooleanField()))
         return qs
+    
 
     @action(detail=False, methods=['get', 'put'], permission_classes=[IsAuthenticated])
     def me(self, request):
@@ -103,6 +106,25 @@ class VideoView(ModelViewSet):
     filterset_fields = ['channel', 'starred']
     filterset_class = VideoFilter
 
+    @action(detail=False, methods=['get'])
+    def search(self, request):
+        """
+        Семантический поиск по видео.
+        GET /api/videos/search/?q=запрос
+        """
+        query = request.GET.get("q", "").strip()
+        if not query:
+            return Response({"detail": "Empty query"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # получаем queryset видео с эмбеддингами
+        videos_qs = self.get_queryset().exclude(video_embedding__isnull=True)
+
+        # сортируем по схожести
+        results = semantic_search_videos(query, videos_qs)
+
+        # сериализуем
+        serializer = self.get_serializer(results, many=True, context={"request": request})
+        return Response(serializer.data)
 
     @action(detail=False, methods=['get', 'delete'], permission_classes=[IsAuthenticated])
     def history(self, request):
