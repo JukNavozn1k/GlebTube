@@ -81,33 +81,14 @@ class UserView(mixins.ListModelMixin,
             "subscribed": sub.active
         })
 
-    # @action(detail=True, methods=['get'])
-    # def user_subscriptions(self, request, pk):
-    #     subs = Subscription.objects.filter(subscriber_id=pk, active=True)
-    #     users = User.objects.filter(id__in=subs.values('channel_id'))
-    #     serializer = serializers.UserSerializer(users, many=True)
-    #     return Response(serializer.data)
-
-
 class CommentView(ModelViewSet):
-    queryset = CommentVideo.objects.all().annotate(
-        baseStars=Count(Case(When(comment_rates__grade=1, then=1)))
-    ).select_related('channel', 'instance')
+    queryset = CommentVideo.objects.all()
     serializer_class = serializers.CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     filter_backends = [OrderingFilter, DjangoFilterBackend]
     ordering_fields = ['baseStars']
-    filterset_fields = ['instance']
-    filterset_class = CommentFilter
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if self.request.user.is_authenticated:
-            subquery = UserCommentRelation.objects.filter(
-                comment_id=OuterRef('pk'), user=self.request.user, grade=1
-            )
-            queryset = queryset.annotate(starred=Exists(subquery))
-        return queryset
-
+    filterset_fields = ['instance', 'parent']
+    
     def perform_create(self, serializer):
         serializer.save(channel=self.request.user)
 
@@ -120,9 +101,37 @@ class CommentView(ModelViewSet):
         rate_obj.save()
         return Response({'starred': bool(rate_obj.grade)})
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+
+        if user.is_authenticated:
+            # starred для комментария
+            subquery = UserCommentRelation.objects.filter(
+                comment_id=OuterRef('pk'), user=user, grade=1
+            )
+            queryset = queryset.annotate(starred=Exists(subquery))
+
+            # подготовим queryset для channel с subscribed-аннотацией
+            channel_sub_q = Subscription.objects.filter(
+                subscriber_id=user.id, channel_id=OuterRef('pk'), active=True
+            )
+            users_qs = User.objects.annotate(subscribed=Exists(channel_sub_q))
+
+            queryset = queryset.prefetch_related(
+                Prefetch('channel', queryset=users_qs)
+            )
+        else:
+            queryset = queryset.annotate(starred=Value(False, output_field=BooleanField()))
+            users_qs = User.objects.annotate(subscribed=Value(False, output_field=BooleanField()))
+            queryset = queryset.prefetch_related(Prefetch('channel', queryset=users_qs))
+
+        return queryset
+
+
 
 class VideoView(ModelViewSet):
-    queryset = Video.objects.all().select_related('channel')
+    queryset = Video.objects.all()
     serializer_class = serializers.VideoSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
@@ -177,12 +186,28 @@ class VideoView(ModelViewSet):
             )
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        if self.request.user.is_authenticated:
-            subquery = UserVideoRelation.objects.filter(
-                video_id=OuterRef('pk'), user=self.request.user, grade=1
+        queryset = Video.objects.all()  # уберите class-level .select_related('channel') иначе prefetch не сработает
+        user = self.request.user
+
+        # annotation для "starred" (у вас уже был)
+        if user.is_authenticated:
+            starred_sq = UserVideoRelation.objects.filter(
+                video_id=OuterRef('pk'), user=user, grade=1
             )
-            queryset = queryset.annotate(starred=Exists(subquery))
+            # подготовим queryset для channel с subscribed-аннотацией
+            channel_sub_q = Subscription.objects.filter(
+                subscriber_id=user.id, channel_id=OuterRef('pk'), active=True
+            )
+            users_qs = User.objects.annotate(subscribed=Exists(channel_sub_q))
+            queryset = queryset.annotate(starred=Exists(starred_sq)).prefetch_related(
+                Prefetch('channel', queryset=users_qs)
+            )
+        else:
+            queryset = queryset.annotate(starred=Value(False, output_field=BooleanField()))
+            # можно явно префетчить каналы с subscribed=False
+            users_qs = User.objects.annotate(subscribed=Value(False, output_field=BooleanField()))
+            queryset = queryset.prefetch_related(Prefetch('channel', queryset=users_qs))
+
         return queryset
 
     @action(methods=['post'], detail=True)

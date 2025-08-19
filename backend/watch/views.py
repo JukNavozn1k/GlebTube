@@ -86,7 +86,7 @@ class RateCommentView(View):
 class ViewComments(View):
     def get(self,request,video_id):
         comments = models.CommentVideo.objects.all().filter(instance__id=video_id).order_by('-id').prefetch_related('channel').only(
-            'channel__username','channel__avatar','content','createdAt').annotate(baseStars=Count(Case(When(comment_rates__grade=1,then=1))))
+            'channel__username','channel__avatar','content','createdAt', 'baseStars')
         if request.user.is_authenticated:
             subquery = models.UserCommentRelation.objects.filter(comment_id=OuterRef('pk'), grade=1,user=request.user)
             comments = comments.annotate(starred=Exists(subquery))
