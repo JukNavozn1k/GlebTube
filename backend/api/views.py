@@ -122,7 +122,7 @@ class CommentView(ModelViewSet):
 
 
 class VideoView(ModelViewSet):
-    queryset = Video.objects.all().select_related('channel')
+    queryset = Video.objects.all()
     serializer_class = serializers.VideoSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
@@ -177,12 +177,28 @@ class VideoView(ModelViewSet):
             )
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        if self.request.user.is_authenticated:
-            subquery = UserVideoRelation.objects.filter(
-                video_id=OuterRef('pk'), user=self.request.user, grade=1
+        queryset = Video.objects.all()  # уберите class-level .select_related('channel') иначе prefetch не сработает
+        user = self.request.user
+
+        # annotation для "starred" (у вас уже был)
+        if user.is_authenticated:
+            starred_sq = UserVideoRelation.objects.filter(
+                video_id=OuterRef('pk'), user=user, grade=1
             )
-            queryset = queryset.annotate(starred=Exists(subquery))
+            # подготовим queryset для channel с subscribed-аннотацией
+            channel_sub_q = Subscription.objects.filter(
+                subscriber_id=user.id, channel_id=OuterRef('pk'), active=True
+            )
+            users_qs = User.objects.annotate(subscribed=Exists(channel_sub_q))
+            queryset = queryset.annotate(starred=Exists(starred_sq)).prefetch_related(
+                Prefetch('channel', queryset=users_qs)
+            )
+        else:
+            queryset = queryset.annotate(starred=Value(False, output_field=BooleanField()))
+            # можно явно префетчить каналы с subscribed=False
+            users_qs = User.objects.annotate(subscribed=Value(False, output_field=BooleanField()))
+            queryset = queryset.prefetch_related(Prefetch('channel', queryset=users_qs))
+
         return queryset
 
     @action(methods=['post'], detail=True)
