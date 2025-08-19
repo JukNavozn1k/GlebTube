@@ -72,6 +72,17 @@ export class VideoApi extends Api<Video> {
     return res.data;
   }
 
+  /**
+   * Search videos by query
+   * GET /video/search/?q=<query>
+   */
+  async search(query: string): Promise<Video[]> {
+    const res = await this.apiClient.get<Video[]>(`/${this.prefix}/search/`, {
+      params: { q: query },
+    });
+    return res.data;
+  }
+
   // Keep compatibility with base Api create/update if needed
   async create(data: unknown): Promise<Video> {
     return this.createVideo(data as UploadVideoPayload);

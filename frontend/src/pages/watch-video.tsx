@@ -5,13 +5,15 @@ import { Comments } from "@/components/comments"
 
 import { formatViews, timeAgo, formatDuration } from "@/utils/format"
 import type { Video } from "@/types/video"
-import { addHistory, isSubscribed, toggleChannelSubscription } from "@/utils/storage"
+import { addHistory } from "@/utils/storage"
+
 import { Button } from "@/components/ui/button"
 import { BottomNav } from "@/components/bottom-nav"
 import { CustomPlayer } from "@/components/custom-player"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
 import { videoUseCases } from "@/use-cases/video"
+import { userUseCases } from "@/use-cases/user"
 
 function channelSlug(channelId: string) {
   return encodeURIComponent(channelId || "unknown")
@@ -48,8 +50,7 @@ export function WatchPage() {
 
         setVideo(v);
         setRecommended(list.filter((item) => item.id !== id).slice(0, 6));
-       
-        if (v?.channel?.id) setSub(isSubscribed(v.channel.id));
+        if (v?.channel) setSub(!!v.channel.subscribed);
       } catch (error) {
         console.error("Failed to load video or recommendations:", error);
         setVideo(null);
@@ -132,12 +133,16 @@ export function WatchPage() {
                         ? "bg-blue-600 text-white hover:bg-blue-700 flex-shrink-0"
                         : "border-blue-200 text-blue-700 hover:bg-blue-50 flex-shrink-0"
                     }
-                    onClick={() => {
-                      const newSubscribed = toggleChannelSubscription(video.channel.id)
-                      setSub(newSubscribed)
-                      // Update the video channel object as well
-                      if (video.channel) {
-                        video.channel.subscribed = newSubscribed
+                    onClick={async () => {
+                      try {
+                        const res = await userUseCases.subscribe(video.channel.id)
+                        setSub(res.subscribed)
+                        // Update local video object flag to keep UI consistent
+                        if (video.channel) {
+                          video.channel.subscribed = res.subscribed
+                        }
+                      } catch (e) {
+                        console.error("Failed to toggle subscription:", e)
                       }
                     }}
                   >

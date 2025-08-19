@@ -52,6 +52,13 @@ export class VideoUseCases extends UseCases<Video> {
   async fetchByChannel(channel: number | string, opts?: { starred?: boolean }) {
     return this.videoApi.fetchByChannel(channel, opts);
   }
+
+  /**
+   * Search videos by text query
+   */
+  async search(query: string) {
+    return this.videoApi.search(query);
+  }
 }
 
 export const videoUseCases = new VideoUseCases(videoApi);

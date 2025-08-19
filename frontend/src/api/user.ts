@@ -37,6 +37,17 @@ export class UserApi extends Api<User> {
     const res = await this.apiClient.get<User[]>(url)
     return res.data
   }
+
+  /**
+   * Toggle subscription for a channel
+   * POST /user/<channel_id>/subscribe/
+   */
+  async subscribe(channel_id: string | number): Promise<{ channel_id: number; subscribed: boolean }> {
+    const res = await this.apiClient.post<{ channel_id: number; subscribed: boolean }>(
+      `/${this.prefix}/${channel_id}/subscribe/`
+    )
+    return res.data
+  }
 }
 
 export const userApi = new UserApi(api, "user")

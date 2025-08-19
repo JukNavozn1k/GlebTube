@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router-dom" // <-- заменено
 import { formatViews } from "@/utils/format"
-import { isSubscribed, toggleSubscription } from "@/utils/storage"
+import { isSubscribed } from "@/utils/storage"
 import { Button } from "@/components/ui/button"
 import { VideoCard } from "@/components/video-card"
 import { BottomNav } from "@/components/bottom-nav"
@@ -67,7 +67,9 @@ export function ChannelPage() {
 
   const [sub, setSub] = useState(false)
   useEffect(() => {
-    setSub(isSubscribed(channel?.id || ""))
+    // initialize from server-provided flag when channel changes
+    if (channel && typeof channel.subscribed === "boolean") setSub(!!channel.subscribed)
+    else setSub(isSubscribed(channel?.id || ""))
   }, [channel?.id])
 
   const sortedVideos = useMemo(() => {
@@ -132,7 +134,15 @@ export function ChannelPage() {
                   ? "bg-blue-600 text-white hover:bg-blue-700 flex-shrink-0"
                   : "border-blue-200 text-blue-700 hover:bg-blue-50 flex-shrink-0"
               }
-              onClick={() => setSub(toggleSubscription(channel?.id || ""))}
+              onClick={async () => {
+                if (!channel?.id) return
+                try {
+                  const res = await userUseCases.subscribe(channel.id)
+                  setSub(res.subscribed)
+                } catch (e) {
+                  console.error("Failed to toggle subscription:", e)
+                }
+              }}
             >
               {sub ? "Вы подписаны" : "Подписаться"}
             </Button>

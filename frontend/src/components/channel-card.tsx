@@ -1,13 +1,12 @@
-
 import {Link} from "react-router-dom"
 
 import type { Video } from "@/types/video"
 import type { User } from "@/types/user"
 import { Button } from "@/components/ui/button"
-import { isSubscribed, toggleSubscription } from "@/utils/storage"
 import { useState } from "react"
 import { Users, VideoIcon } from "lucide-react"
 import { formatViews } from "@/utils/format"
+import { userUseCases } from "@/use-cases/user"
 
 type ChannelCardProps = {
   channel: User | null
@@ -15,7 +14,7 @@ type ChannelCardProps = {
 }
 
 export function ChannelCard({ channel, videos }: ChannelCardProps) {
-  const [sub, setSub] = useState(() => (channel ? isSubscribed(channel.id) : false))
+  const [sub, setSub] = useState(() => (!!channel?.subscribed))
 
   // Защита от undefined channel
   if (!channel) {
@@ -71,7 +70,14 @@ export function ChannelCard({ channel, videos }: ChannelCardProps) {
           className={
             sub ? "bg-blue-600 text-white hover:bg-blue-700" : "border-blue-200 text-blue-700 hover:bg-blue-50"
           }
-          onClick={() => setSub(toggleSubscription(channel.id))}
+          onClick={async () => {
+            try {
+              const res = await userUseCases.subscribe(channel.id)
+              setSub(res.subscribed)
+            } catch (e) {
+              console.error("Failed to toggle subscription:", e)
+            }
+          }}
         >
           {sub ? "Подписан" : "Подписаться"}
         </Button>

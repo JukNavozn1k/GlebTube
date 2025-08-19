@@ -15,44 +15,31 @@ export function HomePage() {
   const location = useLocation()
 
   useEffect(() => {
-  // Prefer API videos only. No local stubs or uploads merged into the main list.
-
+    // Prefer API videos only. If query is present, use server search.
     let mounted = true
     ;(async () => {
-      // fetch when user lands on the home route (and also on every navigation to it)
-      if (location.pathname === "/" || location.pathname === "") {
-        console.log("HomePage: fetching videos from API...")
-        try {
-          const list = await videoUseCases.fetchList()
-          console.log("HomePage: fetched videos count=", Array.isArray(list) ? list.length : typeof list)
-          if (mounted) setApiVideos(list)
-        } catch (err) {
-          // keep uploads as fallback
-          console.error("Failed to load videos from API:", err)
-        }
+      if (location.pathname !== "/" && location.pathname !== "") return
+      try {
+        const list = q ? await videoUseCases.search(q) : await videoUseCases.fetchList()
+        if (mounted) setApiVideos(list)
+      } catch (err) {
+        console.error("Failed to load videos from API:", err)
+        if (mounted) setApiVideos([])
       }
     })()
 
     return () => {
       mounted = false
     }
-  }, [location.pathname])
+  }, [location.pathname, q])
 
   const allVideos = useMemo<Video[]>(() => {
   // Only use API videos. If API returned nothing, the list will be empty.
   return apiVideos
   }, [apiVideos])
 
-  const filtered = useMemo(() => {
-    if (!q) return allVideos
-    return allVideos.filter(
-      (v: Video) =>
-        v.title.toLowerCase().includes(q) ||
-        v.channel.username.toLowerCase().includes(q) ||
-        v.description.toLowerCase().includes(q) ||
-        v.tags.some((tag: string) => tag.toLowerCase().includes(q)),
-    )
-  }, [q, allVideos])
+  // Server already filtered when q present
+  const filtered = useMemo(() => allVideos, [allVideos])
 
   // Debug: log what's being rendered
   console.log("HomePage: filtered videos count=", filtered.length)

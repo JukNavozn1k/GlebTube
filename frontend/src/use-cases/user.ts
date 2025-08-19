@@ -26,6 +26,13 @@ export class UserUseCases extends UseCases<User> {
   async fetchSubscriptions(username?: string): Promise<User[]> {
     return this.userApi.listByFilter({ subscribed: true, username })
   }
+
+  /**
+   * Toggle subscription for a channel
+   */
+  async subscribe(channel_id: string | number): Promise<{ channel_id: number; subscribed: boolean }> {
+    return this.userApi.subscribe(channel_id)
+  }
 }
 
 export const userUseCases = new UserUseCases(userApi)
