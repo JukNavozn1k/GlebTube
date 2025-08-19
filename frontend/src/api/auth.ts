@@ -22,6 +22,14 @@ export class AuthApi extends Api<AuthTokens> {
     const response = await this.apiClient.get<UserProfile>(`/user/me/`);
     return response.data;
   }
+
+  async refresh(refreshToken: string): Promise<{ access: string }> {
+    const response = await this.apiClient.post<{ access: string }>(
+      `/${this.prefix}/jwt/refresh/`,
+      { refresh: refreshToken }
+    );
+    return response.data;
+  }
 }
 
 export const authApi = new AuthApi(api, "auth");

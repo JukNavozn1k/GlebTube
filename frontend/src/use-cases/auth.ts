@@ -59,6 +59,22 @@ export class AuthUseCases {
       throw error;
     }
   }
+  /** NEW: обновление access токена с использованием refresh */
+  async refreshTokens(): Promise<string> {
+    const refreshToken = localStorage.getItem(LOCAL_STORAGE_KEYS.REFRESH_TOKEN);
+    if (!refreshToken) throw new Error("No refresh token available");
+
+    try {
+      const { access } = await this.authApi.refresh(refreshToken);
+      localStorage.setItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN, access);
+      return access;
+    } catch (error) {
+      console.error("Token refresh error:", error);
+      this.logout();
+      throw parseAxiosError(error);
+    }
+  }
+
 
   getCurrentUser(): UserProfile | null {
     return this.currentUser;
@@ -76,3 +92,14 @@ export class AuthUseCases {
 }
 
 export const authUseCases = new AuthUseCases(authApi);
+// Автообновление access токена каждые 5 минут (300 000 мс)
+setInterval(async () => {
+  if (authUseCases.isAuthenticated()) {
+    try {
+      await authUseCases.refreshTokens();
+      console.log("Access token refreshed");
+    } catch (error) {
+      console.warn("Failed to refresh token:", error);
+    }
+  }
+}, 300_000); // 5 минут в миллисекундах
