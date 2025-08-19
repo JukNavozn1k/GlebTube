@@ -1,17 +1,17 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { StarButton } from "@/components/star-button"
 import { Comments } from "@/components/comments"
 
-import { formatViews, formatDuration, timeAgo } from "@/utils/format"
+import { formatViews, timeAgo, formatDuration } from "@/utils/format"
 import type { Video } from "@/types/video"
-import { addHistory, isSubscribed, toggleSubscription } from "@/utils/storage"
+import { addHistory, isSubscribed, toggleChannelSubscription } from "@/utils/storage"
 import { Button } from "@/components/ui/button"
 import { BottomNav } from "@/components/bottom-nav"
 import { CustomPlayer } from "@/components/custom-player"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
-import { VideoUseCases } from "@/use-cases/video"
+import { videoUseCases } from "@/use-cases/video"
 
 function channelSlug(channelId: string) {
   return encodeURIComponent(channelId || "unknown")
@@ -35,18 +35,20 @@ export function WatchPage() {
   const [video, setVideo] = useState<Video | null>(null)
   const [recommended, setRecommended] = useState<Video[]>([])
   const [sub, setSub] = useState(false)
+
   const [theater, setTheater] = useState(false)
-  const videoUseCase = useMemo(() => new VideoUseCases(), [])
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const [v, list] = await Promise.all([
-          videoUseCase.fetchById(id),
-          videoUseCase.fetchList()
+          videoUseCases.fetchById(id),
+          videoUseCases.fetchList()
         ]);
+
         setVideo(v);
         setRecommended(list.filter((item) => item.id !== id).slice(0, 6));
+       
         if (v?.channel?.id) setSub(isSubscribed(v.channel.id));
       } catch (error) {
         console.error("Failed to load video or recommendations:", error);
@@ -97,6 +99,7 @@ export function WatchPage() {
               {video.title}
             </h1>
 
+            {/* Channel info with subscription button aligned */}
             <div className="flex items-start gap-3 min-w-0">
               <Link to={`/channel/${channelSlug(video.channel.id)}`} className="flex-shrink-0">
                 <div className="h-10 w-10 rounded-full overflow-hidden border border-blue-200 bg-blue-50 flex items-center justify-center">
@@ -129,7 +132,14 @@ export function WatchPage() {
                         ? "bg-blue-600 text-white hover:bg-blue-700 flex-shrink-0"
                         : "border-blue-200 text-blue-700 hover:bg-blue-50 flex-shrink-0"
                     }
-                    onClick={() => setSub(toggleSubscription(video.channel.id))}
+                    onClick={() => {
+                      const newSubscribed = toggleChannelSubscription(video.channel.id)
+                      setSub(newSubscribed)
+                      // Update the video channel object as well
+                      if (video.channel) {
+                        video.channel.subscribed = newSubscribed
+                      }
+                    }}
                   >
                     {sub ? "Вы подписаны" : "Подписаться"}
                   </Button>
@@ -139,13 +149,14 @@ export function WatchPage() {
                 </div>
               </div>
               <div className="flex-shrink-0">
-                <StarButton videoId={video.id} baseCount={video.baseStars} />
+                <StarButton videoId={video.id} starred={video.starred} baseCount={video.baseStars} />
               </div>
             </div>
 
             <ExpandableDescription text={video.description} />
           </div>
 
+          {/* Comments: toggle visible on <lg (phones/tablets) */}
           <div className="lg:hidden min-w-0">
             <ToggleComments videoId={video.id} />
           </div>
@@ -164,10 +175,7 @@ export function WatchPage() {
                 <Link key={v.id} to={`/watch/${v.id}`} className="flex gap-3 group min-w-0">
                   <div className="relative aspect-video w-40 min-w-40 rounded-md overflow-hidden bg-blue-50 flex-shrink-0">
                     <img
-                      src={
-                        v.thumbnail ||
-                        "/placeholder.svg?height=90&width=160&query=video%20thumb%20blue%20white"
-                      }
+                      src={v.thumbnail || "/placeholder.svg?height=90&width=160&query=video%20thumb%20blue%20white"}
                       alt={`Thumbnail ${v.title}`}
                       width={160}
                       height={90}

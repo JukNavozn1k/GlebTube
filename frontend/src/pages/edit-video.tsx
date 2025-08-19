@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { getUploads, updateUpload, deleteUpload, type UploadedVideo } from "@/lib/glebtube-storage"
+import type { Video } from "@/types/video"
+import { videoUseCases } from "@/use-cases/video"
 import { BottomNav } from "@/components/bottom-nav"
 import {
   AlertDialog,
@@ -26,7 +27,7 @@ import { cn } from "@/lib/utils"
 export function EditVideoPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const [video, setVideo] = useState<UploadedVideo | null>(null)
+  const [video, setVideo] = useState<Video | null>(null)
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [thumbFile, setThumbFile] = useState<File | null>(null)
@@ -64,11 +65,22 @@ export function EditVideoPage() {
   }, [])
 
   useEffect(() => {
-    const v = getUploads().find((u) => u.id === id) || null
-    setVideo(v || null)
-    if (v) {
-      setTitle(v.title)
-      setDescription(v.description)
+    let mounted = true
+    if (!id) return
+    ;(async () => {
+      try {
+        const v = await videoUseCases.fetchById(id)
+        if (!mounted) return
+        setVideo(v)
+        setTitle(v.title)
+        setDescription(v.description)
+      } catch (e) {
+        if (!mounted) return
+        setVideo(null)
+      }
+    })()
+    return () => {
+      mounted = false
     }
   }, [id])
 
@@ -86,29 +98,30 @@ export function EditVideoPage() {
     )
   }
 
-  function onSave() {
+  async function onSave() {
+    if (!video || !id) return
     setSaving(true)
-    const patch: Partial<UploadedVideo> = {
-      title: title.trim() || video.title,
-      description: description.trim(),
+    try {
+      const updated = await videoUseCases.updateVideo(id, {
+        title: title.trim() || video.title,
+        description: description.trim(),
+        thumbnail: thumbFile || undefined,
+      })
+      navigate(`/watch/${updated.id}`)
+    } finally {
+      setSaving(false)
     }
-    if (thumbFile) {
-      patch.thumbnail = URL.createObjectURL(thumbFile)
-    }
-    updateUpload(video.id, {
-      title: patch.title,
-      description: patch.description,
-      thumbnail: patch.thumbnail,
-    })
-    setSaving(false)
-    navigate(`/watch/${video.id}`)
   }
 
   async function confirmDelete() {
+    if (!id) return
     setDeleting(true)
-    deleteUpload(video.id)
-    setDeleting(false)
-    navigate("/profile")
+    try {
+      await videoUseCases.remove(id)
+      navigate("/profile")
+    } finally {
+      setDeleting(false)
+    }
   }
 
   function fileToDataUrl(file: File): Promise<string> {
@@ -271,9 +284,7 @@ export function EditVideoPage() {
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Удалить это видео?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Действие необратимо. Видео будет удалено с этого устройства.
-                  </AlertDialogDescription>
+                  <AlertDialogDescription>Действие необратимо. Видео будет удалено.</AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Отмена</AlertDialogCancel>

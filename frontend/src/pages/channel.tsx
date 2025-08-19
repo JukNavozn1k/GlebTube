@@ -1,17 +1,18 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router-dom" // <-- заменено
-import { videos as builtins, formatViews } from "@/lib/glebtube-data"
-import { getUploads, isSubscribed, toggleSubscription } from "@/utils/storage"
-import { getChannelById, getChannelByName } from "@/data/channels"
+import { formatViews } from "@/utils/format"
+import { isSubscribed, toggleSubscription } from "@/utils/storage"
 import { Button } from "@/components/ui/button"
 import { VideoCard } from "@/components/video-card"
 import { BottomNav } from "@/components/bottom-nav"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-import { Calendar, Users, VideoIcon, BarChart3 } from "lucide-react"
+import { Calendar, Users, VideoIcon } from "lucide-react"
 import type { User } from "@/types/user"
 import type { Video } from "@/types/video"
+import { userUseCases } from "@/use-cases/user"
+import { videoUseCases } from "@/use-cases/video"
 
 function nameFromSlug(slug: string) {
   return decodeURIComponent(String(slug))
@@ -26,33 +27,56 @@ function initials(username?: string) {
 
 export function ChannelPage() {
   const { slug } = useParams<{ slug: string }>() // <-- react-router-dom
-  const uploads = getUploads()
-  const all: Video[] = useMemo(() => [...uploads, ...builtins], [uploads])
+  const [channel, setChannel] = useState<User | null>(null)
+  const [videos, setVideos] = useState<Video[]>([])
+  const [loading, setLoading] = useState(false)
 
-  // Try to find channel by ID first, then by username
-  const channelIdentifier = nameFromSlug(slug || "")
-  let channel: User | undefined = getChannelById(channelIdentifier)
+  // Fetch channel by ID using user use-cases; slug is treated as ID
+  useEffect(() => {
+    const id = nameFromSlug(slug || "")
+    if (!id) {
+      setChannel(null)
+      setVideos([])
+      return
+    }
+    let cancelled = false
+    setLoading(true)
+    ;(async () => {
+      try {
+        const [user, vids] = await Promise.all([
+          userUseCases.fetchById(id),
+          videoUseCases.fetchByChannel(id),
+        ])
+        if (!cancelled) {
+          setChannel(user)
+          setVideos(vids)
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setChannel(null)
+          setVideos([])
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [slug])
 
-  if (!channel) {
-    channel = getChannelByName(channelIdentifier)
-  }
-
-  const channelVideos = all.filter(
-    (v) =>
-      v.channel?.id === channel?.id ||
-      v.channel?.username?.toLowerCase() === channelIdentifier.toLowerCase(),
-  )
-
-  const [sub, setSub] = useState(isSubscribed(channel?.id || ""))
+  const [sub, setSub] = useState(false)
+  useEffect(() => {
+    setSub(isSubscribed(channel?.id || ""))
+  }, [channel?.id])
 
   const sortedVideos = useMemo(() => {
-    return [...channelVideos].sort(
+    return [...videos].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     )
-  }, [channelVideos])
+  }, [videos])
 
-  const totalViews = channelVideos.reduce((sum, v) => sum + v.views, 0)
-  const subscriberCount = channel?.subscriberCount || Math.floor(Math.random() * 50000) + 1000
+  const subscriberCount = channel?.subscriberCount ?? 0
   const joinYear = channel?.joinedAt ? new Date(channel.joinedAt).getFullYear() : 2023
 
   if (!channel) {
@@ -76,13 +100,13 @@ export function ChannelPage() {
         <section className="mb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
             <Avatar className="h-20 w-20 sm:h-24 sm:w-24 border-2 border-blue-200 flex-shrink-0">
-              <AvatarImage src={channel.avatar || "/blue-channel-avatar.png"} alt={channel.username || "Channel"} />
-              <AvatarFallback className="text-lg">{initials(channel.username)}</AvatarFallback>
+              <AvatarImage src={channel?.avatar || "/blue-channel-avatar.png"} alt={channel?.username || "Channel"} />
+              <AvatarFallback className="text-lg">{initials(channel?.username || "")}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl sm:text-3xl font-bold break-words hyphens-auto overflow-wrap-anywhere">
-                  {channel.username || "Unknown Channel"}
+                  {channel?.username || "Unknown Channel"}
                 </h1>
               </div>
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
@@ -92,7 +116,7 @@ export function ChannelPage() {
                 </div>
                 <div className="flex items-center gap-1">
                   <VideoIcon className="h-4 w-4 flex-shrink-0" />
-                  <span>{channelVideos.length} видео</span>
+                  <span>{channel?.videoCount ?? 0} видео</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4 flex-shrink-0" />
@@ -117,7 +141,7 @@ export function ChannelPage() {
 
         {/* Tabs */}
         <Tabs defaultValue="videos" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="videos" className="flex items-center gap-1 py-1.5 px-2">
               <VideoIcon className="h-4 w-4 flex-shrink-0" />
               <span className="text-xs hidden md:inline">Видео</span>
@@ -126,14 +150,12 @@ export function ChannelPage() {
               <Users className="h-4 w-4 flex-shrink-0" />
               <span className="text-xs hidden md:inline">О канале</span>
             </TabsTrigger>
-            <TabsTrigger value="stats" className="flex items-center gap-1 py-1.5 px-2">
-              <BarChart3 className="h-4 w-4 flex-shrink-0" />
-              <span className="text-xs hidden md:inline">Статистика</span>
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="videos" className="mt-0">
-            {sortedVideos.length === 0 ? (
+            {loading ? (
+              <div className="text-sm text-muted-foreground">Загрузка...</div>
+            ) : sortedVideos.length === 0 ? (
               <div className="text-center py-12">
                 <VideoIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Нет видео</h3>
@@ -160,9 +182,7 @@ export function ChannelPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="stats" className="mt-0">
-            <div>Общая статистика канала</div>
-          </TabsContent>
+          
         </Tabs>
       </main>
       <BottomNav />

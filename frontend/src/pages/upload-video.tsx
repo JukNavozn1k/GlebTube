@@ -5,8 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { addUpload } from "@/lib/glebtube-storage"
-import { currentUser } from "@/lib/glebtube-user"
+import { videoUseCases } from "@/use-cases/video"
 import { useNavigate } from "react-router-dom"
 import { BottomNav } from "@/components/bottom-nav"
 import { Upload, X, FileVideo, ImageIcon } from "lucide-react"
@@ -62,29 +61,25 @@ export function UploadPage() {
     }
   }, [])
 
-  function onSubmit() {
+  async function onSubmit() {
     setError(null)
     if (!title.trim()) return setError("Укажите название")
     if (!videoFile) return setError("Выберите файл видео")
 
-    // Create object URLs (valid for current session)
-    const src = URL.createObjectURL(videoFile)
-    const thumbnail = thumbFile ? URL.createObjectURL(thumbFile) : "/blue-white-thumbnail.png"
-
-    setSubmitting(true)
-    const v = addUpload({
-      title: title.trim(),
-      channel: currentUser.username,
-      duration: "00:00",
-      src,
-      thumbnail,
-      description: description.trim(),
-      baseStars: 0,
-      tags: [],
-      uploaderId: currentUser.id,
-    } as any)
-    setSubmitting(false)
-    navigate(`/watch/${v.id}`)
+    try {
+      setSubmitting(true)
+      const created = await videoUseCases.createVideo({
+        title: title.trim(),
+        description: description.trim(),
+        src: videoFile,
+        thumbnail: thumbFile || undefined,
+      })
+      navigate(`/watch/${created.id}`)
+    } catch (e: any) {
+      setError(typeof e === "string" ? e : "Не удалось загрузить видео")
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const formatFileSize = (bytes: number) => {
@@ -277,8 +272,7 @@ export function UploadPage() {
         </div>
 
         <div className="text-xs text-muted-foreground bg-blue-50 p-4 rounded-lg">
-          <strong>Примечание:</strong> Файлы загружаются как временные ссылки (object URL) и работают только в текущей
-          вкладке. Для постоянного хранения подключим облачное хранилище.
+          <strong>Примечание:</strong> Файлы загружаются на сервер. Допустимые форматы см. в описании инпутов.
         </div>
       </main>
       <BottomNav />

@@ -1,16 +1,7 @@
 
 import {Link} from "react-router-dom"
-import { useEffect, useMemo, useState } from "react"
-import {
-  getHistory,
-  getStarredVideoIds,
-  getUploads,
-  getSubscriptions,
-  
-  clearHistory,
-} from "@/utils/storage"
-import { videos as builtins } from "@/data/videos"
-import {type UploadedVideo, type Video} from "@/types/video"
+import { useEffect, useState } from "react"
+import { type Video } from "@/types/video"
 import { formatViews } from "@/utils/format"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { VideoCard } from "@/components/video-card"
@@ -32,40 +23,60 @@ import {
 import { useAuth } from "@/contexts/auth-context"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { VideoIcon, Star, History, Users, Upload, Settings, LogOut, Edit } from "lucide-react"
+import { videoUseCases } from "@/use-cases/video"
+import { userUseCases } from "@/use-cases/user"
+import type { User } from "@/types/user"
+import { ChannelCard } from "@/components/channel-card"
 
 export function ProfilePage() {
   const { user } = useUser()
   const { logout } = useAuth()
   const isAuthorized = useProtectedRoute("/profile")
-  const [starredIds, setStarredIds] = useState<string[]>([])
-  const [history, setHistory] = useState<{ id: string; at: string }[]>([])
-  const [uploads, setUploads] = useState<UploadedVideo[]>([])
-  const [subs, setSubs] = useState<string[]>([])
+  const [myVideos, setMyVideos] = useState<Video[]>([])
+  const [historyVideos, setHistoryVideos] = useState<Video[]>([])
+  const [starredVideos, setStarredVideos] = useState<Video[]>([])
+  const [subsUsers, setSubsUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(false)
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false)
 
-  const all = useMemo<Video[]>(() => [...uploads, ...builtins], [uploads])
-  const starredVideos = useMemo(() => all.filter((v) => starredIds.includes(v.id)), [starredIds, all])
-  const historyVideos = useMemo(() => {
-    const map = new Map(all.map((v) => [v.id, v]))
-    return history.map((h) => map.get(h.id)).filter(Boolean) as Video[]
-  }, [history, all])
+  //
 
-  function initials(username: string) {
-    const parts = username.trim().split(" ")
-    const s = (parts[0]?.[0] || "") + (parts[1]?.[0] || "")
-    return s.toUpperCase() || "US"
-  }
-
-  const totalViews = uploads.reduce((sum, v) => sum + v.views, 0)
+  const totalViews = myVideos.reduce((sum, v) => sum + (v.views || 0), 0)
 
   useEffect(() => {
-    if (isAuthorized) {
-      setStarredIds(getStarredVideoIds())
-      setHistory(getHistory())
-      setUploads(getUploads())
-      setSubs(getSubscriptions())
-    }
+    if (!isAuthorized) return
+    // Fetch server data
+    setLoading(true)
+    ;(async () => {
+      try {
+        const [history, starred, subs] = await Promise.all([
+          videoUseCases.fetchHistory(),
+          videoUseCases.fetchStarred(),
+          userUseCases.fetchSubscriptions(),
+        ])
+        setHistoryVideos(history)
+        setStarredVideos(starred)
+        setSubsUsers(subs)
+      } catch (e) {
+        console.error("Failed to load profile data", e)
+      } finally {
+        setLoading(false)
+      }
+    })()
   }, [isAuthorized])
+
+  useEffect(() => {
+    if (!isAuthorized) return
+    if (!user?.id) return
+    ;(async () => {
+      try {
+        const mine = await videoUseCases.fetchByChannel(user.id)
+        setMyVideos(mine)
+      } catch (e) {
+        console.error("Failed to fetch my videos", e)
+      }
+    })()
+  }, [isAuthorized, user?.id])
 
   // Если не авторизован, не рендерим содержимое
   if (!isAuthorized) {
@@ -108,11 +119,11 @@ export function ProfilePage() {
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <VideoIcon className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span>{uploads.length} видео</span>
+                  <span>{user.videoCount ?? 0} видео</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Users className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span>{subs.length} подписок</span>
+                  <span>{user.subscriberCount ?? 0} подписчиков</span>
                 </div>
                 {totalViews > 0 && (
                   <div className="flex items-center gap-1">
@@ -196,7 +207,9 @@ export function ProfilePage() {
                 </Button>
               </Link>
             </div>
-            {uploads.length === 0 ? (
+            {loading ? (
+              <div className="text-sm text-muted-foreground">Загрузка...</div>
+            ) : myVideos.length === 0 ? (
               <div className="text-center py-8 sm:py-12">
                 <VideoIcon className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-3 sm:mb-4" />
                 <h3 className="text-base sm:text-lg font-semibold mb-2">Нет видео</h3>
@@ -212,7 +225,7 @@ export function ProfilePage() {
               </div>
             ) : (
               <div className="grid gap-3 sm:gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                {uploads.map((v) => (
+                {myVideos.map((v) => (
                   <div key={v.id} className="relative group">
                     <VideoCard video={v} />
                     <Link
@@ -247,16 +260,21 @@ export function ProfilePage() {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Очистить историю просмотров?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Действие необратимо. Вся история будет удалена на этом устройстве.
+                      Действие необратимо. Вся история будет удалена.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Отмена</AlertDialogCancel>
                     <AlertDialogAction
                       className="bg-blue-600 hover:bg-blue-700 text-white"
-                      onClick={() => {
-                        clearHistory()
-                        setHistory([])
+                      onClick={async () => {
+                        try {
+                          await videoUseCases.clearHistory()
+                        } catch (e) {
+                          console.error("Failed to clear history", e)
+                        } finally {
+                          setHistoryVideos([])
+                        }
                       }}
                     >
                       Очистить
@@ -265,7 +283,9 @@ export function ProfilePage() {
                 </AlertDialogContent>
               </AlertDialog>
             </div>
-            {historyVideos.length === 0 ? (
+            {loading ? (
+              <div className="text-sm text-muted-foreground">Загрузка...</div>
+            ) : historyVideos.length === 0 ? (
               <div className="text-center py-8 sm:py-12">
                 <History className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-3 sm:mb-4" />
                 <h3 className="text-base sm:text-lg font-semibold mb-2">История пуста</h3>
@@ -282,7 +302,9 @@ export function ProfilePage() {
 
           <TabsContent value="starred" className="mt-0">
             <h2 className="text-lg font-semibold mb-4">Избранные видео</h2>
-            {starredVideos.length === 0 ? (
+            {loading ? (
+              <div className="text-sm text-muted-foreground">Загрузка...</div>
+            ) : starredVideos.length === 0 ? (
               <div className="text-center py-8 sm:py-12">
                 <Star className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-3 sm:mb-4" />
                 <h3 className="text-base sm:text-lg font-semibold mb-2">Нет избранных видео</h3>
@@ -301,7 +323,9 @@ export function ProfilePage() {
 
           <TabsContent value="subscriptions" className="mt-0">
             <h2 className="text-lg font-semibold mb-4">Мои подписки</h2>
-            {subs.length === 0 ? (
+            {loading ? (
+              <div className="text-sm text-muted-foreground">Загрузка...</div>
+            ) : subsUsers.length === 0 ? (
               <div className="text-center py-8 sm:py-12">
                 <Users className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-3 sm:mb-4" />
                 <h3 className="text-base sm:text-lg font-semibold mb-2">Нет подписок</h3>
@@ -317,28 +341,9 @@ export function ProfilePage() {
               </div>
             ) : (
               <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
-                {subs.map((channelId) => {
-                  // Найдем канал по ID
-                  const channel = all.find((v) => v.channel.id === channelId)?.channel
-                  if (!channel) return null
-
-                  return (
-                    <Link
-                      key={channelId}
-                      to={`/channel/${encodeURIComponent(channelId)}`}
-                      className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border border-blue-100 hover:bg-blue-50 transition-colors"
-                    >
-                      <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border border-blue-200">
-                        <AvatarImage src={channel.avatar || "/blue-channel-avatar.png"} alt={channel.username} />
-                        <AvatarFallback className="text-xs sm:text-sm">{initials(channel.username || "")}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium line-clamp-1 text-sm sm:text-base">{channel.username}</h3>
-                        <p className="text-xs sm:text-sm text-muted-foreground">Канал</p>
-                      </div>
-                    </Link>
-                  )
-                })}
+                {subsUsers.map((s) => (
+                  <ChannelCard key={s.id} channel={s} videos={[]} />
+                ))}
               </div>
             )}
           </TabsContent>

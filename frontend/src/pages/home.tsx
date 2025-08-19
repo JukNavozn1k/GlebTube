@@ -4,14 +4,13 @@ import { useEffect, useMemo, useState } from "react"
 import { useSearchParams, useLocation } from "react-router-dom" // заменили на react-router-dom
 import { VideoCard } from "@/components/video-card"
 import { BottomNav } from "@/components/bottom-nav"
-import { VideoUseCases } from "@/use-cases/video"
+import { videoUseCases } from "@/use-cases/video"
 import type { Video } from "@/types/video"
 
 export function HomePage() {
   const [searchParams] = useSearchParams() // в react-router-dom возвращается массив [params, setParams]
   const q = (searchParams.get("q") || "").toLowerCase().trim()
   const [apiVideos, setApiVideos] = useState<Video[]>([])
-  const videoUseCase = useMemo(() => new VideoUseCases(), [])
 
   const location = useLocation()
 
@@ -24,7 +23,7 @@ export function HomePage() {
       if (location.pathname === "/" || location.pathname === "") {
         console.log("HomePage: fetching videos from API...")
         try {
-          const list = await videoUseCase.fetchList()
+          const list = await videoUseCases.fetchList()
           console.log("HomePage: fetched videos count=", Array.isArray(list) ? list.length : typeof list)
           if (mounted) setApiVideos(list)
         } catch (err) {
@@ -37,9 +36,9 @@ export function HomePage() {
     return () => {
       mounted = false
     }
-  }, [videoUseCase, location.pathname])
+  }, [location.pathname])
 
-  const allVideos = useMemo(() => {
+  const allVideos = useMemo<Video[]>(() => {
   // Only use API videos. If API returned nothing, the list will be empty.
   return apiVideos
   }, [apiVideos])
@@ -47,11 +46,11 @@ export function HomePage() {
   const filtered = useMemo(() => {
     if (!q) return allVideos
     return allVideos.filter(
-      (v) =>
+      (v: Video) =>
         v.title.toLowerCase().includes(q) ||
         v.channel.username.toLowerCase().includes(q) ||
         v.description.toLowerCase().includes(q) ||
-        v.tags.some((tag) => tag.toLowerCase().includes(q)),
+        v.tags.some((tag: string) => tag.toLowerCase().includes(q)),
     )
   }, [q, allVideos])
 
@@ -69,7 +68,7 @@ export function HomePage() {
           </div>
         )}
         <div className={cn("grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3", q ? "pt-0" : "pt-2")}>
-          {filtered.map((v) => (
+          {filtered.map((v: Video) => (
             <VideoCard key={v.id} video={v} />
           ))}
         </div>

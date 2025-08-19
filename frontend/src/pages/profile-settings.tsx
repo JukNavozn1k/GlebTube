@@ -11,14 +11,16 @@ import { useNavigate } from "react-router-dom"
 import { BottomNav } from "@/components/bottom-nav"
 import { Upload, User } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { userUseCases } from "@/use-cases/user"
 
 export function ProfileSettingsPage() {
-  const { user, setAvatarFile, setDescription } = useUser()
+  const { user, setAvatarFile, setBio } = useUser()
   const fileRef = useRef<HTMLInputElement>(null)
   const [desc, setDesc] = useState<string>(user.bio ?? "")
   const [saving, setSaving] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [previewAvatar, setPreviewAvatar] = useState<string | null>(null)
+  const [avatarFile, setAvatarFileState] = useState<File | null>(null)
   const navigate = useNavigate()
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -44,6 +46,7 @@ export function ProfileSettingsPage() {
       if (file.type.startsWith("image/")) {
         const dataUrl = await fileToDataUrl(file)
         setPreviewAvatar(dataUrl)
+        setAvatarFileState(file)
         await setAvatarFile(file)
       }
     },
@@ -55,14 +58,19 @@ export function ProfileSettingsPage() {
     if (!f) return
     const dataUrl = await fileToDataUrl(f)
     setPreviewAvatar(dataUrl)
+    setAvatarFileState(f)
     await setAvatarFile(f)
   }
 
-  function onSave() {
-    setSaving(true)
-    setDescription(desc)
-    setSaving(false)
-    navigate("/profile")
+  async function onSave() {
+    try {
+      setSaving(true)
+      await userUseCases.updateMyProfile({ bio: desc, avatar: avatarFile ?? undefined })
+      setBio(desc) // keep local user state in sync
+      navigate("/profile")
+    } finally {
+      setSaving(false)
+    }
   }
 
   function fileToDataUrl(file: File): Promise<string> {
@@ -72,15 +80,6 @@ export function ProfileSettingsPage() {
       reader.onerror = reject
       reader.readAsDataURL(file)
     })
-  }
-
-  const formatFileSize = (file: File) => {
-    const bytes = file.size
-    if (bytes === 0) return "0 Bytes"
-    const k = 1024
-    const sizes = ["Bytes", "KB", "MB", "GB"]
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
   }
 
   const currentAvatar = previewAvatar || user.avatar || "/placeholder.svg"

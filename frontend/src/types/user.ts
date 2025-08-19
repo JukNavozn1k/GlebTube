@@ -5,25 +5,19 @@ export type User = {
   avatar?: string
   bio?: string
   subscriberCount?: number
+  baseStars?: number
   videoCount?: number
   joinedAt?: string
   location?: string
   website?: string
+  subscribed: boolean // Новое поле для упрощения подписок
 }
-
 
 export type AuthState = {
   loggedIn: boolean
   username: string
   // currentUser is the latest profile returned by the use-case (null when not authenticated)
-  currentUser?: {
-    id: number
-    username: string
-    avatar?: string | null
-    bio?: string
-    baseStars?: number
-    subscriberCount?: number
-  } | null
+  currentUser?: User | null
 }
 
 export type UserUpdateData = Partial<Pick<User, "bio" | "avatar">>

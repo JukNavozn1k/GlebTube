@@ -325,9 +325,9 @@ export function AuthPage() {
                 </TabsContent>
               </Tabs>
 
-              <div className="mt-6 text-center">
+              {/* <div className="mt-6 text-center">
                 <p className="text-xs text-gray-500">Это демо-версия. Данные сохраняются только локально.</p>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
         </div>

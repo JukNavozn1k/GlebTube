@@ -2,14 +2,12 @@ import { Link, useLocation } from "react-router-dom"
 import { Home, Upload, UserRound, ListVideo, Users, LogIn } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
-import { useState } from "react"
-import { AuthDialog } from "@/components/auth-dialog"
 
 export function BottomNav() {
   const location = useLocation()
   const pathname = location.pathname
-  const { auth, login, register } = useAuth()
-  const [open, setOpen] = useState(false)
+  const { auth } = useAuth()
+  
 
   const loggedInItems = [
     { to: "/", label: "Главная", icon: Home, type: "link" as const },
@@ -22,7 +20,7 @@ export function BottomNav() {
   const loggedOutItems = [
     { to: "/", label: "Главная", icon: Home, type: "link" as const },
     { to: "/channels", label: "Каналы", icon: Users, type: "link" as const },
-    { to: "#login", label: "Войти", icon: LogIn, type: "login" as const },
+    { to: "/auth", label: "Войти", icon: LogIn, type: "link" as const },
   ]
 
   const items = auth.loggedIn ? loggedInItems : loggedOutItems
@@ -48,15 +46,14 @@ export function BottomNav() {
                     <span>{it.label}</span>
                   </Link>
                 ) : (
-                  <button
+                  <Link
                     className="w-full h-full flex flex-col items-center justify-center py-2 text-xs text-gray-600"
-                    onClick={() => setOpen(true)}
-                    aria-haspopup="dialog"
-                    aria-controls="auth-dialog-mobile"
-                  >
+                    to={it.to} >
+                      
                     <Icon className="h-5 w-5" />
                     <span>{it.label}</span>
-                  </button>
+                    
+                  </Link>
                 )}
               </li>
             )
@@ -64,19 +61,6 @@ export function BottomNav() {
         </ul>
       </nav>
 
-      {/* Auth dialog for mobile */}
-      <AuthDialog
-        open={open}
-        onOpenChange={setOpen}
-        onLogin={(username) => {
-          login(username)
-          setOpen(false)
-        }}
-        onRegister={(username) => {
-          register(username)
-          setOpen(false)
-        }}
-      />
     </>
   )
 }

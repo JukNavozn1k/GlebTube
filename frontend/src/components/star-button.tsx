@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react"
+
+import { useState } from "react"
 import { Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { isVideoStarred, toggleVideoStar } from "@/utils/storage"
+import { toggleVideoStarred } from "@/utils/storage"
 
 type StarButtonProps = {
   videoId: string
   baseCount?: number
   showCount?: boolean
   size?: "default" | "sm" | "lg"
-  className?: string
+  className?: string,
+  starred: boolean,
 }
 
 export function StarButton({
@@ -17,36 +19,36 @@ export function StarButton({
   showCount = true,
   size = "default",
   className = "",
+  starred = false,
 }: StarButtonProps) {
-  const [starred, setStarred] = useState<boolean>(false)
+  const [isStarred, setisStarred] = useState<boolean>(starred)
 
-  useEffect(() => {
-    setStarred(isVideoStarred(videoId))
-  }, [videoId])
+
 
   const handleToggle = () => {
-    const newStarred = toggleVideoStar(videoId)
-    setStarred(newStarred)
+    const newisStarred = toggleVideoStarred(videoId)
+    setisStarred(newisStarred)
   }
 
-  const count = baseCount + (starred ? 1 : 0)
+  const count = Math.max(0, baseCount - (isStarred ? 0 : 1))
 
   return (
     <div className={className}>
       <Button
         type="button"
         size={size}
-        variant={starred ? "default" : "outline"}
-        aria-pressed={starred}
-        aria-label={starred ? "Убрать звезду" : "Поставить звезду"}
+        variant={isStarred ? "default" : "outline"}
+        aria-pressed={isStarred}
+        aria-label={isStarred ? "Убрать звезду" : "Поставить звезду"}
         className={
-          starred ? "bg-blue-600 hover:bg-blue-700 text-white" : "border-blue-200 text-blue-700 hover:bg-blue-50"
+          isStarred ? "bg-blue-600 hover:bg-blue-700 text-white" : "border-blue-200 text-blue-700 hover:bg-blue-50"
         }
         onClick={handleToggle}
       >
-        <Star className={starred ? "h-4 w-4 fill-white" : "h-4 w-4 text-blue-700"} />
+        <Star className={isStarred ? "h-4 w-4 fill-white" : "h-4 w-4 text-blue-700"} />
         {showCount && <span className="ml-2 text-sm">{count.toLocaleString("ru-RU")}</span>}
       </Button>
     </div>
   )
 }
+
