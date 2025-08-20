@@ -66,6 +66,10 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.prod
     working_dir: /frontend
+    env_file:
+      - .env
+    environment:
+      - VITE_APP_API_URL=${VITE_APP_API_URL}
     volumes:
       - ./frontend:/frontend
       - ./frontend/dist:/frontend/dist

@@ -115,7 +115,7 @@ _To execute the following commands, you need to install python and pip_
 • __Frontend API base URL__
 
 - By default the frontend uses same-origin `"/api"` (see `frontend/src/lib/constants.ts`).
-- If you must override, set `REACT_APP_API_URL` at build time, or update code to use Vite `import.meta.env.VITE_API_URL`.
+- If you must override, set `VITE_APP_API_URL` at build time, or update code to use Vite `import.meta.env.VITE_API_URL`.
 
 • __Nginx routing__
 
