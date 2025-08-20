@@ -66,6 +66,13 @@ export class VideoUseCases extends UseCases<Video> {
   async rate(id: string) {
     return this.videoApi.rate(id);
   }
+
+  /**
+   * Fetch similar videos for a given id
+   */
+  async fetchSimilar(id: string) {
+    return this.videoApi.fetchSimilar(id);
+  }
 }
 
 export const videoUseCases = new VideoUseCases(videoApi);

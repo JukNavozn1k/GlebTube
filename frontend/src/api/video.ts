@@ -94,6 +94,15 @@ export class VideoApi extends Api<Video> {
     return res.data;
   }
 
+  /**
+   * Fetch similar videos for a given id
+   * GET /video/{id}/similar
+   */
+  async fetchSimilar(id: string): Promise<Video[]> {
+    const res = await this.apiClient.get<Video[]>(`/${this.prefix}/${id}/similar`);
+    return res.data;
+  }
+
   // Keep compatibility with base Api create/update if needed
   async create(data: unknown): Promise<Video> {
     return this.createVideo(data as UploadVideoPayload);
