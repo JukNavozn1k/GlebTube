@@ -2,7 +2,6 @@
 
 import type { User } from "@/types/user"
 import type { UploadedVideo } from "@/types/video"
-import type { Comment } from "@/types/comment"
 import { getChannelByName } from "@/data/channels"
 
 const COMMENTS_PREFIX = "glebtube:comments:"
@@ -18,8 +17,19 @@ function safeParse<T>(val: string | null, fallback: T): T {
   }
 }
 
-/* Comments with simplified rating system */
-export function getComments(video: string): Comment[] {
+/* Comments with simplified rating system (legacy, local only) */
+type LegacyComment = {
+  id: string
+  video: string
+  parent?: string
+  user: User
+  text: string
+  createdAt: string
+  stars?: number
+  starred: boolean
+}
+
+export function getComments(video: string): LegacyComment[] {
   if (typeof window === "undefined") return []
   const comments = safeParse<any[]>(localStorage.getItem(COMMENTS_PREFIX + video), [])
 
@@ -27,7 +37,7 @@ export function getComments(video: string): Comment[] {
   return comments.map((comment) => {
     if (comment.user && typeof comment.starred === "boolean") {
       // Already in new format
-      return comment as Comment
+      return comment as LegacyComment
     } else {
       // Migrate from old format
       return {
@@ -45,13 +55,13 @@ export function getComments(video: string): Comment[] {
         createdAt: comment.createdAt,
         stars: comment.stars || 0,
         starred: false, // Default value for migrated comments
-      } as Comment
+      } as LegacyComment
     }
   })
 }
 
-export function addComment(video: string, text: string, user: User, parent?: string): Comment {
-  const c: Comment = {
+export function addComment(video: string, text: string, user: User, parent?: string): LegacyComment {
+  const c: LegacyComment = {
     id: `${video}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     video,
     parent,
