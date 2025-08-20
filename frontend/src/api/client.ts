@@ -84,7 +84,7 @@ api.interceptors.response.use(
     const original = error.config as (AxiosRequestConfig & { _retry?: boolean }) | undefined;
     const status = error.response?.status;
 
-    if (status === 401 && original && !original._retry) {
+    if ((status === 401 || status==403) && original && !original._retry) {
       original._retry = true;
       try {
         const newAccess = await refreshAccessToken();
