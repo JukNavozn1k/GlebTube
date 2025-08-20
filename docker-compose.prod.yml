@@ -1,6 +1,6 @@
 version: "3.0"
 services:
-  web:
+  backend:
     build: 
       context: ./backend
     env_file:
@@ -81,7 +81,7 @@ services:
       - ./backend/media:/backend/media:ro
       - ./backend/staticfiles:/backend/staticfiles:ro
     depends_on:
-      - web
+      - backend
       - frontend
 
 volumes:
