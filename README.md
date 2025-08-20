@@ -77,3 +77,63 @@ _To execute the following commands, you need to install python and pip_
    ```python
    poetry run python manage.py runserver
    ```
+
+
+## Production (Docker Compose)
+
+• __Prepare environment__
+
+1. Copy environment template and edit secrets
+   ```sh
+   cp .env.example .env
+   # edit .env (SECRET_KEY, DB_*, ALLOWED_HOSTS, OAuth keys, etc.)
+   ```
+
+• __Build and start__
+
+2. Build images and start services
+   ```sh
+   docker compose -f docker-compose.prod.yml --env-file .env up -d --build
+   ```
+
+3. App should be available on http://localhost/ (Nginx)
+
+• __What this stack runs__
+
+- __web__: Django + Gunicorn. On start runs `migrate` and `collectstatic`.
+- __db__: Postgres 16.
+- __redis__: Redis for Celery and cache.
+- __worker__: Celery worker.
+- __frontend__: builds Vite app to `frontend/dist` (build-only container).
+- __nginx__: Serves SPA and proxies API to Django.
+
+• __Volumes and paths__
+
+- Django static files are collected to `backend/staticfiles` and served by Nginx at `/static/`.
+- Media files are served by Nginx at `/media/` from `backend/media`.
+
+• __Frontend API base URL__
+
+- By default the frontend uses same-origin `"/api"` (see `frontend/src/lib/constants.ts`).
+- If you must override, set `REACT_APP_API_URL` at build time, or update code to use Vite `import.meta.env.VITE_API_URL`.
+
+• __Nginx routing__
+
+- `location /` serves the built SPA from `frontend/dist`.
+- `location /api/`, `/admin/`, HLS endpoints are proxied to Django (`web:8000`).
+- `location /static/` -> `/backend/staticfiles/`, `location /media/` -> `/backend/media/`.
+
+• __Common commands__
+
+```sh
+# Logs
+docker compose -f docker-compose.prod.yml logs -f web nginx worker
+
+# Run manage.py inside web
+docker compose -f docker-compose.prod.yml exec web python manage.py createsuperuser
+
+# Rebuild frontend only
+docker compose -f docker-compose.prod.yml up -d --build frontend
+
+# Full rebuild
+docker compose -f docker-compose.prod.yml up -d --build
