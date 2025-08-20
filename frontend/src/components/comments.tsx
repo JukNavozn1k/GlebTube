@@ -68,10 +68,6 @@ export function Comments({ video }: CommentsProps) {
         setLoading(false)
       }
     }
-    // reset editors
-    setReplyTo(null)
-    setReplyText("")
-    setText("")
     setOpenReplies({})
     setEditingComment(null)
     setEditText("")
@@ -87,6 +83,9 @@ export function Comments({ video }: CommentsProps) {
     }),
     [user, auth.username],
   )
+
+  // Normalize current user id as string for comparisons
+  const currentUserId = useMemo(() => String(currentUser.id), [currentUser.id])
 
   const roots = useMemo(() => {
     const rootComments = items.filter((c) => !c.parent)
@@ -295,7 +294,7 @@ export function Comments({ video }: CommentsProps) {
         {loading && <div className="text-sm text-muted-foreground">Загрузка комментариев…</div>}
         {!loading && roots.map((c) => {
           const replies = repliesByParent.get(c.id) || []
-          const meRoot = c.channel.id === currentUser.id
+          const meRoot = String((c.channel as any).id) === currentUserId
           const isOpen = openReplies[c.id] || false
           const isEditing = editingComment === c.id
           return (
@@ -463,7 +462,7 @@ export function Comments({ video }: CommentsProps) {
                 {replies.length > 0 && isOpen && (
                   <div className="mt-2 pl-10 grid gap-3 min-w-0">
                     {replies.map((r) => {
-                      const rMe = r.channel.id === currentUser.id
+                      const rMe = String((r.channel as any).id) === currentUserId
                       const rIsEditing = editingComment === r.id
                       return (
                         <div key={r.id} className="flex items-start gap-3 min-w-0">
