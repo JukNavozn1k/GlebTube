@@ -70,3 +70,34 @@ def semantic_search_videos(query, videos_qs, normalize=True):
     query_emb = encode_texts([query])
 
     return search_by_embeddings(query_emb, video_embeddings, videos_list, normalize=normalize)
+
+
+def semantic_search_videos_by_embedding(query_video, videos_qs, normalize=True):
+    """
+    query_video: Video (объект модели) с готовым video_embedding
+    videos_qs: QuerySet Video с заполненным video_embedding
+    Возвращает список Video, отсортированных по косинусной близости
+    """
+    if not query_video.video_embedding:
+        return []
+
+    videos_list, embeddings_list = [], []
+    for video in videos_qs:
+        if video.video_embedding:
+            embeddings_list.append(torch.tensor(video.video_embedding))
+            videos_list.append(video)
+
+    if not embeddings_list:
+        return []
+
+    query_emb = torch.tensor(query_video.video_embedding).unsqueeze(0)
+    video_embeddings = torch.stack(embeddings_list)
+
+    if normalize:
+        video_embeddings = F.normalize(video_embeddings, p=2, dim=1)
+        query_emb = F.normalize(query_emb, p=2, dim=1)
+
+    cos_sim = torch.matmul(video_embeddings, query_emb.T).squeeze(1)
+    sorted_idx = torch.argsort(cos_sim, descending=True)
+
+    return [videos_list[idx] for idx in sorted_idx]

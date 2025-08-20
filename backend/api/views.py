@@ -16,7 +16,9 @@ from videos.models import Video, CommentVideo, UserVideoRelation, UserCommentRel
 from . import serializers, permissions
 from watch import tasks
 
-from ml.search import semantic_search_videos
+import torch
+from ml.search import semantic_search_videos,semantic_search_videos_by_embedding
+
 
 
 class UserView(mixins.ListModelMixin,
@@ -162,7 +164,33 @@ class VideoView(ModelViewSet):
         # сериализуем
         serializer = self.get_serializer(results, many=True, context={"request": request})
         return Response(serializer.data)
+    
+    @action(detail=True, methods=['get'])
+    def similar(self, request, pk=None):
+        base_video = self.get_object()
+        if not base_video.video_embedding:
+            return Response(
+                {"detail": "This video has no embedding."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
+        qs = (
+            self.get_queryset()
+            .exclude(pk=base_video.pk)
+            .exclude(video_embedding__isnull=True)
+        )
+
+        ranked_videos = semantic_search_videos_by_embedding(
+            base_video,
+            qs,
+            normalize=True
+        )
+
+        serializer = self.get_serializer(
+            ranked_videos, many=True, context={"request": request}
+        )
+        return Response(serializer.data)
+    
     @action(detail=False, methods=['get', 'delete'], permission_classes=[IsAuthenticated])
     def history(self, request):
         if request.method == 'GET':
