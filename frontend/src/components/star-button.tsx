@@ -2,10 +2,10 @@
 import { useState } from "react"
 import { Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { toggleVideoStarred } from "@/utils/storage"
+import { videoUseCases } from "@/use-cases/video"
 
 type StarButtonProps = {
-  videoId: string
+  video: string
   baseCount?: number
   showCount?: boolean
   size?: "default" | "sm" | "lg"
@@ -14,7 +14,7 @@ type StarButtonProps = {
 }
 
 export function StarButton({
-  videoId,
+  video,
   baseCount = 0,
   showCount = true,
   size = "default",
@@ -23,14 +23,16 @@ export function StarButton({
 }: StarButtonProps) {
   const [isStarred, setisStarred] = useState<boolean>(starred)
 
-
-
-  const handleToggle = () => {
-    const newisStarred = toggleVideoStarred(videoId)
-    setisStarred(newisStarred)
+  const handleToggle = async () => {
+    try {
+      const res = await videoUseCases.rate(video)
+      setisStarred(res.starred)
+    } catch (e) {
+      console.error("Failed to rate video:", e)
+    }
   }
 
-  const count = Math.max(0, baseCount - (isStarred ? 0 : 1))
+  const count =  baseCount + (isStarred ? 1 : 0)
 
   return (
     <div className={className}>

@@ -83,6 +83,26 @@ export class VideoApi extends Api<Video> {
     return res.data;
   }
 
+  /**
+   * Toggle star for a video
+   * POST /video/rate/{id}/
+   */
+  async rate(id: string): Promise<{ video_id: string; starred: boolean }> {
+    const res = await this.apiClient.post<{ video_id: string; starred: boolean }>(
+      `/${this.prefix}/${id}/rate/`
+    );
+    return res.data;
+  }
+
+  /**
+   * Fetch similar videos for a given id
+   * GET /video/{id}/similar
+   */
+  async fetchSimilar(id: string): Promise<Video[]> {
+    const res = await this.apiClient.get<Video[]>(`/${this.prefix}/${id}/similar`);
+    return res.data;
+  }
+
   // Keep compatibility with base Api create/update if needed
   async create(data: unknown): Promise<Video> {
     return this.createVideo(data as UploadVideoPayload);

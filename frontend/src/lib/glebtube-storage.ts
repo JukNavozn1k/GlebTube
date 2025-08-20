@@ -26,31 +26,31 @@ export function getStarred(): string[] {
   return safeParse(localStorage.getItem(STAR_KEY), [])
 }
 
-export function isStarred(videoId: string): boolean {
-  return getStarred().includes(videoId)
+export function isStarred(video: string): boolean {
+  return getStarred().includes(video)
 }
 
-export function toggleStar(videoId: string): boolean {
+export function toggleStar(video: string): boolean {
   if (typeof window === "undefined") return false
   const set = new Set(getStarred())
-  if (set.has(videoId)) set.delete(videoId)
-  else set.add(videoId)
+  if (set.has(video)) set.delete(video)
+  else set.add(video)
   const arr = Array.from(set)
   localStorage.setItem(STAR_KEY, JSON.stringify(arr))
-  return arr.includes(videoId)
+  return arr.includes(video)
 }
 
 /* Comments with replies */
-export function getComments(videoId: string): Comment[] {
+export function getComments(video: string): Comment[] {
   if (typeof window === "undefined") return []
-  return safeParse(localStorage.getItem(COMMENTS_PREFIX + videoId), [])
+  return safeParse(localStorage.getItem(COMMENTS_PREFIX + video), [])
 }
 
-export function addComment(videoId: string, text: string, user: User, parentId?: string): Comment {
+export function addComment(video: string, text: string, user: User, parent?: string): Comment {
   const c: Comment = {
-    id: `${videoId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    videoId,
-    parentId,
+    id: `${video}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    video,
+    parent,
     userId: user.id,
     userName: user.username,
     userHandle: user.handle,
@@ -59,27 +59,27 @@ export function addComment(videoId: string, text: string, user: User, parentId?:
     createdAt: new Date().toISOString(),
     stars: 0,
   }
-  const list = getComments(videoId)
+  const list = getComments(video)
   list.unshift(c)
-  localStorage.setItem(COMMENTS_PREFIX + videoId, JSON.stringify(list))
+  localStorage.setItem(COMMENTS_PREFIX + video, JSON.stringify(list))
   return c
 }
 
-export function updateComment(videoId: string, commentId: string, newText: string): boolean {
+export function updateComment(video: string, commentId: string, newText: string): boolean {
   if (typeof window === "undefined") return false
-  const list = getComments(videoId)
+  const list = getComments(video)
   const idx = list.findIndex((c) => c.id === commentId)
   if (idx === -1) return false
 
   list[idx].text = newText
-  localStorage.setItem(COMMENTS_PREFIX + videoId, JSON.stringify(list))
+  localStorage.setItem(COMMENTS_PREFIX + video, JSON.stringify(list))
   return true
 }
 
-export function removeComment(videoId: string, commentId: string) {
+export function removeComment(video: string, commentId: string) {
   // remove the comment and its direct replies
-  const list = getComments(videoId).filter((c) => c.id !== commentId && c.parentId !== commentId)
-  localStorage.setItem(COMMENTS_PREFIX + videoId, JSON.stringify(list))
+  const list = getComments(video).filter((c) => c.id !== commentId && c.parent !== commentId)
+  localStorage.setItem(COMMENTS_PREFIX + video, JSON.stringify(list))
 }
 
 /* Comment stars (per-user 1-star) */
@@ -92,10 +92,10 @@ export function hasStarredComment(commentId: string): boolean {
   return getMyCommentStars().includes(commentId)
 }
 
-export function toggleCommentStar(videoId: string, commentId: string): boolean {
+export function toggleCommentStar(video: string, commentId: string): boolean {
   if (typeof window === "undefined") return false
   const mine = new Set(getMyCommentStars())
-  const list = getComments(videoId)
+  const list = getComments(video)
   const idx = list.findIndex((c) => c.id === commentId)
   if (idx === -1) return hasStarredComment(commentId)
 
@@ -108,16 +108,16 @@ export function toggleCommentStar(videoId: string, commentId: string): boolean {
     list[idx].stars = (list[idx].stars || 0) + 1
   }
   localStorage.setItem(COMMENT_STARS_KEY, JSON.stringify(Array.from(mine)))
-  localStorage.setItem(COMMENTS_PREFIX + videoId, JSON.stringify(list))
+  localStorage.setItem(COMMENTS_PREFIX + video, JSON.stringify(list))
   return !currently
 }
 
 /* History: array of { id, at } sorted by latest */
-export function addHistory(videoId: string) {
+export function addHistory(video: string) {
   if (typeof window === "undefined") return
   const list = safeParse<{ id: string; at: string }[]>(localStorage.getItem(HISTORY_KEY), [])
-  const filtered = list.filter((x) => x.id !== videoId)
-  filtered.unshift({ id: videoId, at: new Date().toISOString() })
+  const filtered = list.filter((x) => x.id !== video)
+  filtered.unshift({ id: video, at: new Date().toISOString() })
   localStorage.setItem(HISTORY_KEY, JSON.stringify(filtered.slice(0, 200)))
 }
 

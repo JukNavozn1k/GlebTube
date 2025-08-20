@@ -16,7 +16,9 @@ from videos.models import Video, CommentVideo, UserVideoRelation, UserCommentRel
 from . import serializers, permissions
 from watch import tasks
 
-from ml.search import semantic_search_videos
+import torch
+from ml.search import semantic_search_videos,semantic_search_videos_by_embedding
+
 
 
 class UserView(mixins.ListModelMixin,
@@ -86,8 +88,8 @@ class CommentView(ModelViewSet):
     serializer_class = serializers.CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, permissions.EditContentPermission]
     filter_backends = [OrderingFilter, DjangoFilterBackend]
-    ordering_fields = ['baseStars']
-    filterset_fields = ['instance', 'parent']
+    ordering_fields = ['baseStars', 'createdAt']
+    filterset_fields = ['video', 'parent']
     
     def perform_create(self, serializer):
         serializer.save(channel=self.request.user)
@@ -99,7 +101,10 @@ class CommentView(ModelViewSet):
         )
         rate_obj.grade = 0 if rate_obj.grade == 1 else 1
         rate_obj.save()
-        return Response({'starred': bool(rate_obj.grade)})
+        return Response({
+            "comment_id": pk,
+            "starred": bool(rate_obj.grade)
+        })
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -159,7 +164,33 @@ class VideoView(ModelViewSet):
         # сериализуем
         serializer = self.get_serializer(results, many=True, context={"request": request})
         return Response(serializer.data)
+    
+    @action(detail=True, methods=['get'])
+    def similar(self, request, pk=None):
+        base_video = self.get_object()
+        if not base_video.video_embedding:
+            return Response(
+                {"detail": "This video has no embedding."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
+        qs = (
+            self.get_queryset()
+            .exclude(pk=base_video.pk)
+            .exclude(video_embedding__isnull=True)
+        )
+
+        ranked_videos = semantic_search_videos_by_embedding(
+            base_video,
+            qs,
+            normalize=True
+        )
+
+        serializer = self.get_serializer(
+            ranked_videos, many=True, context={"request": request}
+        )
+        return Response(serializer.data)
+    
     @action(detail=False, methods=['get', 'delete'], permission_classes=[IsAuthenticated])
     def history(self, request):
         if request.method == 'GET':
@@ -215,13 +246,16 @@ class VideoView(ModelViewSet):
         rate_obj, _ = UserVideoRelation.objects.get_or_create(video_id=pk, user=request.user)
         rate_obj.grade = 0 if rate_obj.grade == 1 else 1
         rate_obj.save()
-        return Response({'starred': bool(rate_obj.grade)})
+        return Response({
+            "video_id": pk,
+            "starred": bool(rate_obj.grade)
+        })
 
     def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        tasks.refresh_views.delay(instance.id)
+        video = self.get_object()
+        tasks.refresh_views.delay(video.id)
         if request.user.is_authenticated:
-            tasks.refresh_history.delay(instance.id, request.user.id)
+            tasks.refresh_history.delay(video.id, request.user.id)
         return super().retrieve(request, *args, **kwargs)
 
     def perform_create(self, serializer):

@@ -1,7 +1,8 @@
 import type { LoginCredentials, RegisterCredentials, AuthTokens, RegisterResponse, UserProfile } from "@/types/auth";
-import { authApi,AuthApi } from "@/api/auth";
+import { authApi, AuthApi } from "@/api/auth";
 import { LOCAL_STORAGE_KEYS } from "@/lib/constants";
 import { parseAxiosError } from "@/types/http";
+import { setAccessToken, setRefreshToken, getRefreshToken, clearAuth, getAccessToken } from "@/api/client";
 
 export class AuthUseCases {
   private authApi: AuthApi;
@@ -16,11 +17,20 @@ export class AuthUseCases {
    * If profile fetch fails, perform logout to clear tokens.
    */
   async initialize(): Promise<void> {
-    if (!this.isAuthenticated()) return;
+    // If we have an access token already in memory, try to load the profile.
+    // Otherwise, if we have a refresh token, try to refresh and then load profile.
     try {
-      await this.loadUserProfile();
+      if (getAccessToken()) {
+        await this.loadUserProfile();
+        return;
+      }
+
+      const refresh = getRefreshToken();
+      if (refresh) {
+        await this.refreshTokens();
+        await this.loadUserProfile();
+      }
     } catch {
-      // If initializing fails (expired token etc) clear stored tokens
       this.logout();
     }
   }
@@ -28,8 +38,9 @@ export class AuthUseCases {
   async login(credentials: LoginCredentials): Promise<AuthTokens> {
     try {
       const tokens = await this.authApi.login(credentials);
-      localStorage.setItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN, tokens.access);
-      localStorage.setItem(LOCAL_STORAGE_KEYS.REFRESH_TOKEN, tokens.refresh);
+      // Keep access in-memory; persist only refresh
+      setAccessToken(tokens.access);
+      setRefreshToken(tokens.refresh);
       await this.loadUserProfile();
       return tokens;
     } catch (error) {
@@ -61,12 +72,12 @@ export class AuthUseCases {
   }
   /** NEW: обновление access токена с использованием refresh */
   async refreshTokens(): Promise<string> {
-    const refreshToken = localStorage.getItem(LOCAL_STORAGE_KEYS.REFRESH_TOKEN);
+    const refreshToken = getRefreshToken();
     if (!refreshToken) throw new Error("No refresh token available");
 
     try {
       const { access } = await this.authApi.refresh(refreshToken);
-      localStorage.setItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN, access);
+      setAccessToken(access);
       return access;
     } catch (error) {
       console.error("Token refresh error:", error);
@@ -75,31 +86,24 @@ export class AuthUseCases {
     }
   }
 
-
   getCurrentUser(): UserProfile | null {
     return this.currentUser;
   }
 
   isAuthenticated(): boolean {
-    return !!localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+    // Consider authenticated if we have an access token in memory or a refresh token persisted
+    return !!getAccessToken() || !!getRefreshToken();
   }
 
   logout(): void {
     this.currentUser = null;
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.REFRESH_TOKEN);
+    clearAuth();
+    // Ensure refresh token is also cleared from storage
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(LOCAL_STORAGE_KEYS.REFRESH_TOKEN);
+    }
   }
 }
 
 export const authUseCases = new AuthUseCases(authApi);
-// Автообновление access токена каждые 5 минут (300 000 мс)
-setInterval(async () => {
-  if (authUseCases.isAuthenticated()) {
-    try {
-      await authUseCases.refreshTokens();
-      console.log("Access token refreshed");
-    } catch (error) {
-      console.warn("Failed to refresh token:", error);
-    }
-  }
-}, 300_000); // 5 минут в миллисекундах
+// Removed periodic refresh in favor of on-demand refresh via Axios interceptor

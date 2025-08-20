@@ -43,13 +43,14 @@ export function WatchPage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [v, list] = await Promise.all([
+        const [v, similar] = await Promise.all([
           videoUseCases.fetchById(id),
-          videoUseCases.fetchList()
+          videoUseCases.fetchSimilar(id)
         ]);
 
         setVideo(v);
-        setRecommended(list.filter((item) => item.id !== id).slice(0, 6));
+        // If backend returns current video in similar list, filter it out; do not enforce any limit
+        setRecommended(similar.filter((item) => item.id !== id));
         if (v?.channel) setSub(!!v.channel.subscribed);
       } catch (error) {
         console.error("Failed to load video or recommendations:", error);
@@ -154,7 +155,7 @@ export function WatchPage() {
                 </div>
               </div>
               <div className="flex-shrink-0">
-                <StarButton videoId={video.id} starred={video.starred} baseCount={video.baseStars} />
+                <StarButton video={video.id} starred={video.starred} baseCount={video.baseStars} />
               </div>
             </div>
 
@@ -163,10 +164,10 @@ export function WatchPage() {
 
           {/* Comments: toggle visible on <lg (phones/tablets) */}
           <div className="lg:hidden min-w-0">
-            <ToggleComments videoId={video.id} />
+            <ToggleComments video={video.id} />
           </div>
           <div className="hidden lg:block min-w-0">
-            <Comments videoId={video.id} />
+            <Comments video={video.id} />
           </div>
         </section>
 
@@ -212,7 +213,7 @@ export function WatchPage() {
   )
 }
 
-function ToggleComments({ videoId }: { videoId: string }) {
+function ToggleComments({ video }: { video: string }) {
   const [open, setOpen] = useState(false)
   return (
     <div className="grid gap-2">
@@ -223,7 +224,7 @@ function ToggleComments({ videoId }: { videoId: string }) {
       >
         {open ? "Скрыть комментарии" : "Показать комментарии"}
       </Button>
-      {open && <Comments videoId={videoId} />}
+      {open && <Comments video={video} />}
     </div>
   )
 }

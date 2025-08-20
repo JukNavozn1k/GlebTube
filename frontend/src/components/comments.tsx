@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { addComment, getComments, removeComment, updateComment, toggleCommentStar } from "@/utils/storage"
 import type { Comment } from "@/types/comment"
 import { formatCommentTime } from "@/utils/format"
 import { useUser } from "@/hooks/use-user"
 import { useAuth } from "@/contexts/auth-context"
+import { commentUseCases } from "@/use-cases/comment"
 import {
   Star,
   ChevronDown,
@@ -35,12 +35,12 @@ import {
 } from "@/components/ui/alert-dialog"
 
 type CommentsProps = {
-  videoId: string
+  video: string
 }
 
 type SortOption = "newest" | "oldest" | "popular"
 
-export function Comments({ videoId }: CommentsProps) {
+export function Comments({ video }: CommentsProps) {
   const [items, setItems] = useState<Comment[]>([])
   const [text, setText] = useState<string>("")
   const [replyTo, setReplyTo] = useState<string | null>(null)
@@ -52,29 +52,43 @@ export function Comments({ videoId }: CommentsProps) {
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null)
   const { user } = useUser()
   const { auth } = useAuth()
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    setItems(getComments(videoId))
-    setReplyTo(null)
-    setReplyText("")
-    setText("")
+    const ordering = sortBy === "popular" ? "-baseStars" : sortBy === "newest" ? "-createdAt" : "createdAt"
+    const load = async () => {
+      setLoading(true)
+      try {
+        const list = await commentUseCases.fetchForVideo(video, { ordering })
+        setItems(list)
+      } catch (e) {
+        console.error("Failed to load comments:", e)
+        setItems([])
+      } finally {
+        setLoading(false)
+      }
+    }
     setOpenReplies({})
     setEditingComment(null)
     setEditText("")
-  }, [videoId])
+    load()
+  }, [video, sortBy])
 
   // Create current user object
   const currentUser = useMemo(
     () => ({
       id: user.id || "me",
-      name: auth.username || user.name || "User",
+      username: auth.username || (user as any).name || (user as any).username || "User",
       avatar: user.avatar,
     }),
     [user, auth.username],
   )
 
+  // Normalize current user id as string for comparisons
+  const currentUserId = useMemo(() => String(currentUser.id), [currentUser.id])
+
   const roots = useMemo(() => {
-    const rootComments = items.filter((c) => !c.parentId)
+    const rootComments = items.filter((c) => !c.parent)
 
     // Сортируем корневые комментарии
     switch (sortBy) {
@@ -83,7 +97,7 @@ export function Comments({ videoId }: CommentsProps) {
       case "oldest":
         return rootComments.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
       case "popular":
-        return rootComments.sort((a, b) => (b.stars || 0) - (a.stars || 0))
+        return rootComments.sort((a, b) => (b.baseStars || 0) - (a.baseStars || 0))
       default:
         return rootComments
     }
@@ -92,9 +106,9 @@ export function Comments({ videoId }: CommentsProps) {
   const repliesByParent = useMemo(() => {
     const map = new Map<string, Comment[]>()
     for (const c of items) {
-      if (!c.parentId) continue
-      if (!map.has(c.parentId)) map.set(c.parentId, [])
-      map.get(c.parentId)!.push(c)
+      if (!c.parent) continue
+      if (!map.has(c.parent)) map.set(c.parent, [])
+      map.get(c.parent)!.push(c)
     }
     // Ответы всегда сортируем по дате (новые сначала)
     for (const arr of map.values()) {
@@ -106,19 +120,31 @@ export function Comments({ videoId }: CommentsProps) {
   function submitRoot() {
     const val = text.trim()
     if (!val) return
-    const c = addComment(videoId, val, currentUser)
-    setItems((prev) => [c, ...prev])
-    setText("")
+    ;(async () => {
+      try {
+        const c = await commentUseCases.createComment({ video, text: val })
+        setItems((prev) => [c, ...prev])
+        setText("")
+      } catch (e) {
+        console.error("Failed to create comment:", e)
+      }
+    })()
   }
 
-  function submitReply(parentId: string) {
+  function submitReply(parent: string) {
     const val = replyText.trim()
     if (!val) return
-    const c = addComment(videoId, val, currentUser, parentId)
-    setItems((prev) => [c, ...prev])
-    setReplyText("")
-    setReplyTo(null)
-    setOpenReplies((s) => ({ ...s, [parentId]: true }))
+    ;(async () => {
+      try {
+        const c = await commentUseCases.createComment({ video, text: val, parent })
+        setItems((prev) => [c, ...prev])
+        setReplyText("")
+        setReplyTo(null)
+        setOpenReplies((s) => ({ ...s, [parent]: true }))
+      } catch (e) {
+        console.error("Failed to create reply:", e)
+      }
+    })()
   }
 
   function startEdit(comment: Comment) {
@@ -134,25 +160,55 @@ export function Comments({ videoId }: CommentsProps) {
   function saveEdit(commentId: string) {
     const newText = editText.trim()
     if (!newText) return
-
-    if (updateComment(videoId, commentId, newText)) {
-      setItems(getComments(videoId))
-      setEditingComment(null)
-      setEditText("")
-    }
+    ;(async () => {
+      try {
+        const updated = await commentUseCases.updateComment(commentId, newText)
+        setItems((prev) => prev.map((c) => (c.id === updated.id ? updated : c)))
+        setEditingComment(null)
+        setEditText("")
+      } catch (e) {
+        console.error("Failed to update comment:", e)
+      }
+    })()
   }
 
   function onRemove(id: string) {
-    removeComment(videoId, id)
-    setItems((prev) => prev.filter((c) => c.id !== id && c.parentId !== id))
+    ;(async () => {
+      try {
+        await commentUseCases.remove(id)
+        // Re-fetch to also reflect backend cascading rules
+        const list = await commentUseCases.fetchForVideo(video, {
+          ordering: sortBy === "popular" ? "-baseStars" : sortBy === "newest" ? "-createdAt" : "createdAt",
+        })
+        setItems(list)
+      } catch (e) {
+        console.error("Failed to delete comment:", e)
+      }
+    })()
   }
 
   function onToggleCommentStar(id: string) {
-    toggleCommentStar(videoId, id)
-    setItems(getComments(videoId))
+    ;(async () => {
+      try {
+        const res = await commentUseCases.rate(id)
+        setItems((prev) => {
+          let found = false
+          const next = prev.map((c) => {
+            if (c.id !== id) return c
+            found = true
+            const nextStarred = typeof res?.starred === "boolean" ? res.starred : !c.starred
+            const delta = nextStarred === c.starred ? 0 : nextStarred ? 1 : -1
+            return { ...c, starred: nextStarred, baseStars: Math.max(0, (c.baseStars || 0) + delta) }
+          })
+          return found ? next : prev
+        })
+      } catch (e) {
+        console.error("Failed to rate comment:", e)
+      }
+    })()
   }
 
-  const count = items.filter((c) => !c.parentId).length
+  const count = items.filter((c) => !c.parent).length
 
   const sortOptions = [
     { value: "newest" as const, label: "Сначала новые", icon: Clock },
@@ -235,21 +291,22 @@ export function Comments({ videoId }: CommentsProps) {
 
       {/* List */}
       <div className="grid gap-4 min-w-0">
-        {roots.map((c) => {
+        {loading && <div className="text-sm text-muted-foreground">Загрузка комментариев…</div>}
+        {!loading && roots.map((c) => {
           const replies = repliesByParent.get(c.id) || []
-          const meRoot = c.user.id === currentUser.id
+          const meRoot = String((c.channel as any).id) === currentUserId
           const isOpen = openReplies[c.id] || false
           const isEditing = editingComment === c.id
           return (
             <div key={c.id} className="flex items-start gap-3 min-w-0">
               <Avatar className="h-9 w-9 border border-blue-200 flex-shrink-0">
-                <AvatarImage src={c.user.avatar || "/placeholder.svg"} alt={c.user.username} />
+                <AvatarImage src={c.channel.avatar || "/placeholder.svg"} alt={c.channel.username} />
                 <AvatarFallback>US</AvatarFallback>
               </Avatar>
               <div className="grid gap-1 flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm flex-wrap min-w-0">
-                    <span className="font-medium break-words">{c.user.username}</span>
+                    <span className="font-medium break-words">{c.channel.username}</span>
                     <span className="text-muted-foreground">• {formatCommentTime(c.createdAt)}</span>
                   </div>
 
@@ -333,7 +390,7 @@ export function Comments({ videoId }: CommentsProps) {
                         onClick={() => onToggleCommentStar(c.id)}
                       >
                         <Star className={cn("h-4 w-4 mr-1", c.starred ? "fill-blue-600 text-blue-600" : "")} />
-                        <span className="text-xs">{(c.stars || 0).toLocaleString("ru-RU")}</span>
+                        <span className="text-xs">{(c.baseStars || 0).toLocaleString("ru-RU")}</span>
                       </Button>
 
                       <Button
@@ -405,18 +462,18 @@ export function Comments({ videoId }: CommentsProps) {
                 {replies.length > 0 && isOpen && (
                   <div className="mt-2 pl-10 grid gap-3 min-w-0">
                     {replies.map((r) => {
-                      const rMe = r.user.id === currentUser.id
+                      const rMe = String((r.channel as any).id) === currentUserId
                       const rIsEditing = editingComment === r.id
                       return (
                         <div key={r.id} className="flex items-start gap-3 min-w-0">
                           <Avatar className="h-7 w-7 border border-blue-200 flex-shrink-0">
-                            <AvatarImage src={r.user.avatar || "/placeholder.svg"} alt={r.user.username} />
+                            <AvatarImage src={r.channel.avatar || "/placeholder.svg"} alt={r.channel.username} />
                             <AvatarFallback>US</AvatarFallback>
                           </Avatar>
                           <div className="grid gap-1 flex-1 min-w-0">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2 text-sm flex-wrap min-w-0">
-                                <span className="font-medium break-words">{r.user.username}</span>
+                                <span className="font-medium break-words">{r.channel.username}</span>
                                 <span className="text-muted-foreground">• {formatCommentTime(r.createdAt)}</span>
                               </div>
 
@@ -502,7 +559,7 @@ export function Comments({ videoId }: CommentsProps) {
                                     <Star
                                       className={cn("h-4 w-4 mr-1", r.starred ? "fill-blue-600 text-blue-600" : "")}
                                     />
-                                    <span className="text-xs">{(r.stars || 0).toLocaleString("ru-RU")}</span>
+                                    <span className="text-xs">{(r.baseStars || 0).toLocaleString("ru-RU")}</span>
                                   </Button>
                                 </div>
                               </>

@@ -21,12 +21,12 @@ class UserVideoRelationAdmin(admin.ModelAdmin):
 
 @admin.register(models.CommentVideo)
 class CommentVideoAdmin(admin.ModelAdmin):
-    list_display = ("id", "channel", "instance", "createdAt")
-    list_select_related = ("channel", "instance")
+    list_display = ("id", "channel", "video", "createdAt")
+    list_select_related = ("channel", "video")
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        return qs.select_related("channel", "instance")
+        return qs.select_related("channel", "video")
 
 
 @admin.register(models.UserCommentRelation)
@@ -36,5 +36,5 @@ class UserCommentRelationAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        return qs.select_related("user", "comment__instance", "comment__channel")
+        return qs.select_related("user", "comment__video", "comment__channel")
         
