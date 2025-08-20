@@ -10,14 +10,14 @@ export type User = {
   joinedAt?: string
   location?: string
   website?: string
-  subscribed: boolean // Новое поле для упрощения подписок
+  subscribed?: boolean // Новое поле для упрощения подписок
 }
 
 export type AuthState = {
   loggedIn: boolean
   username: string
   // currentUser is the latest profile returned by the use-case (null when not authenticated)
-  currentUser?: User | null
+  currentUser?: import("@/types/auth").UserProfile | null
 }
 
 export type UserUpdateData = Partial<Pick<User, "bio" | "avatar">>

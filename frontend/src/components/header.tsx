@@ -40,7 +40,7 @@ function initials(username: string) {
   return s.toUpperCase() || "US"
 }
 
-export function Header({ className = "", showSearch = true, sidebarCollapsed = false }: HeaderProps) {
+export function Header({ className = "", showSearch = true }: HeaderProps) {
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()

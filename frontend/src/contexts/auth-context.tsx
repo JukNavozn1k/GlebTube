@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react"
+import { createContext, useContext, useEffect, useState, useCallback } from "react"
+import type { ReactNode } from "react"
 import type { AuthState } from "@/types/user"
 import type { LoginCredentials, RegisterCredentials } from "@/types/auth"
 import { AuthUseCases, authUseCases } from "@/use-cases/auth"

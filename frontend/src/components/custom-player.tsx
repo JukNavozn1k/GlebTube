@@ -17,8 +17,6 @@ type CustomPlayerProps = {
   title?: string
   className?: string
   autoPlay?: boolean
-  theater?: boolean
-  onToggleTheater?: () => void
 }
 
 export function CustomPlayer({
@@ -27,8 +25,6 @@ export function CustomPlayer({
   title = "Видео",
   className = "",
   autoPlay = false,
-  theater = false,
-  onToggleTheater,
 }: CustomPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
@@ -440,7 +436,7 @@ export function CustomPlayer({
       </div>
 
       {/* Enhanced range styling */}
-      <style jsx>{`
+      <style>{`
         .player-range {
           appearance: none;
           -webkit-appearance: none;
