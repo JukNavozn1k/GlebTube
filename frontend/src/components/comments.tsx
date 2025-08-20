@@ -192,13 +192,17 @@ export function Comments({ video }: CommentsProps) {
     ;(async () => {
       try {
         const res = await commentUseCases.rate(id)
-        setItems((prev) =>
-          prev.map((c) =>
-            c.id === res.comment_id
-              ? { ...c, starred: res.starred, baseStars: Math.max(0, (c.baseStars || 0) + (res.starred ? 1 : -1)) }
-              : c,
-          ),
-        )
+        setItems((prev) => {
+          let found = false
+          const next = prev.map((c) => {
+            if (c.id !== id) return c
+            found = true
+            const nextStarred = typeof res?.starred === "boolean" ? res.starred : !c.starred
+            const delta = nextStarred === c.starred ? 0 : nextStarred ? 1 : -1
+            return { ...c, starred: nextStarred, baseStars: Math.max(0, (c.baseStars || 0) + delta) }
+          })
+          return found ? next : prev
+        })
       } catch (e) {
         console.error("Failed to rate comment:", e)
       }
