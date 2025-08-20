@@ -20,7 +20,8 @@ export class CommentApi extends Api<Comment> {
   }
 
   async updateComment(id: string, data: Pick<CreateCommentPayload, "text">): Promise<Comment> {
-    const res = await this.apiClient.put<Comment>(`/${this.prefix}/${id}/`, data);
+    // Use PATCH for partial updates so backend doesn't require full payload (e.g., 'video')
+    const res = await this.apiClient.patch<Comment>(`/${this.prefix}/${id}/`, data);
     return res.data;
   }
 
