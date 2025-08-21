@@ -1,5 +1,6 @@
-from django.db.models import Count, Case, When, OuterRef, Exists, Value, BooleanField, Prefetch
+from django.db.models import OuterRef, Exists, Value, BooleanField, Prefetch
 from django.shortcuts import get_object_or_404
+from django.http import FileResponse, HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import UserFilter, VideoFilter, CommentFilter
 from rest_framework import mixins, status
@@ -143,6 +144,36 @@ class VideoView(ModelViewSet):
     ordering_fields = ['baseStars', 'views']
     filterset_fields = ['channel', 'starred']
     filterset_class = VideoFilter
+
+    @action(detail=True, methods=['get'])
+    def hls(self, request, pk=None):
+        """Вернуть HLS playlist (.m3u8)"""
+        video = self.get_object()
+        hls_playlist_path = video.hls
+
+        try:
+            with open(hls_playlist_path, 'r') as f:
+                m3u8_content = f.read()
+        except FileNotFoundError:
+            return HttpResponse("HLS playlist not found", status=404)
+
+        base_url = request.build_absolute_uri('/')
+        serve_hls_segment_url = base_url + f"api/videos/{video.id}/hls_segment/"
+        m3u8_content = m3u8_content.replace('{{ dynamic_path }}', serve_hls_segment_url)
+
+        return HttpResponse(m3u8_content, content_type='application/vnd.apple.mpegurl')
+
+    @action(detail=True, methods=['get'], url_path='hls_segment/(?P<segment_name>[^/]+)')
+    def hls_segment(self, request, pk=None, segment_name=None):
+        """Отдача сегментов TS"""
+        video = self.get_object()
+        hls_directory = os.path.join(os.path.dirname(video.src.path), 'hls_output')
+        segment_path = os.path.join(hls_directory, segment_name)
+
+        if not os.path.exists(segment_path):
+            return HttpResponse("HLS segment not found", status=404)
+
+        return FileResponse(open(segment_path, 'rb'))
 
     @action(detail=False, methods=['get'])
     def search(self, request):

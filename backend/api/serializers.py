@@ -44,6 +44,6 @@ class VideoSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = video_models.Video
-        exclude = ["video_embedding"]
+        exclude = ["video_embedding","hls", "is_running"]
         read_only_fields = ['hls', 'duration', 'status', 'is_running', 'views', 'baseStars', 'createdAt']
 
