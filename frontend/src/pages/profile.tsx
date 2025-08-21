@@ -5,6 +5,7 @@ import { type Video } from "@/types/video"
 import { formatViews } from "@/utils/format"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { VideoCard } from "@/components/video-card"
+import { VideoCardSkeleton } from "@/components/video-card-skeleton"
 import { BottomNav } from "@/components/bottom-nav"
 import { Button } from "@/components/ui/button"
 import { useUser } from "@/hooks/use-user"
@@ -27,6 +28,7 @@ import { videoUseCases } from "@/use-cases/video"
 import { userUseCases } from "@/use-cases/user"
 import type { User } from "@/types/user"
 import { ChannelCard } from "@/components/channel-card"
+import { ChannelCardSkeleton } from "@/components/channel-card-skeleton"
 
 export function ProfilePage() {
   const { user } = useUser()
@@ -208,7 +210,11 @@ export function ProfilePage() {
               </Link>
             </div>
             {loading ? (
-              <div className="text-sm text-muted-foreground">Загрузка...</div>
+              <div className="grid gap-3 sm:gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <VideoCardSkeleton key={`profile-videos-skel-${i}`} />
+                ))}
+              </div>
             ) : myVideos.length === 0 ? (
               <div className="text-center py-8 sm:py-12">
                 <VideoIcon className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-3 sm:mb-4" />
@@ -230,7 +236,7 @@ export function ProfilePage() {
                     <VideoCard video={v} />
                     <Link
                       to={`/video/${v.id}/edit`}
-                      className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/90 hover:bg-white border border-gray-200 hover:border-blue-300 flex items-center justify-center text-gray-600 hover:text-blue-700 transition-all shadow-sm opacity-0 group-hover:opacity-100 sm:opacity-100"
+                      className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/90 hover:bg-white border border-gray-200 hover:border-blue-300 flex items-center justify-center text-gray-600 hover:text-blue-700 transition-all shadow-sm"
                       title="Редактировать видео"
                       aria-label="Редактировать видео"
                     >
@@ -284,7 +290,11 @@ export function ProfilePage() {
               </AlertDialog>
             </div>
             {loading ? (
-              <div className="text-sm text-muted-foreground">Загрузка...</div>
+              <div className="grid gap-3 sm:gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <VideoCardSkeleton key={`profile-history-skel-${i}`} />
+                ))}
+              </div>
             ) : historyVideos.length === 0 ? (
               <div className="text-center py-8 sm:py-12">
                 <History className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-3 sm:mb-4" />
@@ -303,7 +313,11 @@ export function ProfilePage() {
           <TabsContent value="starred" className="mt-0">
             <h2 className="text-lg font-semibold mb-4">Избранные видео</h2>
             {loading ? (
-              <div className="text-sm text-muted-foreground">Загрузка...</div>
+              <div className="grid gap-3 sm:gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <VideoCardSkeleton key={`profile-starred-skel-${i}`} />
+                ))}
+              </div>
             ) : starredVideos.length === 0 ? (
               <div className="text-center py-8 sm:py-12">
                 <Star className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-3 sm:mb-4" />
@@ -324,7 +338,11 @@ export function ProfilePage() {
           <TabsContent value="subscriptions" className="mt-0">
             <h2 className="text-lg font-semibold mb-4">Мои подписки</h2>
             {loading ? (
-              <div className="text-sm text-muted-foreground">Загрузка...</div>
+              <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <ChannelCardSkeleton key={`profile-subs-skel-${i}`} />
+                ))}
+              </div>
             ) : subsUsers.length === 0 ? (
               <div className="text-center py-8 sm:py-12">
                 <Users className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-3 sm:mb-4" />

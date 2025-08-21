@@ -73,6 +73,13 @@ export class VideoUseCases extends UseCases<Video> {
   async fetchSimilar(id: string) {
     return this.videoApi.fetchSimilar(id);
   }
+
+  /**
+   * Get HLS playlist URL for a video id (pages should not build URLs directly).
+   */
+  hlsUrl(id: string) {
+    return this.videoApi.hlsUrl(id);
+  }
 }
 
 export const videoUseCases = new VideoUseCases(videoApi);

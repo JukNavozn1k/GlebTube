@@ -1,5 +1,6 @@
-from django.db.models import Count, Case, When, OuterRef, Exists, Value, BooleanField, Prefetch
+from django.db.models import OuterRef, Exists, Value, BooleanField, Prefetch
 from django.shortcuts import get_object_or_404
+from django.http import FileResponse, HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import UserFilter, VideoFilter, CommentFilter
 from rest_framework import mixins, status
@@ -8,6 +9,11 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
+import os
+from urllib.parse import unquote
+import unicodedata
+from django.core.cache import cache
+from django.conf import settings
 
 from auths.models import User
 from profiles.models import WatchHistory, Subscription
@@ -143,6 +149,25 @@ class VideoView(ModelViewSet):
     ordering_fields = ['baseStars', 'views']
     filterset_fields = ['channel', 'starred']
     filterset_class = VideoFilter
+
+    @action(detail=True, methods=['get'])
+    def hls(self, request, pk=None):
+        """Вернуть HLS playlist (.m3u8)"""
+        video = self.get_object()
+        hls_playlist_path = video.hls
+
+        try:
+            with open(hls_playlist_path, 'r') as f:
+                m3u8_content = f.read()
+        except FileNotFoundError:
+            return HttpResponse("HLS playlist not found", status=404)
+
+        base_url = request.build_absolute_uri('/')
+        # Router is registered as 'video', not 'videos'. No trailing slash to avoid '//' in playlist.
+        serve_hls_segment_url = base_url + f"api/video/{video.id}/hls_segment"
+        m3u8_content = m3u8_content.replace('{{ dynamic_path }}', serve_hls_segment_url)
+
+        return HttpResponse(m3u8_content, content_type='application/vnd.apple.mpegurl')
 
     @action(detail=False, methods=['get'])
     def search(self, request):

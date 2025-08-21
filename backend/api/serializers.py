@@ -4,12 +4,18 @@ import videos.models as video_models
 import auths.models as auth_models 
 import profiles.models as profile_models
 
+from django.conf import settings
 
 class UserSerializer(serializers.ModelSerializer):
     subscribed = serializers.BooleanField(read_only=True, default=False)
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if not data.get("avatar"):
+            data["avatar"] = settings.DEFAULT_AVATAR_URL
+        return data
     class Meta:
         model = auth_models.User
-        fields = ("id","username", "avatar", "bio",'baseStars', 'subscriberCount', 'subscribed')
+        fields = ("id","username", "avatar", "bio",'baseStars', 'subscriberCount', 'subscribed', 'joinedAt')
         read_only_fields = ['baseStars', 'subscriberCount','user_videos','username', 'subscribed']
 
 
@@ -30,10 +36,14 @@ class VideoSerializer(serializers.ModelSerializer):
     channel = UserSerializer(read_only=True)
     starred = serializers.BooleanField(default=False,read_only=True)
     
-    # video_comments = CommentSerializer(many=True,read_only=True)
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if not data.get("thumbnail"):
+            data["thumbnail"] = settings.DEFAULT_THUMBNAIL_URL
+        return data
     
     class Meta:
         model = video_models.Video
-        exclude = ["video_embedding"]
+        exclude = ["video_embedding","hls", "is_running"]
         read_only_fields = ['hls', 'duration', 'status', 'is_running', 'views', 'baseStars', 'createdAt']
 

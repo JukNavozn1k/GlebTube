@@ -13,6 +13,7 @@ export type Video = {
   baseStars: number
   starred: boolean // Новое поле для упрощения рейтинга
   tags: string[]
+  status?: string // e.g. 'completed' | 'processing' | 'failed'; HLS доступен когда status === 'completed'
 }
 
 export type UploadedVideo = Video & {

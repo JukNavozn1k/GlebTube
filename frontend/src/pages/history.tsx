@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { type Video } from "@/types/video"
 import { VideoCard } from "@/components/video-card"
+import { VideoCardSkeleton } from "@/components/video-card-skeleton"
 import { BottomNav } from "@/components/bottom-nav"
 import { Button } from "@/components/ui/button"
 import {
@@ -80,7 +81,11 @@ export function HistoryPage() {
         </div>
 
         {loading ? (
-          <div className="text-center py-12 text-muted-foreground">Загрузка...</div>
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <VideoCardSkeleton key={`history-skel-${i}`} />
+            ))}
+          </div>
         ) : videos.length === 0 ? (
           <div className="text-center py-12">
             <History className="h-12 w-12 mx-auto text-muted-foreground mb-4" />

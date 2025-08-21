@@ -7,6 +7,7 @@ import { videos as builtins } from "@/lib/glebtube-data"
 import { getUploads } from "@/lib/glebtube-storage"
 import { type Video, type UploadedVideo } from "@/types/video"
 import { ChannelCard } from "@/components/channel-card"
+import { ChannelCardSkeleton } from "@/components/channel-card-skeleton"
 import { useSearchParams } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
@@ -16,6 +17,7 @@ import { userUseCases } from "@/use-cases/user"
 export function ChannelsPage() {
   const [uploads, setUploads] = useState<UploadedVideo[]>([])
   const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchParams, setSearchParams] = useSearchParams()
 
   const qParam = (searchParams.get("q") || "").trim()
@@ -26,10 +28,13 @@ export function ChannelsPage() {
     let cancelled = false
     ;(async () => {
       try {
+        setLoading(true)
         const list = await userUseCases.fetchList()
         if (!cancelled) setUsers(list)
       } catch (e) {
         if (!cancelled) setUsers([])
+      } finally {
+        if (!cancelled) setLoading(false)
       }
     })()
     return () => {
@@ -117,7 +122,13 @@ export function ChannelsPage() {
           </Button>
         </form>
 
-        {grouped.length === 0 ? (
+        {loading ? (
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <ChannelCardSkeleton key={`channels-skel-${i}`} />
+            ))}
+          </div>
+        ) : grouped.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-muted-foreground mb-2">
               <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">

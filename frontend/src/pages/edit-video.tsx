@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { X, ImageIcon, Edit } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { EditVideoSkeleton } from "@/components/edit-video-skeleton"
 
 export function EditVideoPage() {
   const { id } = useParams<{ id: string }>()
@@ -35,6 +36,7 @@ export function EditVideoPage() {
   const [deleting, setDeleting] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [previewThumb, setPreviewThumb] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   const thumbInputRef = useRef<HTMLInputElement>(null)
 
@@ -69,6 +71,7 @@ export function EditVideoPage() {
     if (!id) return
     ;(async () => {
       try {
+        setIsLoading(true)
         const v = await videoUseCases.fetchById(id)
         if (!mounted) return
         setVideo(v)
@@ -77,12 +80,18 @@ export function EditVideoPage() {
       } catch (e) {
         if (!mounted) return
         setVideo(null)
+      } finally {
+        if (mounted) setIsLoading(false)
       }
     })()
     return () => {
       mounted = false
     }
   }, [id])
+
+  if (isLoading) {
+    return <EditVideoSkeleton />
+  }
 
   if (!video) {
     return (

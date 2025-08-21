@@ -4,6 +4,7 @@ import { BottomNav } from "@/components/bottom-nav"
 import { getUploads } from "@/utils/storage"
 import { videos as builtins } from "@/lib/glebtube-data"
 import { ChannelCard } from "@/components/channel-card"
+import { ChannelCardSkeleton } from "@/components/channel-card-skeleton"
 import { useProtectedRoute } from "@/hooks/use-protected-route"
 import type { User } from "@/types/user"
 import type { Video } from "@/types/video"
@@ -48,7 +49,11 @@ export function SubscriptionsPage() {
       <main className="mx-auto max-w-5xl px-3 sm:px-4 py-6 grid gap-4">
         <h1 className="text-xl sm:text-2xl font-semibold">Мои подписки</h1>
         {loading ? (
-          <div className="text-sm text-muted-foreground">Загрузка...</div>
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <ChannelCardSkeleton key={`subs-skel-${i}`} />
+            ))}
+          </div>
         ) : channels.length === 0 ? (
           <div className="text-sm text-muted-foreground">Вы пока ни на кого не подписаны.</div>
         ) : (
