@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils"
 import { useEffect, useMemo, useState } from "react"
 import { useSearchParams, useLocation } from "react-router-dom" // заменили на react-router-dom
 import { VideoCard } from "@/components/video-card"
+import { VideoCardSkeleton } from "@/components/video-card-skeleton"
 import { BottomNav } from "@/components/bottom-nav"
 import { videoUseCases } from "@/use-cases/video"
 import type { Video } from "@/types/video"
@@ -11,14 +12,19 @@ export function HomePage() {
   const [searchParams] = useSearchParams() // в react-router-dom возвращается массив [params, setParams]
   const q = (searchParams.get("q") || "").toLowerCase().trim()
   const [apiVideos, setApiVideos] = useState<Video[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   const location = useLocation()
 
   useEffect(() => {
     // Prefer API videos only. If query is present, use server search.
     let mounted = true
+    setIsLoading(true)
     ;(async () => {
-      if (location.pathname !== "/" && location.pathname !== "") return
+      if (location.pathname !== "/" && location.pathname !== "") {
+        setIsLoading(false)
+        return
+      }
       try {
         const list = q ? await videoUseCases.search(q) : await videoUseCases.fetchList()
         // Normalize to an array in case backend returns a wrapped object (e.g., { results: [...] })
@@ -27,10 +33,16 @@ export function HomePage() {
           : (list as any)?.results && Array.isArray((list as any).results)
             ? (list as any).results
             : []
-        if (mounted) setApiVideos(normalized)
+        if (mounted) {
+          setApiVideos(normalized)
+          setIsLoading(false)
+        }
       } catch (err) {
         console.error("Failed to load videos from API:", err)
-        if (mounted) setApiVideos([])
+        if (mounted) {
+          setApiVideos([])
+          setIsLoading(false)
+        }
       }
     })()
 
@@ -61,9 +73,17 @@ export function HomePage() {
           </div>
         )}
         <div className={cn("grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3", q ? "pt-0" : "pt-2")}>
-          {(Array.isArray(filtered) ? filtered : []).map((v: Video) => (
-            <VideoCard key={v.id} video={v} />
-          ))}
+          {isLoading ? (
+            // Show skeleton cards while loading
+            Array.from({ length: 6 }).map((_, index) => (
+              <VideoCardSkeleton key={`skeleton-${index}`} />
+            ))
+          ) : (
+            // Show actual video cards when loaded
+            (Array.isArray(filtered) ? filtered : []).map((v: Video) => (
+              <VideoCard key={v.id} video={v} />
+            ))
+          )}
         </div>
       </main>
       <BottomNav />
