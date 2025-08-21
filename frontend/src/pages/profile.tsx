@@ -236,7 +236,7 @@ export function ProfilePage() {
                     <VideoCard video={v} />
                     <Link
                       to={`/video/${v.id}/edit`}
-                      className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/90 hover:bg-white border border-gray-200 hover:border-blue-300 flex items-center justify-center text-gray-600 hover:text-blue-700 transition-all shadow-sm opacity-0 group-hover:opacity-100 sm:opacity-100"
+                      className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/90 hover:bg-white border border-gray-200 hover:border-blue-300 flex items-center justify-center text-gray-600 hover:text-blue-700 transition-all shadow-sm"
                       title="Редактировать видео"
                       aria-label="Редактировать видео"
                     >
