@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
         return data
     class Meta:
         model = auth_models.User
-        fields = ("id","username", "avatar", "bio",'baseStars', 'subscriberCount', 'subscribed')
+        fields = ("id","username", "avatar", "bio",'baseStars', 'subscriberCount', 'subscribed', 'joinedAt')
         read_only_fields = ['baseStars', 'subscriberCount','user_videos','username', 'subscribed']
 
 
