@@ -28,6 +28,7 @@ import { videoUseCases } from "@/use-cases/video"
 import { userUseCases } from "@/use-cases/user"
 import type { User } from "@/types/user"
 import { ChannelCard } from "@/components/channel-card"
+import { ChannelCardSkeleton } from "@/components/channel-card-skeleton"
 
 export function ProfilePage() {
   const { user } = useUser()
@@ -337,7 +338,11 @@ export function ProfilePage() {
           <TabsContent value="subscriptions" className="mt-0">
             <h2 className="text-lg font-semibold mb-4">Мои подписки</h2>
             {loading ? (
-              <div className="text-sm text-muted-foreground">Загрузка...</div>
+              <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <ChannelCardSkeleton key={`profile-subs-skel-${i}`} />
+                ))}
+              </div>
             ) : subsUsers.length === 0 ? (
               <div className="text-center py-8 sm:py-12">
                 <Users className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-3 sm:mb-4" />

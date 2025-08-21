@@ -7,6 +7,7 @@ import { VideoCard } from "@/components/video-card"
 import { BottomNav } from "@/components/bottom-nav"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { ChannelPageSkeleton } from "@/components/channel-page-skeleton"
 
 import { Calendar, Users, VideoIcon } from "lucide-react"
 import type { User } from "@/types/user"
@@ -81,6 +82,10 @@ export function ChannelPage() {
 
   const subscriberCount = channel?.subscriberCount ?? 0
   const joinYear = channel?.joinedAt ? new Date(channel.joinedAt).getFullYear() : 2023
+
+  if (loading) {
+    return <ChannelPageSkeleton />
+  }
 
   if (!channel) {
     return (
