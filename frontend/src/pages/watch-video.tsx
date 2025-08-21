@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { BottomNav } from "@/components/bottom-nav"
 import { CustomPlayer } from "@/components/custom-player"
 import { ChevronDown, ChevronUp } from "lucide-react"
+import { WatchPageSkeleton } from "@/components/watch-skeleton"
 
 import { videoUseCases } from "@/use-cases/video"
 import { userUseCases } from "@/use-cases/user"
@@ -37,11 +38,13 @@ export function WatchPage() {
   const [video, setVideo] = useState<Video | null>(null)
   const [recommended, setRecommended] = useState<Video[]>([])
   const [sub, setSub] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   // Theater mode was removed from CustomPlayer; keep layout static
 
   useEffect(() => {
     const loadData = async () => {
+      setIsLoading(true)
       try {
         const [v, similar] = await Promise.all([
           videoUseCases.fetchById(id),
@@ -56,6 +59,8 @@ export function WatchPage() {
         console.error("Failed to load video or recommendations:", error);
         setVideo(null);
         setRecommended([]);
+      } finally {
+        setIsLoading(false)
       }
     };
     loadData();
@@ -64,6 +69,10 @@ export function WatchPage() {
   useEffect(() => {
     if (video) addHistory(video.id)
   }, [video])
+
+  if (isLoading) {
+    return <WatchPageSkeleton />
+  }
 
   if (!video || !video.channel) {
     return (
