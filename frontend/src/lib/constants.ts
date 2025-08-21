@@ -1,8 +1,4 @@
-const BASE_URL = typeof process !== "undefined" && process.env && process.env.REACT_APP_API_URL
-  ? process.env.REACT_APP_API_URL
-  : "http://127.0.0.1:8000/api";
-
-
+const BASE_URL = import.meta.env.VITE_APP_API_URL || "/api";
 
 export const LOCAL_STORAGE_KEYS = {
     ACCESS_TOKEN: 'access_token',

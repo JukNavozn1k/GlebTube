@@ -7,7 +7,7 @@ import { EditVideoPage } from "@/pages/edit-video"
 import { ProfilePage } from "@/pages/profile"
 import { ProfileSettingsPage } from "@/pages/profile-settings"
 import { SubscriptionsPage } from "@/pages/subscriptions"
-import { NotFound } from "@/pages/not-found"
+
 import { ClientLayout } from "@/ClientLayout"
 import { AuthPage } from "@/pages/auth"
 import {StarredPage} from "@/pages/starred"
@@ -32,9 +32,6 @@ function App() {
           <Route path="/profile/settings" element={<ProfileSettingsPage />} />
           <Route path="/subscriptions" element={<SubscriptionsPage />} />
         </Route>
-
-        {/* Отдельно NotFound */}
-        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   )

@@ -21,7 +21,13 @@ export function HomePage() {
       if (location.pathname !== "/" && location.pathname !== "") return
       try {
         const list = q ? await videoUseCases.search(q) : await videoUseCases.fetchList()
-        if (mounted) setApiVideos(list)
+        // Normalize to an array in case backend returns a wrapped object (e.g., { results: [...] })
+        const normalized = Array.isArray(list)
+          ? list
+          : (list as any)?.results && Array.isArray((list as any).results)
+            ? (list as any).results
+            : []
+        if (mounted) setApiVideos(normalized)
       } catch (err) {
         console.error("Failed to load videos from API:", err)
         if (mounted) setApiVideos([])
@@ -38,8 +44,8 @@ export function HomePage() {
   return apiVideos
   }, [apiVideos])
 
-  // Server already filtered when q present
-  const filtered = useMemo(() => allVideos, [allVideos])
+  // Server already filtered when q present. Ensure it's always an array.
+  const filtered = useMemo<Video[]>(() => (Array.isArray(allVideos) ? allVideos : []), [allVideos])
 
   // Debug: log what's being rendered
   console.log("HomePage: filtered videos count=", filtered.length)
@@ -55,7 +61,7 @@ export function HomePage() {
           </div>
         )}
         <div className={cn("grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3", q ? "pt-0" : "pt-2")}>
-          {filtered.map((v: Video) => (
+          {(Array.isArray(filtered) ? filtered : []).map((v: Video) => (
             <VideoCard key={v.id} video={v} />
           ))}
         </div>

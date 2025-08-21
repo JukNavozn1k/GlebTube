@@ -51,13 +51,11 @@ export function addComment(video: string, text: string, user: User, parent?: str
     id: `${video}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     video,
     parent,
-    userId: user.id,
-    userName: user.username,
-    userHandle: user.handle,
-    userAvatar: user.avatar,
+    channel: user,
     text,
     createdAt: new Date().toISOString(),
-    stars: 0,
+    baseStars: 0,
+    starred: false,
   }
   const list = getComments(video)
   list.unshift(c)
@@ -102,10 +100,12 @@ export function toggleCommentStar(video: string, commentId: string): boolean {
   const currently = mine.has(commentId)
   if (currently) {
     mine.delete(commentId)
-    list[idx].stars = Math.max(0, (list[idx].stars || 0) - 1)
+    list[idx].starred = false
+    list[idx].baseStars = Math.max(0, (list[idx].baseStars || 0) - 1)
   } else {
     mine.add(commentId)
-    list[idx].stars = (list[idx].stars || 0) + 1
+    list[idx].starred = true
+    list[idx].baseStars = (list[idx].baseStars || 0) + 1
   }
   localStorage.setItem(COMMENT_STARS_KEY, JSON.stringify(Array.from(mine)))
   localStorage.setItem(COMMENTS_PREFIX + video, JSON.stringify(list))

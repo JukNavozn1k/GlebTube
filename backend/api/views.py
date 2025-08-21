@@ -16,7 +16,6 @@ from videos.models import Video, CommentVideo, UserVideoRelation, UserCommentRel
 from . import serializers, permissions
 from watch import tasks
 
-import torch
 from ml.search import semantic_search_videos,semantic_search_videos_by_embedding
 
 
@@ -169,10 +168,11 @@ class VideoView(ModelViewSet):
     def similar(self, request, pk=None):
         base_video = self.get_object()
         if not base_video.video_embedding:
-            return Response(
-                {"detail": "This video has no embedding."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            qs = self.get_queryset().exclude(pk=base_video.pk)
+            serializer = self.get_serializer(
+            ranked_videos, many=True, context={"request": request}
+        )
+            return Response(serializer.data)
 
         qs = (
             self.get_queryset()

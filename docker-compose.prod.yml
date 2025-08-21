@@ -1,6 +1,6 @@
 version: "3.0"
 services:
-  web:
+  backend:
     build: 
       context: ./backend
     env_file:
@@ -16,11 +16,11 @@ services:
     volumes:
       - ./backend:/backend
       - ./backend/media:/backend/media
-      - ./backend/static:/backend/static
+      - ./backend/staticfiles:/backend/staticfiles
     depends_on:
       - db
     command: > 
-      sh -c "gunicorn --workers 2 --bind 0.0.0.0:8000 GlebTube.wsgi"
+      sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn --workers 2 --bind 0.0.0.0:8000 GlebTube.wsgi"
 
   db:
     image: postgres:16.3-alpine3.20
@@ -48,7 +48,6 @@ services:
     command: -A celery_app.app worker --loglevel=info
     volumes:
       - ./backend/:/backend
-
     links: 
       - redis
     depends_on:
@@ -61,17 +60,33 @@ services:
       POSTGRES_USER: ${DB_USER}
       PGPORT : ${DB_PORT}
       POSTGRES_PASSWORD: ${DB_PASS}
-  
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    working_dir: /frontend
+    env_file:
+      - .env
+    environment:
+      - VITE_APP_API_URL=${VITE_APP_API_URL}
+    volumes:
+      - ./frontend:/frontend
+      - ./frontend/dist:/frontend/dist
+    command: sh -c "npm ci && npm run build && tail -f /dev/null"
+
   nginx:
     image: nginx:latest
     ports:
       - "80:80"
     volumes:
-      - ./backend/nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ./backend/media:/backend/media
-      - ./backend/static:/backend/static
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend/dist:/usr/share/nginx/html:ro
+      - ./backend/media:/backend/media:ro
+      - ./backend/staticfiles:/backend/staticfiles:ro
     depends_on:
-      - web
+      - backend
+      - frontend
 
 volumes:
   postgres_data:

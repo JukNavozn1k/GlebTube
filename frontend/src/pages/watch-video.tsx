@@ -38,7 +38,7 @@ export function WatchPage() {
   const [recommended, setRecommended] = useState<Video[]>([])
   const [sub, setSub] = useState(false)
 
-  const [theater, setTheater] = useState(false)
+  // Theater mode was removed from CustomPlayer; keep layout static
 
   useEffect(() => {
     const loadData = async () => {
@@ -79,8 +79,8 @@ export function WatchPage() {
     )
   }
 
-  const containerWidth = theater ? "max-w-7xl" : "max-w-6xl"
-  const gridCols = theater ? "lg:grid-cols-1" : "lg:grid-cols-[1fr_360px]"
+  const containerWidth = "max-w-6xl"
+  const gridCols = "lg:grid-cols-[1fr_360px]"
 
   return (
     <div className="min-h-dvh bg-white pb-14 sm:pb-0 overflow-x-hidden">
@@ -92,8 +92,6 @@ export function WatchPage() {
             src={video.src}
             poster={video.thumbnail}
             title={video.title}
-            theater={theater}
-            onToggleTheater={() => setTheater((v) => !v)}
           />
 
           <div className="grid gap-4 min-w-0">
