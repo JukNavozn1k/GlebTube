@@ -103,6 +103,15 @@ export class VideoApi extends Api<Video> {
     return res.data;
   }
 
+  /**
+   * Build HLS playlist URL for a given video id.
+   * It relies on the Axios client's baseURL so that pages do not import BASE_URL directly.
+   */
+  hlsUrl(id: string): string {
+    const base = (this.apiClient.defaults.baseURL || "").replace(/\/$/, "");
+    return `${base}/${this.prefix}/${id}/hls/`;
+  }
+
   // Keep compatibility with base Api create/update if needed
   async create(data: unknown): Promise<Video> {
     return this.createVideo(data as UploadVideoPayload);

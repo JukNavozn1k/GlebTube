@@ -17,6 +17,8 @@ type CustomPlayerProps = {
   title?: string
   className?: string
   autoPlay?: boolean
+  // If provided, try to play HLS from this URL first; on error, fallback to MP4 `src`.
+  hlsUrl?: string
 }
 
 export function CustomPlayer({
@@ -25,10 +27,12 @@ export function CustomPlayer({
   title = "Видео",
   className = "",
   autoPlay = false,
+  hlsUrl,
 }: CustomPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
   const progressRef = useRef<HTMLDivElement>(null)
+  const hlsRef = useRef<any>(null)
 
   const [ready, setReady] = useState(false)
   const [playing, setPlaying] = useState(false)
@@ -39,7 +43,6 @@ export function CustomPlayer({
   const [buffered, setBuffered] = useState(0)
   const [fs, setFs] = useState(false)
   const [controlsVisible, setControlsVisible] = useState(true)
-  const [useNative, setUseNative] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [playbackRate, setPlaybackRate] = useState(1)
 
@@ -168,7 +171,7 @@ export function CustomPlayer({
       setMuted(v.muted)
       setVolume(v.volume ?? 1)
     }
-    const onError = () => setUseNative(true)
+    // Remove generic error-based native fallback; we manage fallback explicitly in HLS init
 
     v.addEventListener("loadedmetadata", onLoaded)
     v.addEventListener("timeupdate", onTime)
@@ -179,7 +182,7 @@ export function CustomPlayer({
     v.addEventListener("playing", onPlaying)
     v.addEventListener("stalled", onStalled)
     v.addEventListener("volumechange", onVolume)
-    v.addEventListener("error", onError)
+    // v.addEventListener("error", onError)
 
     if (autoPlay) v.play().catch(() => {})
 
@@ -193,9 +196,87 @@ export function CustomPlayer({
       v.removeEventListener("playing", onPlaying)
       v.removeEventListener("stalled", onStalled)
       v.removeEventListener("volumechange", onVolume)
-      v.removeEventListener("error", onError)
+      // v.removeEventListener("error", onError)
     }
   }, [autoPlay, playbackRate])
+
+  // Initialize HLS playback if hlsUrl is provided
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v) return
+
+    // Cleanup previous hls instance
+    if (hlsRef.current) {
+      try { hlsRef.current.destroy?.() } catch {}
+      hlsRef.current = null
+    }
+
+    const fallbackToMp4 = () => {
+      // Keep custom UI, just set MP4 src
+      try { v.pause() } catch {}
+      v.src = src
+      v.load()
+      if (autoPlay) v.play().catch(() => {})
+    }
+
+    if (!hlsUrl) {
+      // No HLS provided, initialize MP4 without switching to native
+      fallbackToMp4()
+      return
+    }
+
+    // Try native HLS first (Safari / some browsers)
+    const canNative = v.canPlayType('application/vnd.apple.mpegurl')
+    if (canNative) {
+      try {
+        v.src = hlsUrl
+        v.load()
+        if (autoPlay) v.play().catch(() => {})
+      } catch {
+        fallbackToMp4()
+      }
+      return
+    }
+
+    // Else try hls.js dynamically
+    let cancelled = false
+    ;(async () => {
+      try {
+        const mod = await import('hls.js')
+        const Hls = (mod as any).default || (mod as any)
+        if (!Hls?.isSupported?.()) return fallbackToMp4()
+        if (cancelled) return
+        const hls = new Hls({ enableWorker: true })
+        hlsRef.current = hls
+        hls.attachMedia(v)
+        hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+          try {
+            hls.loadSource(hlsUrl)
+          } catch {
+            fallbackToMp4()
+          }
+        })
+        hls.on(Hls.Events.ERROR, (_evt: any, data: any) => {
+          const fatal = data?.fatal
+          if (fatal) {
+            try { hls.destroy() } catch {}
+            hlsRef.current = null
+            fallbackToMp4()
+          }
+        })
+      } catch {
+        fallbackToMp4()
+      }
+    })()
+
+    return () => {
+      cancelled = true
+      if (hlsRef.current) {
+        try { hlsRef.current.destroy?.() } catch {}
+        hlsRef.current = null
+      }
+    }
+  }, [hlsUrl, src, autoPlay])
 
   // Fullscreen state
   useEffect(() => {
@@ -281,21 +362,6 @@ export function CustomPlayer({
     if (videoRef.current) videoRef.current.playbackRate = playbackRate
   }, [playbackRate])
 
-  if (useNative) {
-    return (
-      <div className={cn("relative w-full rounded-xl overflow-hidden bg-black shadow-lg", className)}>
-        <video
-          src={src}
-          poster={poster}
-          className="w-full h-full aspect-video"
-          controls
-          playsInline
-          preload="metadata"
-        />
-      </div>
-    )
-  }
-
   const played = duration > 0 ? (current / duration) * 100 : 0
   const buff = buffered * 100
 
@@ -318,11 +384,12 @@ export function CustomPlayer({
         preload="metadata"
         onClick={onTogglePlay}
       >
-        <source src={src} />
+        {/* When HLS is used, source will be set programmatically; keep MP4 as fallback */}
+        {!hlsUrl && <source src={src} />}
         {"Ваш браузер не поддерживает видео."}
       </video>
 
-      {(isLoading || (!ready && !useNative)) && (
+      {(isLoading || !ready) && (
         <div className="absolute inset-0 grid place-items-center bg-black/20 backdrop-blur-sm">
           <div className="h-8 w-8 rounded-full border-2 border-white/30 border-t-white animate-spin" />
         </div>

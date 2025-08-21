@@ -9,6 +9,11 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
+import os
+from urllib.parse import unquote
+import unicodedata
+from django.core.cache import cache
+from django.conf import settings
 
 from auths.models import User
 from profiles.models import WatchHistory, Subscription
@@ -158,22 +163,11 @@ class VideoView(ModelViewSet):
             return HttpResponse("HLS playlist not found", status=404)
 
         base_url = request.build_absolute_uri('/')
-        serve_hls_segment_url = base_url + f"api/videos/{video.id}/hls_segment/"
+        # Router is registered as 'video', not 'videos'. No trailing slash to avoid '//' in playlist.
+        serve_hls_segment_url = base_url + f"api/video/{video.id}/hls_segment"
         m3u8_content = m3u8_content.replace('{{ dynamic_path }}', serve_hls_segment_url)
 
         return HttpResponse(m3u8_content, content_type='application/vnd.apple.mpegurl')
-
-    @action(detail=True, methods=['get'], url_path='hls_segment/(?P<segment_name>[^/]+)')
-    def hls_segment(self, request, pk=None, segment_name=None):
-        """Отдача сегментов TS"""
-        video = self.get_object()
-        hls_directory = os.path.join(os.path.dirname(video.src.path), 'hls_output')
-        segment_path = os.path.join(hls_directory, segment_name)
-
-        if not os.path.exists(segment_path):
-            return HttpResponse("HLS segment not found", status=404)
-
-        return FileResponse(open(segment_path, 'rb'))
 
     @action(detail=False, methods=['get'])
     def search(self, request):

@@ -101,6 +101,7 @@ export function WatchPage() {
             src={video.src}
             poster={video.thumbnail}
             title={video.title}
+            hlsUrl={video.status === 'Completed' ? videoUseCases.hlsUrl(video.id) : undefined}
           />
 
           <div className="grid gap-4 min-w-0">
