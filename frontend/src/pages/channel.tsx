@@ -185,13 +185,16 @@ export function ChannelPage() {
                 {sortedVideos.map((v) => (
                   <VideoCard key={v.id} video={v} showChannelAvatar={false} />
                 ))}
-                {hasNext && (
-                  <div ref={sentinelRef} className="contents">
-                    {Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
+                {hasNext &&
+                  Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
+                    i === 0 ? (
+                      <div key={`channel-tail-sentinel-wrap-${i}`} ref={sentinelRef}>
+                        <VideoCardSkeleton />
+                      </div>
+                    ) : (
                       <VideoCardSkeleton key={`channel-tail-skel-${i}`} />
-                    ))}
-                  </div>
-                )}
+                    )
+                  ))}
               </div>
             )}
           </TabsContent>
