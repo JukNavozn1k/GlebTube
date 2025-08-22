@@ -16,3 +16,26 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+
+
+class Subscription(models.Model):
+      '''
+            Allows you to register subscriptions. 
+            Unsubscription is performed by deleting records
+      '''
+      subscriber = models.ForeignKey(User,on_delete=models.CASCADE,related_name='subscriptions',verbose_name='Подписчик')
+      channel = models.ForeignKey(User,on_delete=models.CASCADE,related_name='subscribers',verbose_name='Автор')
+      active = models.BooleanField(verbose_name='Подписка активна',default=False)
+      class Meta:
+            constraints = [
+                  models.UniqueConstraint(fields=['subscriber', 'channel'], name='unique_users_sub')
+            ]
+            verbose_name = 'Подписка'
+            verbose_name_plural = 'Подписки'
+      
+      def __str__(self) -> str:
+          return f'{self.subscriber} -> {self.channel}'
+      def clean(self):
+        if self.channel == self.subscriber:
+            from django.core.exceptions import ValidationError
+            raise ValidationError("User and linked user cannot be the same.")

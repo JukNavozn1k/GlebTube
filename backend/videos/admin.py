@@ -38,3 +38,13 @@ class UserCommentRelationAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.select_related("user", "comment__video", "comment__channel")
+
+
+@admin.register(models.WatchHistory)
+class WatchHistoryAdmin(admin.ModelAdmin):
+    list_display = ("id", "viewer", "video", "watch_time")
+    list_select_related = ("viewer", "video")
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related("viewer", "video__channel")

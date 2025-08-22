@@ -16,11 +16,12 @@ from django.core.cache import cache
 from django.conf import settings
 
 from users.models import User
-from profiles.models import WatchHistory, Subscription
+from videos.models import WatchHistory
+from users.models import Subscription
 from videos.models import Video, CommentVideo, UserVideoRelation, UserCommentRelation
 
 from . import serializers, permissions
-from watch import tasks
+from videos import tasks
 
 from ml.search import semantic_search_videos,semantic_search_videos_by_embedding
 

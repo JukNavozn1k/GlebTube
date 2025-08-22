@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     'users',
     'profiles',
     'videos',
-    'watch',
 ]
 
 MIDDLEWARE = [
