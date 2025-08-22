@@ -19,7 +19,7 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ("username", "email")
     list_filter = ("is_staff", "is_superuser", "is_active")
 
-    readonly_fields = ("user_embeddings_pretty", "avatar_preview")
+    readonly_fields = ("user_embeddings", "user_embeddings_pretty", "avatar_preview")
 
     fieldsets = (
         (None, {"fields": ("username", "password")}),
