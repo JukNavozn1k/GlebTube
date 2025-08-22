@@ -2,7 +2,7 @@
 from rest_framework import serializers
 import videos.models as video_models
 import users.models as auth_models 
-import profiles.models as profile_models
+import users.models as profile_models
 
 from django.conf import settings
 

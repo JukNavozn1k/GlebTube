@@ -27,7 +27,6 @@ INSTALLED_APPS = [
     'djoser',
     'social_django',
     'users',
-    'profiles',
     'videos',
 ]
 

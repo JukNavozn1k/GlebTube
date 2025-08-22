@@ -1,1 +1,0 @@
-"""Deprecated watch views. Functionality moved or removed."""

@@ -153,4 +153,4 @@ class WatchHistory(models.Model):
         verbose_name = 'Просмотр'
         verbose_name_plural = 'История просмотров'
         unique_together = ('viewer', 'video')
-        db_table = 'profiles_watchhistory'
+        db_table = 'users_watchhistory'
