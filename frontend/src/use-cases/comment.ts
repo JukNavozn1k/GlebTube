@@ -36,17 +36,17 @@ export class CommentUseCases extends UseCases<Comment> {
 
   async fetchForVideo(
     video: string,
-    opts?: { ordering?: ListCommentsParams["ordering"]; parent?: string }
+    opts?: { ordering?: ListCommentsParams["ordering"]; parent?: string; parent__isnull?: boolean }
   ): Promise<Comment[]> {
-    const page = await this.apiImpl.fetch({ video, ordering: opts?.ordering, parent: opts?.parent });
+    const page = await this.apiImpl.fetch({ video, ...opts });
     return page.results;
   }
 
   async fetchForVideoPaginated(
     video: string,
-    opts?: { ordering?: ListCommentsParams["ordering"]; parent?: string }
+    opts?: { ordering?: ListCommentsParams["ordering"]; parent?: string; parent__isnull?: boolean }
   ): Promise<Paginated<Comment>> {
-    return this.apiImpl.fetch({ video, ordering: opts?.ordering, parent: opts?.parent });
+    return this.apiImpl.fetch({ video, ...opts });
   }
 
   async fetchNext(nextUrl: string): Promise<Paginated<Comment>> {
