@@ -186,7 +186,12 @@ class VideoView(ModelViewSet):
         # сортируем по схожести
         results = semantic_search_videos(query, videos_qs)
 
-        # сериализуем
+        # пагинация
+        page = self.paginate_queryset(results)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, context={"request": request})
+            return self.get_paginated_response(serializer.data)
+
         serializer = self.get_serializer(results, many=True, context={"request": request})
         return Response(serializer.data)
     
@@ -195,9 +200,11 @@ class VideoView(ModelViewSet):
         base_video = self.get_object()
         if not base_video.video_embedding:
             qs = self.get_queryset().exclude(pk=base_video.pk)
-            serializer = self.get_serializer(
-            ranked_videos, many=True, context={"request": request}
-        )
+            page = self.paginate_queryset(qs)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True, context={"request": request})
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(qs, many=True, context={"request": request})
             return Response(serializer.data)
 
         qs = (
@@ -212,9 +219,11 @@ class VideoView(ModelViewSet):
             normalize=True
         )
 
-        serializer = self.get_serializer(
-            ranked_videos, many=True, context={"request": request}
-        )
+        page = self.paginate_queryset(ranked_videos)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, context={"request": request})
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(ranked_videos, many=True, context={"request": request})
         return Response(serializer.data)
     
     @action(detail=False, methods=['get', 'delete'], permission_classes=[IsAuthenticated])
@@ -231,6 +240,12 @@ class VideoView(ModelViewSet):
                              .select_related('channel')
             )
             queryset = queryset.prefetch_related(prefetched_data)
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                videos = [entry.video for entry in page]
+                serializer = serializers.VideoSerializer(videos, many=True, context={"request": request})
+                return self.get_paginated_response(serializer.data)
+
             videos = [entry.video for entry in queryset]
             serializer = serializers.VideoSerializer(videos, many=True, context={"request": request})
             return Response(serializer.data)
