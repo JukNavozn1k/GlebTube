@@ -25,7 +25,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
-    'social_django',
     'users',
     'videos',
 ]
@@ -97,15 +96,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTHENTICATION_BACKENDS = (
-    'social_core.backends.github.GithubOAuth2',
-    'django.contrib.auth.backends.ModelBackend',
-)
-
-SOCIAL_AUTH_GITHUB_KEY = os.getenv('GITHUB_KEY', '')
-SOCIAL_AUTH_GITHUB_SECRET = os.getenv('GITHUB_SECRET', '')
-
-SOCIAL_AUTH_JSONFIELD_ENABLED = True
 
 if DEBUG:
     INTERNAL_IPS = ["127.0.0.1"]
