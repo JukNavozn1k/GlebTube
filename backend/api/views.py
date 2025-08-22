@@ -100,7 +100,7 @@ class CommentView(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(channel=self.request.user)
 
-    @action(methods=['post'], detail=True)
+    @action(methods=['post'], detail=True, permission_classes=[IsAuthenticated])
     def rate(self, request, pk):
         rate_obj, _ = UserCommentRelation.objects.get_or_create(
             comment_id=pk, user=request.user
@@ -267,7 +267,7 @@ class VideoView(ModelViewSet):
 
         return queryset
 
-    @action(methods=['post'], detail=True)
+    @action(methods=['post'], detail=True, permission_classes=[IsAuthenticated])
     def rate(self, request, pk):
         rate_obj, _ = UserVideoRelation.objects.get_or_create(video_id=pk, user=request.user)
         rate_obj.grade = 0 if rate_obj.grade == 1 else 1
