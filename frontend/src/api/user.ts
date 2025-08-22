@@ -3,6 +3,7 @@ import type { AxiosInstance } from "axios"
 import { Api } from "@/api/api"
 import api from "@/api/client"
 import type { UpdateUserProfilePayload } from "@/types/upload"
+import type { Paginated, PaginationParams } from "@/types/pagination"
 
 export class UserApi extends Api<User> {
   constructor(apiClient: AxiosInstance, prefix: string = "user") {
@@ -28,13 +29,8 @@ export class UserApi extends Api<User> {
   /**
    * List users with optional filters. For subscriptions page we use: { subscribed: true, username?: prefix }
    */
-  async listByFilter(params: { username?: string; subscribed?: boolean }): Promise<User[]> {
-    const query = new URLSearchParams()
-    if (typeof params.username === "string") query.append("username", params.username)
-    if (typeof params.subscribed === "boolean") query.append("subscribed", String(params.subscribed))
-    const qs = query.toString()
-    const url = qs ? `/${this.prefix}/?${qs}` : `/${this.prefix}/`
-    const res = await this.apiClient.get<User[]>(url)
+  async listByFilter(params: { username?: string; subscribed?: boolean } & PaginationParams): Promise<Paginated<User>> {
+    const res = await this.apiClient.get<Paginated<User>>(`/${this.prefix}/`, { params })
     return res.data
   }
 

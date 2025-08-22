@@ -23,6 +23,8 @@ export type ListCommentsParams = {
   ordering?: "-baseStars" | "baseStars" | "-createdAt" | "createdAt"
   parent?: string
   video?: string
+  page?: number
+  page_size?: number
 }
 
 // Response for rating endpoint

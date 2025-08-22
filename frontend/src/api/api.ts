@@ -1,4 +1,5 @@
 import type { AxiosInstance } from "axios"
+import type { Paginated, PaginationParams } from "@/types/pagination"
 
 export abstract class Api<T> {
   prefix: string
@@ -9,8 +10,16 @@ export abstract class Api<T> {
     this.apiClient = apiClient
   }
 
-  async list(): Promise<T[]> {
-    const res = await this.apiClient.get<T[]>(`/${this.prefix}/`)
+  async list(params?: PaginationParams): Promise<Paginated<T>> {
+    const res = await this.apiClient.get<Paginated<T>>(`/${this.prefix}/`, { params })
+    return res.data
+  }
+
+  /**
+   * Fetch by absolute/relative 'next' URL from DRF pagination
+   */
+  async fetchNext(nextUrl: string): Promise<Paginated<T>> {
+    const res = await this.apiClient.get<Paginated<T>>(nextUrl)
     return res.data
   }
 

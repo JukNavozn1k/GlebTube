@@ -51,14 +51,14 @@ export function ProfilePage() {
     setLoading(true)
     ;(async () => {
       try {
-        const [history, starred, subs] = await Promise.all([
+        const [historyPage, starredPage, subsPage] = await Promise.all([
           videoUseCases.fetchHistory(),
           videoUseCases.fetchStarred(),
           userUseCases.fetchSubscriptions(),
         ])
-        setHistoryVideos(history)
-        setStarredVideos(starred)
-        setSubsUsers(subs)
+        setHistoryVideos(Array.isArray(historyPage?.results) ? historyPage.results : [])
+        setStarredVideos(Array.isArray(starredPage?.results) ? starredPage.results : [])
+        setSubsUsers(Array.isArray(subsPage?.results) ? subsPage.results : [])
       } catch (e) {
         console.error("Failed to load profile data", e)
       } finally {
@@ -72,8 +72,8 @@ export function ProfilePage() {
     if (!user?.id) return
     ;(async () => {
       try {
-        const mine = await videoUseCases.fetchByChannel(user.id)
-        setMyVideos(mine)
+        const minePage = await videoUseCases.fetchByChannel(user.id)
+        setMyVideos(Array.isArray(minePage?.results) ? minePage.results : [])
       } catch (e) {
         console.error("Failed to fetch my videos", e)
       }

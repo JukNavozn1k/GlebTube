@@ -46,14 +46,16 @@ export function WatchPage() {
     const loadData = async () => {
       setIsLoading(true)
       try {
-        const [v, similar] = await Promise.all([
+        const [v, similarPage] = await Promise.all([
           videoUseCases.fetchById(id),
           videoUseCases.fetchSimilar(id)
         ]);
 
         setVideo(v);
         // If backend returns current video in similar list, filter it out; do not enforce any limit
+        const similar = Array.isArray(similarPage?.results) ? similarPage.results : []
         setRecommended(similar.filter((item) => item.id !== id));
+
         if (v?.channel) setSub(!!v.channel.subscribed);
       } catch (error) {
         console.error("Failed to load video or recommendations:", error);

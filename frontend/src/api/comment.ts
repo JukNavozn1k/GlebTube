@@ -3,14 +3,15 @@ import api from "@/api/client";
 import { Api } from "@/api/api";
 import type { Comment } from "@/types/comment";
 import type { CreateCommentPayload, RateCommentResponse, ListCommentsParams } from "@/types/comment";
+import type { Paginated } from "@/types/pagination";
 
 export class CommentApi extends Api<Comment> {
   constructor(apiClient: AxiosInstance, prefix: string = "comment") {
     super(prefix, apiClient);
   }
 
-  async fetch(params?: ListCommentsParams): Promise<Comment[]> {
-    const res = await this.apiClient.get<Comment[]>(`/${this.prefix}/`, { params });
+  async fetch(params?: ListCommentsParams): Promise<Paginated<Comment>> {
+    const res = await this.apiClient.get<Paginated<Comment>>(`/${this.prefix}/`, { params });
     return res.data;
   }
 

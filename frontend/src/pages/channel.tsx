@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router-dom" // <-- заменено
 import { formatViews } from "@/utils/format"
 import { isSubscribed } from "@/utils/storage"
@@ -15,6 +15,7 @@ import type { Video } from "@/types/video"
 import { userUseCases } from "@/use-cases/user"
 import { videoUseCases } from "@/use-cases/video"
 import { useUser } from "@/hooks/use-user"
+import { usePaginatedList } from "@/hooks/use-paginated-list"
 function nameFromSlug(slug: string) {
   return decodeURIComponent(String(slug))
 }
@@ -29,35 +30,25 @@ function initials(username?: string) {
 export function ChannelPage() {
   const { slug } = useParams<{ slug: string }>() // <-- react-router-dom
   const [channel, setChannel] = useState<User | null>(null)
-  const [videos, setVideos] = useState<Video[]>([])
+  // videos are now provided by paginated hook
   const [loading, setLoading] = useState(false)
   const { user } = useUser()
 
-  // Fetch channel by ID using user use-cases; slug is treated as ID
+  // Fetch channel info (not paginated)
   useEffect(() => {
     const id = nameFromSlug(slug || "")
     if (!id) {
       setChannel(null)
-      setVideos([])
       return
     }
     let cancelled = false
     setLoading(true)
     ;(async () => {
       try {
-        const [user, vids] = await Promise.all([
-          userUseCases.fetchById(id),
-          videoUseCases.fetchByChannel(id),
-        ])
-        if (!cancelled) {
-          setChannel(user)
-          setVideos(vids)
-        }
+        const usr = await userUseCases.fetchById(id)
+        if (!cancelled) setChannel(usr)
       } catch (e) {
-        if (!cancelled) {
-          setChannel(null)
-          setVideos([])
-        }
+        if (!cancelled) setChannel(null)
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -66,6 +57,18 @@ export function ChannelPage() {
       cancelled = true
     }
   }, [slug])
+
+  // Paginated videos for channel
+  const channelId = useMemo(() => nameFromSlug(slug || ""), [slug])
+  const loadFirst = useCallback(() => videoUseCases.fetchByChannel(channelId), [channelId])
+  const loadNext = useCallback((nextUrl: string) => videoUseCases.fetchNext(nextUrl), [])
+  const { items: videos, loading: listLoading, reload } = usePaginatedList<Video>(loadFirst, loadNext)
+
+  // Reload videos when channel changes
+  useEffect(() => {
+    if (!channelId) return
+    reload()
+  }, [channelId, reload])
 
   const [sub, setSub] = useState(false)
   useEffect(() => {
@@ -168,7 +171,7 @@ export function ChannelPage() {
           </TabsList>
 
           <TabsContent value="videos" className="mt-0">
-            {loading ? (
+            {loading || listLoading ? (
               <div className="text-sm text-muted-foreground">Загрузка...</div>
             ) : sortedVideos.length === 0 ? (
               <div className="text-center py-12">

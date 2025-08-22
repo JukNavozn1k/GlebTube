@@ -1,33 +1,18 @@
-import { useEffect, useState } from "react"
-import { type Video} from "@/types/video" 
+import { type Video } from "@/types/video"
 import { VideoCard } from "@/components/video-card"
 import { VideoCardSkeleton } from "@/components/video-card-skeleton"
 import { BottomNav } from "@/components/bottom-nav"
 import { Star } from "lucide-react"
 import { useProtectedRoute } from "@/hooks/use-protected-route"
 import { videoUseCases } from "@/use-cases/video"
+import { usePaginatedList } from "@/hooks/use-paginated-list"
 
 export function StarredPage() {
   const isAuthorized = useProtectedRoute("/starred")
-  const [videos, setVideos] = useState<Video[]>([])
-  const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    if (!isAuthorized) return
-    let cancelled = false
-    setLoading(true)
-    ;(async () => {
-      try {
-        const list = await videoUseCases.fetchStarred()
-        if (!cancelled) setVideos(list)
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [isAuthorized])
+  const { items: videos, loading } = usePaginatedList<Video>(
+    () => videoUseCases.fetchStarred(),
+    (next) => videoUseCases.fetchNext(next)
+  )
 
   if (!isAuthorized) {
     return null

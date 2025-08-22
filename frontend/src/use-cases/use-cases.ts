@@ -1,6 +1,9 @@
+import type { Paginated, PaginationParams } from "@/types/pagination"
+
 export class UseCases<T> {
   api: {
-    list: () => Promise<T[]>
+    list: (params?: PaginationParams) => Promise<Paginated<T>>
+    fetchNext: (nextUrl: string) => Promise<Paginated<T>>
     get: (id: string) => Promise<T>
     create: (data: unknown) => Promise<T>
     update: (id: string, data: unknown) => Promise<T>
@@ -11,8 +14,19 @@ export class UseCases<T> {
     this.api = api
   }
 
-  async fetchList() {
-    return this.api.list()
+  // Backward-compatible: returns only the items array
+  async fetchList(params?: PaginationParams) {
+    const page = await this.api.list(params)
+    return page.results
+  }
+
+  // New: full paginated response
+  async fetchListPaginated(params?: PaginationParams): Promise<Paginated<T>> {
+    return this.api.list(params)
+  }
+
+  async fetchNext(nextUrl: string): Promise<Paginated<T>> {
+    return this.api.fetchNext(nextUrl)
   }
 
   async fetchById(id: string) {

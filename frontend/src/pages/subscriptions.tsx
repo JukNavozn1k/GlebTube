@@ -9,26 +9,18 @@ import { useProtectedRoute } from "@/hooks/use-protected-route"
 import type { User } from "@/types/user"
 import type { Video } from "@/types/video"
 import { userUseCases } from "@/use-cases/user"
+import { usePaginatedList } from "@/hooks/use-paginated-list"
 export function SubscriptionsPage() {
   const isAuthorized = useProtectedRoute("/subscriptions")
-  const [subscribedUsers, setSubscribedUsers] = useState<User[]>([])
   const [uploads, setUploads] = useState<Video[]>([])
-  const [loading, setLoading] = useState(false)
+  const { items: subscribedUsers, loading } = usePaginatedList<User>(
+    () => userUseCases.fetchSubscriptions(),
+    (next) => userUseCases.fetchNext(next)
+  )
 
   useEffect(() => {
     if (!isAuthorized) return
     setUploads(getUploads())
-    setLoading(true)
-    ;(async () => {
-      try {
-        const users = await userUseCases.fetchSubscriptions()
-        setSubscribedUsers(users)
-      } catch (e) {
-        console.error("Failed to fetch subscriptions", e)
-      } finally {
-        setLoading(false)
-      }
-    })()
   }, [isAuthorized])
 
   const all: Video[] = useMemo(() => [...uploads, ...builtins], [uploads])

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+//
 import { type Video } from "@/types/video"
 import { VideoCard } from "@/components/video-card"
 import { VideoCardSkeleton } from "@/components/video-card-skeleton"
@@ -18,29 +18,14 @@ import {
 import { History } from "lucide-react"
 import { useProtectedRoute } from "@/hooks/use-protected-route"
 import { videoUseCases } from "@/use-cases/video"
+import { usePaginatedList } from "@/hooks/use-paginated-list"
 
 export function HistoryPage() {
   const isAuthorized = useProtectedRoute("/history")
-  const [videos, setVideos] = useState<Video[]>([])
-  const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    if (!isAuthorized) return
-    let cancelled = false
-    setLoading(true)
-    ;(async () => {
-      try {
-        const list = await videoUseCases.fetchHistory()
-        console.log(list)
-        if (!cancelled) setVideos(list)
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [isAuthorized])
+  const { items: videos, loading, reload } = usePaginatedList<Video>(
+    () => videoUseCases.fetchHistory(),
+    (next) => videoUseCases.fetchNext(next)
+  )
 
   if (!isAuthorized) {
     return null
@@ -70,7 +55,7 @@ export function HistoryPage() {
                   className="bg-blue-600 hover:bg-blue-700 text-white"
                   onClick={async () => {
                     await videoUseCases.clearHistory()
-                    setVideos([])
+                    reload()
                   }}
                 >
                   Очистить
