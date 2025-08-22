@@ -1,3 +1,4 @@
+import { useRef } from "react"
 import { type Video } from "@/types/video"
 import { VideoCard } from "@/components/video-card"
 import { VideoCardSkeleton } from "@/components/video-card-skeleton"
@@ -9,10 +10,15 @@ import { usePaginatedList } from "@/hooks/use-paginated-list"
 
 export function StarredPage() {
   const isAuthorized = useProtectedRoute("/starred")
-  const { items: videos, loading } = usePaginatedList<Video>(
+  const { items: videos, loading, reload, pageSize } = usePaginatedList<Video>(
     () => videoUseCases.fetchStarred(),
     (next) => videoUseCases.fetchNext(next)
   )
+  const didInitRef = useRef(false)
+  if (isAuthorized && !didInitRef.current) {
+    didInitRef.current = true
+    reload()
+  }
 
   if (!isAuthorized) {
     return null
@@ -25,7 +31,7 @@ export function StarredPage() {
 
         {loading ? (
           <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
+            {Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
               <VideoCardSkeleton key={`starred-skel-${i}`} />
             ))}
           </div>
