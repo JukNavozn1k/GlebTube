@@ -17,15 +17,10 @@ def validate_probability(value):
 
 class Video(models.Model):
 
-    PENDING = 'Pending'
-    PROCESSING = 'Processing'
-    COMPLETED = 'Completed'
-    
-    STATUS_CHOICES = (
-        (PENDING, 'Pending'),
-        (PROCESSING, 'Processing'),
-        (COMPLETED, 'Completed'),
-    )
+    class Status(models.TextChoices):
+        PENDING = 'Pending', 'Pending'
+        PROCESSING = 'Processing', 'Processing'
+        COMPLETED = 'Completed', 'Completed'
 
     id = models.BigAutoField(primary_key=True)
     title = models.CharField(max_length=64,null = False,verbose_name="Название",db_index=True)
@@ -38,7 +33,7 @@ class Video(models.Model):
     
     duration = models.CharField(max_length=20, blank=True,null=True,verbose_name='Длительность')
     hls = models.CharField(max_length=500,blank=True,null=True,verbose_name='HLS')
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=PENDING,verbose_name='Статус')
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING,verbose_name='Статус')
     is_running = models.BooleanField(default=False, verbose_name='В обработке')
 
     # Cache fields
@@ -61,7 +56,8 @@ class Video(models.Model):
         verbose_name = 'Видео'
         verbose_name_plural = verbose_name
     def __str__(self) -> str:
-        return f"Id: {self.id} title: {self.title}"
+        author = self.channel.username if self.channel_id and hasattr(self.channel, 'username') else '—'
+        return f"{self.title} · {author}"
 
 class UserVideoRelation(models.Model):
 
@@ -75,8 +71,9 @@ class UserVideoRelation(models.Model):
     class Meta:
         verbose_name = 'Пользователь-видео'
         verbose_name_plural = 'Пользователи-видео'
-
-        unique_together = ['video', 'user']
+        constraints = [
+            models.UniqueConstraint(fields=['video', 'user'], name='unique_video_user_relation'),
+        ]
     
 
 
@@ -113,7 +110,10 @@ class CommentVideo(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return f'{self.id} : {self.channel} -> {self.video}'
+        preview = (self.text or '')[:30]
+        if len(self.text or '') > 30:
+            preview += '…'
+        return f"Comment #{self.id} by {self.channel} on '{self.video.title}': {preview}"
     
 class UserCommentRelation(models.Model):
     CHOICES = [(0, 'Без оценки'), (1, 'С оценкой')]
@@ -133,8 +133,9 @@ class UserCommentRelation(models.Model):
     class Meta:
         verbose_name = 'Пользователь-комментарий'
         verbose_name_plural = 'Пользователи-комментарии'
-
-        unique_together = ['comment', 'user']
+        constraints = [
+            models.UniqueConstraint(fields=['comment', 'user'], name='unique_comment_user_relation'),
+        ]
     
 
 class WatchHistory(models.Model):
@@ -152,5 +153,7 @@ class WatchHistory(models.Model):
       class Meta:
         verbose_name = 'Просмотр'
         verbose_name_plural = 'История просмотров'
-        unique_together = ('viewer', 'video')
+        constraints = [
+            models.UniqueConstraint(fields=['viewer', 'video'], name='unique_viewer_video_history'),
+        ]
         db_table = 'users_watchhistory'
