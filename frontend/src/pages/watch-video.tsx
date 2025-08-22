@@ -16,7 +16,7 @@ import { WatchPageSkeleton } from "@/components/watch-skeleton"
 import { videoUseCases } from "@/use-cases/video"
 import { userUseCases } from "@/use-cases/user"
 import { usePaginatedList } from "@/hooks/use-paginated-list"
-import { PAGE_SIZE } from "@/lib/constants"
+// page size is provided by usePaginatedList
 
 function channelSlug(channelId: string) {
   return encodeURIComponent(channelId || "unknown")
@@ -46,7 +46,7 @@ export function WatchPage() {
   // Paginated recommendations (similar videos)
   const loadSimilarFirst = useCallback(() => videoUseCases.fetchSimilar(id), [id])
   const loadSimilarNext = useCallback((nextUrl: string) => videoUseCases.fetchNext(nextUrl), [])
-  const { items: recommended, loadingMore: recLoadingMore, reload: reloadRecommended } = usePaginatedList<Video>(
+  const { items: recommended, loadingMore: recLoadingMore, reload: reloadRecommended, pageSize: recPageSize } = usePaginatedList<Video>(
     loadSimilarFirst,
     loadSimilarNext,
   )
@@ -225,7 +225,7 @@ export function WatchPage() {
               )
             })}
             {recLoadingMore &&
-              Array.from({ length: Math.max(1, PAGE_SIZE) }).map((_, i) => (
+              Array.from({ length: Math.max(1, recPageSize) }).map((_, i) => (
                 <div key={`rec-tail-skel-${i}`} className="flex gap-3 min-w-0 animate-pulse">
                   <div className="aspect-video w-40 min-w-40 rounded-md bg-blue-50" />
                   <div className="flex-1 min-w-0 grid gap-2">

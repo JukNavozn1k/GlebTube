@@ -15,7 +15,7 @@ import type { User } from "@/types/user"
 import { userUseCases } from "@/use-cases/user"
 import { userApi } from "@/api/user"
 import { usePaginatedList } from "@/hooks/use-paginated-list"
-import { PAGE_SIZE } from "@/lib/constants"
+// page size is provided by usePaginatedList
 
 export function ChannelsPage() {
   const [uploads, setUploads] = useState<UploadedVideo[]>([])
@@ -33,7 +33,7 @@ export function ChannelsPage() {
     [qParam],
   )
   const loadUsersNext = useCallback((nextUrl: string) => userUseCases.fetchNext(nextUrl), [])
-  const { items: users, count, loading: usersLoading, loadingMore, reload } = usePaginatedList<User>(
+  const { items: users, count, loading: usersLoading, loadingMore, reload, pageSize } = usePaginatedList<User>(
     loadUsersFirst,
     loadUsersNext,
   )
@@ -162,7 +162,7 @@ export function ChannelsPage() {
               <ChannelCard key={item.channel.id} channel={item.channel} videos={item.videos} />
             ))}
             {loadingMore &&
-              Array.from({ length: Math.max(1, PAGE_SIZE) }).map((_, i) => (
+              Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
                 <ChannelCardSkeleton key={`channels-tail-skel-${i}`} />
               ))}
           </div>

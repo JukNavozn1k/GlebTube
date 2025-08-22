@@ -11,7 +11,7 @@ import { useUser } from "@/hooks/use-user"
 import { useAuth } from "@/contexts/auth-context"
 import { commentUseCases } from "@/use-cases/comment"
 import { usePaginatedList } from "@/hooks/use-paginated-list"
-import { PAGE_SIZE } from "@/lib/constants"
+// page size is provided by usePaginatedList
 
 import {
   Star,
@@ -60,7 +60,7 @@ export function Comments({ video }: CommentsProps) {
   const ordering = sortBy === "popular" ? "-baseStars" : sortBy === "newest" ? "-createdAt" : "createdAt"
   const loadFirst = useCallback(() => commentUseCases.fetchForVideoPaginated(video, { ordering }), [video, ordering])
   const loadNext = useCallback((nextUrl: string) => commentUseCases.fetchNext(nextUrl), [])
-  const { items: pagedItems, count, loading, loadingMore, reload } = usePaginatedList<Comment>(loadFirst, loadNext)
+  const { items: pagedItems, count, loading, loadingMore, reload, pageSize } = usePaginatedList<Comment>(loadFirst, loadNext)
 
   // Reset UI state and reload when video or sort changes; guard against StrictMode duplicate for same key
   const lastKeyRef = useRef<string | null>(null)
@@ -581,7 +581,7 @@ export function Comments({ video }: CommentsProps) {
         )}
         {(loading || loadingMore) && (
           <div className="grid gap-4">
-            {Array.from({ length: Math.max(1, PAGE_SIZE) }).map((_, i) => (
+            {Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
               <div key={`comment-tail-skel-${i}`} className="flex items-start gap-3 animate-pulse">
                 <div className="h-9 w-9 rounded-full bg-slate-100 border border-blue-100" />
                 <div className="flex-1 grid gap-2 min-w-0">

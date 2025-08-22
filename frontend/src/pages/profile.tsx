@@ -30,7 +30,7 @@ import type { User } from "@/types/user"
 import { ChannelCard } from "@/components/channel-card"
 import { ChannelCardSkeleton } from "@/components/channel-card-skeleton"
 import { usePaginatedList } from "@/hooks/use-paginated-list"
-import { PAGE_SIZE } from "@/lib/constants"
+// page size is provided by usePaginatedList
 
 export function ProfilePage() {
   const { user } = useUser()
@@ -41,18 +41,18 @@ export function ProfilePage() {
     count: 0, next: null, previous: null, results: [] as Video[],
   })), [user?.id])
   const loadVideosNext = useCallback((nextUrl: string) => videoUseCases.fetchNext(nextUrl), [])
-  const { items: myVideos, loading: myLoading, loadingMore: myLoadingMore, reload: reloadMine } = usePaginatedList<Video>(loadMineFirst, loadVideosNext)
+  const { items: myVideos, loading: myLoading, loadingMore: myLoadingMore, reload: reloadMine, pageSize: myPageSize } = usePaginatedList<Video>(loadMineFirst, loadVideosNext)
 
   // History
   const loadHistoryFirst = useCallback(() => videoUseCases.fetchHistory(), [])
-  const { items: historyVideos, loading: histLoading, loadingMore: histLoadingMore, reload: reloadHistory } = usePaginatedList<Video>(
+  const { items: historyVideos, loading: histLoading, loadingMore: histLoadingMore, reload: reloadHistory, pageSize: histPageSize } = usePaginatedList<Video>(
     loadHistoryFirst,
     loadVideosNext,
   )
 
   // Starred
   const loadStarredFirst = useCallback(() => videoUseCases.fetchStarred(), [])
-  const { items: starredVideos, loading: starLoading, loadingMore: starLoadingMore, reload: reloadStarred } = usePaginatedList<Video>(
+  const { items: starredVideos, loading: starLoading, loadingMore: starLoadingMore, reload: reloadStarred, pageSize: starPageSize } = usePaginatedList<Video>(
     loadStarredFirst,
     loadVideosNext,
   )
@@ -60,7 +60,7 @@ export function ProfilePage() {
   // Subscriptions (users)
   const loadSubsFirst = useCallback(() => userUseCases.fetchSubscriptions(), [])
   const loadUsersNext = useCallback((nextUrl: string) => userUseCases.fetchNext(nextUrl), [])
-  const { items: subsUsers, loading: subsLoading, loadingMore: subsLoadingMore, reload: reloadSubs } = usePaginatedList<User>(
+  const { items: subsUsers, loading: subsLoading, loadingMore: subsLoadingMore, reload: reloadSubs, pageSize: subsPageSize } = usePaginatedList<User>(
     loadSubsFirst,
     loadUsersNext,
   )
@@ -258,7 +258,7 @@ export function ProfilePage() {
                   </div>
                 ))}
                 {myLoadingMore &&
-                  Array.from({ length: Math.max(1, PAGE_SIZE) }).map((_, i) => (
+                  Array.from({ length: Math.max(1, myPageSize) }).map((_, i) => (
                     <VideoCardSkeleton key={`profile-videos-tail-skel-${i}`} />
                   ))}
               </div>
@@ -325,7 +325,7 @@ export function ProfilePage() {
                   <VideoCard key={v.id} video={v} />
                 ))}
                 {histLoadingMore &&
-                  Array.from({ length: Math.max(1, PAGE_SIZE) }).map((_, i) => (
+                  Array.from({ length: Math.max(1, histPageSize) }).map((_, i) => (
                     <VideoCardSkeleton key={`profile-history-tail-skel-${i}`} />
                   ))}
               </div>
@@ -354,7 +354,7 @@ export function ProfilePage() {
                   <VideoCard key={v.id} video={v} />
                 ))}
                 {starLoadingMore &&
-                  Array.from({ length: Math.max(1, PAGE_SIZE) }).map((_, i) => (
+                  Array.from({ length: Math.max(1, starPageSize) }).map((_, i) => (
                     <VideoCardSkeleton key={`profile-starred-tail-skel-${i}`} />
                   ))}
               </div>
@@ -389,7 +389,7 @@ export function ProfilePage() {
                   <ChannelCard key={s.id} channel={s} videos={[]} />
                 ))}
                 {subsLoadingMore &&
-                  Array.from({ length: Math.max(1, PAGE_SIZE) }).map((_, i) => (
+                  Array.from({ length: Math.max(1, subsPageSize) }).map((_, i) => (
                     <ChannelCardSkeleton key={`profile-subs-tail-skel-${i}`} />
                   ))}
               </div>

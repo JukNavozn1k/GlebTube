@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { PAGE_SIZE as DEFAULT_PAGE_SIZE } from "@/lib/constants"
 import type { Paginated } from "@/types/pagination"
 
 /**
@@ -8,8 +9,10 @@ import type { Paginated } from "@/types/pagination"
  */
 export function usePaginatedList<T>(
   loadFirst: () => Promise<Paginated<T>>,
-  loadNext: (nextUrl: string) => Promise<Paginated<T>>
+  loadNext: (nextUrl: string) => Promise<Paginated<T>>,
+  opts?: { pageSize?: number }
 ) {
+  const pageSize = opts?.pageSize ?? DEFAULT_PAGE_SIZE
   const [items, setItems] = useState<T[]>([])
   const [nextUrl, setNextUrl] = useState<string | null>(null)
   const [count, setCount] = useState<number | undefined>(undefined)
@@ -80,7 +83,7 @@ export function usePaginatedList<T>(
   }, [nextUrl, loadMore])
 
   return useMemo(
-    () => ({ items, next: nextUrl, count, loading, loadingMore, reload: load, loadMore }),
-    [items, nextUrl, count, loading, loadingMore, load, loadMore]
+    () => ({ items, next: nextUrl, count, loading, loadingMore, reload: load, loadMore, pageSize }),
+    [items, nextUrl, count, loading, loadingMore, load, loadMore, pageSize]
   )
 }

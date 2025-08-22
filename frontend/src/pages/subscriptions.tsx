@@ -1,5 +1,5 @@
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { BottomNav } from "@/components/bottom-nav"
 import { getUploads } from "@/utils/storage"
 import { videos as builtins } from "@/lib/glebtube-data"
@@ -13,15 +13,22 @@ import { usePaginatedList } from "@/hooks/use-paginated-list"
 export function SubscriptionsPage() {
   const isAuthorized = useProtectedRoute("/subscriptions")
   const [uploads, setUploads] = useState<Video[]>([])
-  const { items: subscribedUsers, loading } = usePaginatedList<User>(
+  const { items: subscribedUsers, loading, reload, pageSize } = usePaginatedList<User>(
     () => userUseCases.fetchSubscriptions(),
     (next) => userUseCases.fetchNext(next)
   )
 
+  const didInitRef = useRef(false)
   useEffect(() => {
-    if (!isAuthorized) return
+    if (!isAuthorized) {
+      didInitRef.current = false
+      return
+    }
     setUploads(getUploads())
-  }, [isAuthorized])
+    if (didInitRef.current) return
+    didInitRef.current = true
+    reload()
+  }, [isAuthorized, reload])
 
   const all: Video[] = useMemo(() => [...uploads, ...builtins], [uploads])
 
@@ -42,7 +49,7 @@ export function SubscriptionsPage() {
         <h1 className="text-xl sm:text-2xl font-semibold">Мои подписки</h1>
         {loading ? (
           <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
-            {Array.from({ length: 6 }).map((_, i) => (
+            {Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
               <ChannelCardSkeleton key={`subs-skel-${i}`} />
             ))}
           </div>
