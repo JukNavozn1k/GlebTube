@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { StarButton } from "@/components/star-button"
 import { Comments } from "@/components/comments"
@@ -15,6 +15,8 @@ import { WatchPageSkeleton } from "@/components/watch-skeleton"
 
 import { videoUseCases } from "@/use-cases/video"
 import { userUseCases } from "@/use-cases/user"
+import { usePaginatedList } from "@/hooks/use-paginated-list"
+import { PAGE_SIZE } from "@/lib/constants"
 
 function channelSlug(channelId: string) {
   return encodeURIComponent(channelId || "unknown")
@@ -36,37 +38,44 @@ function getInitials(username?: string): string {
 export function WatchPage() {
   const { id = "" } = useParams<{ id: string }>()
   const [video, setVideo] = useState<Video | null>(null)
-  const [recommended, setRecommended] = useState<Video[]>([])
   const [sub, setSub] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   // Theater mode was removed from CustomPlayer; keep layout static
 
+  // Paginated recommendations (similar videos)
+  const loadSimilarFirst = useCallback(() => videoUseCases.fetchSimilar(id), [id])
+  const loadSimilarNext = useCallback((nextUrl: string) => videoUseCases.fetchNext(nextUrl), [])
+  const { items: recommended, loadingMore: recLoadingMore, reload: reloadRecommended } = usePaginatedList<Video>(
+    loadSimilarFirst,
+    loadSimilarNext,
+  )
+
   useEffect(() => {
-    const loadData = async () => {
+    const didRef = (WatchPage as any)._didRef || { current: new Map<string, boolean>() }
+    ;(WatchPage as any)._didRef = didRef
+    const loadVideo = async () => {
       setIsLoading(true)
       try {
-        const [v, similarPage] = await Promise.all([
-          videoUseCases.fetchById(id),
-          videoUseCases.fetchSimilar(id)
-        ]);
-
-        setVideo(v);
-        // If backend returns current video in similar list, filter it out; do not enforce any limit
-        const similar = Array.isArray(similarPage?.results) ? similarPage.results : []
-        setRecommended(similar.filter((item) => item.id !== id));
-
-        if (v?.channel) setSub(!!v.channel.subscribed);
+        const v = await videoUseCases.fetchById(id)
+        setVideo(v)
+        if (v?.channel) setSub(!!v.channel.subscribed)
       } catch (error) {
-        console.error("Failed to load video or recommendations:", error);
-        setVideo(null);
-        setRecommended([]);
+        console.error("Failed to load video:", error)
+        setVideo(null)
       } finally {
         setIsLoading(false)
       }
-    };
-    loadData();
-  }, [id])
+    }
+    loadVideo()
+    // reset and load recommendations for new id; guard StrictMode duplicate for same id
+    const key = String(id)
+    const seen = didRef.current.get(key)
+    if (!seen) {
+      didRef.current.set(key, true)
+      reloadRecommended()
+    }
+  }, [id, reloadRecommended])
 
   useEffect(() => {
     if (video) addHistory(video.id)
@@ -184,7 +193,7 @@ export function WatchPage() {
         <aside className="grid gap-4 self-start min-w-0">
           <div className="text-sm font-semibold">Рекомендованные</div>
           <div className="grid gap-3">
-            {recommended.map((v) => {
+            {recommended.filter((rv) => rv.id !== id).map((v) => {
               if (!v.channel) return null
 
               return (
@@ -215,6 +224,17 @@ export function WatchPage() {
                 </Link>
               )
             })}
+            {recLoadingMore &&
+              Array.from({ length: Math.max(1, PAGE_SIZE) }).map((_, i) => (
+                <div key={`rec-tail-skel-${i}`} className="flex gap-3 min-w-0 animate-pulse">
+                  <div className="aspect-video w-40 min-w-40 rounded-md bg-blue-50" />
+                  <div className="flex-1 min-w-0 grid gap-2">
+                    <div className="h-3 bg-slate-100 rounded w-11/12" />
+                    <div className="h-3 bg-slate-100 rounded w-8/12" />
+                    <div className="h-3 bg-slate-100 rounded w-6/12" />
+                  </div>
+                </div>
+              ))}
           </div>
         </aside>
       </main>

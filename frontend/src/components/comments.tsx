@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -9,6 +10,9 @@ import { formatCommentTime } from "@/utils/format"
 import { useUser } from "@/hooks/use-user"
 import { useAuth } from "@/contexts/auth-context"
 import { commentUseCases } from "@/use-cases/comment"
+import { usePaginatedList } from "@/hooks/use-paginated-list"
+import { PAGE_SIZE } from "@/lib/constants"
+
 import {
   Star,
   ChevronDown,
@@ -41,7 +45,6 @@ type CommentsProps = {
 type SortOption = "newest" | "oldest" | "popular"
 
 export function Comments({ video }: CommentsProps) {
-  const [items, setItems] = useState<Comment[]>([])
   const [text, setText] = useState<string>("")
   const [replyTo, setReplyTo] = useState<string | null>(null)
   const [replyText, setReplyText] = useState<string>("")
@@ -52,27 +55,30 @@ export function Comments({ video }: CommentsProps) {
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null)
   const { user } = useUser()
   const { auth } = useAuth()
-  const [loading, setLoading] = useState(false)
 
+  // Pagination: load comments with ordering, infinite scroll on window scroll
+  const ordering = sortBy === "popular" ? "-baseStars" : sortBy === "newest" ? "-createdAt" : "createdAt"
+  const loadFirst = useCallback(() => commentUseCases.fetchForVideoPaginated(video, { ordering }), [video, ordering])
+  const loadNext = useCallback((nextUrl: string) => commentUseCases.fetchNext(nextUrl), [])
+  const { items: pagedItems, count, loading, loadingMore, reload } = usePaginatedList<Comment>(loadFirst, loadNext)
+
+  // Reset UI state and reload when video or sort changes; guard against StrictMode duplicate for same key
+  const lastKeyRef = useRef<string | null>(null)
   useEffect(() => {
-    const ordering = sortBy === "popular" ? "-baseStars" : sortBy === "newest" ? "-createdAt" : "createdAt"
-    const load = async () => {
-      setLoading(true)
-      try {
-        const list = await commentUseCases.fetchForVideo(video, { ordering })
-        setItems(list)
-      } catch (e) {
-        console.error("Failed to load comments:", e)
-        setItems([])
-      } finally {
-        setLoading(false)
-      }
-    }
     setOpenReplies({})
     setEditingComment(null)
     setEditText("")
-    load()
-  }, [video, sortBy])
+    const key = `${video}|${ordering}`
+    if (lastKeyRef.current === key) return
+    lastKeyRef.current = key
+    reload()
+  }, [video, ordering, reload])
+
+  // Mirror paginated items into local items for edit/reply mapping logic
+  const [items, setItems] = useState<Comment[]>(pagedItems)
+  useEffect(() => {
+    setItems(pagedItems)
+  }, [pagedItems])
 
   // Create current user object
   const currentUser = useMemo(
@@ -122,9 +128,10 @@ export function Comments({ video }: CommentsProps) {
     if (!val) return
     ;(async () => {
       try {
-        const c = await commentUseCases.createComment({ video, text: val })
-        setItems((prev) => [c, ...prev])
+        await commentUseCases.createComment({ video, text: val })
         setText("")
+        // Reload first page to reflect server ordering and counts
+        reload()
       } catch (e) {
         console.error("Failed to create comment:", e)
       }
@@ -136,11 +143,11 @@ export function Comments({ video }: CommentsProps) {
     if (!val) return
     ;(async () => {
       try {
-        const c = await commentUseCases.createComment({ video, text: val, parent })
-        setItems((prev) => [c, ...prev])
+        await commentUseCases.createComment({ video, text: val, parent })
         setReplyText("")
         setReplyTo(null)
         setOpenReplies((s) => ({ ...s, [parent]: true }))
+        reload()
       } catch (e) {
         console.error("Failed to create reply:", e)
       }
@@ -162,10 +169,10 @@ export function Comments({ video }: CommentsProps) {
     if (!newText) return
     ;(async () => {
       try {
-        const updated = await commentUseCases.updateComment(commentId, newText)
-        setItems((prev) => prev.map((c) => (c.id === updated.id ? updated : c)))
+        await commentUseCases.updateComment(commentId, newText)
         setEditingComment(null)
         setEditText("")
+        reload()
       } catch (e) {
         console.error("Failed to update comment:", e)
       }
@@ -176,11 +183,7 @@ export function Comments({ video }: CommentsProps) {
     ;(async () => {
       try {
         await commentUseCases.remove(id)
-        // Re-fetch to also reflect backend cascading rules
-        const list = await commentUseCases.fetchForVideo(video, {
-          ordering: sortBy === "popular" ? "-baseStars" : sortBy === "newest" ? "-createdAt" : "createdAt",
-        })
-        setItems(list)
+        reload()
       } catch (e) {
         console.error("Failed to delete comment:", e)
       }
@@ -208,7 +211,7 @@ export function Comments({ video }: CommentsProps) {
     })()
   }
 
-  const count = items.filter((c) => !c.parent).length
+  const displayedCount = typeof count === "number" ? count : items.filter((c) => !c.parent).length
 
   const sortOptions = [
     { value: "newest" as const, label: "Сначала новые", icon: Clock },
@@ -221,7 +224,7 @@ export function Comments({ video }: CommentsProps) {
   return (
     <section className="grid gap-4 min-w-0">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-lg font-semibold">Комментарии ({count})</h3>
+        <h3 className="text-lg font-semibold">Комментарии ({displayedCount})</h3>
 
         {/* Сортировка - адаптивная для мобильных */}
         <DropdownMenu>
@@ -291,8 +294,7 @@ export function Comments({ video }: CommentsProps) {
 
       {/* List */}
       <div className="grid gap-4 min-w-0">
-        {loading && <div className="text-sm text-muted-foreground">Загрузка комментариев…</div>}
-        {!loading && roots.map((c) => {
+        {roots.map((c) => {
           const replies = repliesByParent.get(c.id) || []
           const meRoot = String((c.channel as any).id) === currentUserId
           const isOpen = openReplies[c.id] || false
@@ -574,8 +576,22 @@ export function Comments({ video }: CommentsProps) {
             </div>
           )
         })}
-        {roots.length === 0 && (
+        {roots.length === 0 && !loading && (
           <div className="text-sm text-muted-foreground">Пока нет комментариев. Будьте первым!</div>
+        )}
+        {(loading || loadingMore) && (
+          <div className="grid gap-4">
+            {Array.from({ length: Math.max(1, PAGE_SIZE) }).map((_, i) => (
+              <div key={`comment-tail-skel-${i}`} className="flex items-start gap-3 animate-pulse">
+                <div className="h-9 w-9 rounded-full bg-slate-100 border border-blue-100" />
+                <div className="flex-1 grid gap-2 min-w-0">
+                  <div className="h-3 bg-slate-100 rounded w-24" />
+                  <div className="h-3 bg-slate-100 rounded w-11/12" />
+                  <div className="h-3 bg-slate-100 rounded w-8/12" />
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 

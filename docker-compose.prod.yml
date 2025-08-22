@@ -70,6 +70,7 @@ services:
       - .env
     environment:
       - VITE_APP_API_URL=${VITE_APP_API_URL}
+      - VITE_API_PAGE_SIZE=${API_PAGE_SIZE}
     volumes:
       - ./frontend:/frontend
       - ./frontend/dist:/frontend/dist

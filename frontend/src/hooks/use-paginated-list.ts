@@ -15,6 +15,7 @@ export function usePaginatedList<T>(
   const [count, setCount] = useState<number | undefined>(undefined)
   const [loading, setLoading] = useState(false)
   const loadingMoreRef = useRef(false)
+  const [loadingMore, setLoadingMore] = useState(false)
   // Keep stable refs to the loader functions to avoid effect dependency thrash
   const loadFirstRef = useRef(loadFirst)
   const loadNextRef = useRef(loadNext)
@@ -25,13 +26,13 @@ export function usePaginatedList<T>(
     loadNextRef.current = loadNext
   }, [loadNext])
 
-  const reset = useCallback(() => {
+  // no external reset; reload() resets state before fetching
+
+  const load = useCallback(async () => {
+    // Reset before fetching to reflect loading skeletons in UI
     setItems([])
     setNextUrl(null)
     setCount(undefined)
-  }, [])
-
-  const load = useCallback(async () => {
     setLoading(true)
     try {
       const page = await loadFirstRef.current()
@@ -48,6 +49,7 @@ export function usePaginatedList<T>(
   const loadMore = useCallback(async () => {
     if (!nextUrl || loadingMoreRef.current) return
     loadingMoreRef.current = true
+    setLoadingMore(true)
     try {
       const page = await loadNextRef.current(nextUrl)
       setItems((prev) => [...prev, ...page.results])
@@ -57,16 +59,11 @@ export function usePaginatedList<T>(
       // swallow
     } finally {
       loadingMoreRef.current = false
+      setLoadingMore(false)
     }
   }, [nextUrl])
 
-  // auto load first page on mount only; callers should invoke reload() if inputs change
-  useEffect(() => {
-    reset()
-    // avoid unhandled rejection
-    load().catch(() => {})
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // Note: No auto-load on mount. Callers must call reload() on mount or when inputs change.
 
   // listen scroll: when near bottom, load next
   useEffect(() => {
@@ -83,7 +80,7 @@ export function usePaginatedList<T>(
   }, [nextUrl, loadMore])
 
   return useMemo(
-    () => ({ items, next: nextUrl, count, loading, reload: load, loadMore }),
-    [items, nextUrl, count, loading, load, loadMore]
+    () => ({ items, next: nextUrl, count, loading, loadingMore, reload: load, loadMore }),
+    [items, nextUrl, count, loading, loadingMore, load, loadMore]
   )
 }
