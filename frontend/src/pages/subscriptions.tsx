@@ -1,5 +1,5 @@
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { BottomNav } from "@/components/bottom-nav"
 import { getUploads } from "@/utils/storage"
 import { videos as builtins } from "@/lib/glebtube-data"
@@ -9,27 +9,26 @@ import { useProtectedRoute } from "@/hooks/use-protected-route"
 import type { User } from "@/types/user"
 import type { Video } from "@/types/video"
 import { userUseCases } from "@/use-cases/user"
+import { usePaginatedList } from "@/hooks/use-paginated-list"
 export function SubscriptionsPage() {
   const isAuthorized = useProtectedRoute("/subscriptions")
-  const [subscribedUsers, setSubscribedUsers] = useState<User[]>([])
   const [uploads, setUploads] = useState<Video[]>([])
-  const [loading, setLoading] = useState(false)
+  const { items: subscribedUsers, loading, reload, pageSize, hasNext, sentinelRef } = usePaginatedList<User>(
+    () => userUseCases.fetchSubscriptions(),
+    (next) => userUseCases.fetchNext(next)
+  )
 
+  const didInitRef = useRef(false)
   useEffect(() => {
-    if (!isAuthorized) return
+    if (!isAuthorized) {
+      didInitRef.current = false
+      return
+    }
     setUploads(getUploads())
-    setLoading(true)
-    ;(async () => {
-      try {
-        const users = await userUseCases.fetchSubscriptions()
-        setSubscribedUsers(users)
-      } catch (e) {
-        console.error("Failed to fetch subscriptions", e)
-      } finally {
-        setLoading(false)
-      }
-    })()
-  }, [isAuthorized])
+    if (didInitRef.current) return
+    didInitRef.current = true
+    reload()
+  }, [isAuthorized, reload])
 
   const all: Video[] = useMemo(() => [...uploads, ...builtins], [uploads])
 
@@ -50,7 +49,7 @@ export function SubscriptionsPage() {
         <h1 className="text-xl sm:text-2xl font-semibold">Мои подписки</h1>
         {loading ? (
           <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
-            {Array.from({ length: 6 }).map((_, i) => (
+            {Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
               <ChannelCardSkeleton key={`subs-skel-${i}`} />
             ))}
           </div>
@@ -61,6 +60,16 @@ export function SubscriptionsPage() {
             {channels.map((ch) => (
               <ChannelCard key={ch.channel.id} channel={ch.channel} videos={ch.videos} />
             ))}
+            {hasNext &&
+              Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
+                i === 0 ? (
+                  <div key={`subs-tail-sentinel-wrap-${i}`} ref={sentinelRef}>
+                    <ChannelCardSkeleton />
+                  </div>
+                ) : (
+                  <ChannelCardSkeleton key={`subs-tail-skel-${i}`} />
+                )
+              ))}
           </div>
         )}
       </main>

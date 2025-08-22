@@ -1,6 +1,6 @@
 
 import {Link} from "react-router-dom"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { type Video } from "@/types/video"
 import { formatViews } from "@/utils/format"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -29,56 +29,69 @@ import { userUseCases } from "@/use-cases/user"
 import type { User } from "@/types/user"
 import { ChannelCard } from "@/components/channel-card"
 import { ChannelCardSkeleton } from "@/components/channel-card-skeleton"
+import { usePaginatedList } from "@/hooks/use-paginated-list"
+// page size is provided by usePaginatedList
 
 export function ProfilePage() {
   const { user } = useUser()
   const { logout } = useAuth()
   const isAuthorized = useProtectedRoute("/profile")
-  const [myVideos, setMyVideos] = useState<Video[]>([])
-  const [historyVideos, setHistoryVideos] = useState<Video[]>([])
-  const [starredVideos, setStarredVideos] = useState<Video[]>([])
-  const [subsUsers, setSubsUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState(false)
+  // My videos
+  const loadMineFirst = useCallback(() => (user?.id ? videoUseCases.fetchByChannel(user.id) : Promise.resolve({
+    count: 0, next: null, previous: null, results: [] as Video[],
+  })), [user?.id])
+  const loadVideosNext = useCallback((nextUrl: string) => videoUseCases.fetchNext(nextUrl), [])
+  const { items: myVideos, loading: myLoading, reload: reloadMine, pageSize: myPageSize, hasNext: myHasNext, sentinelRef: mySentinelRef } = usePaginatedList<Video>(loadMineFirst, loadVideosNext)
+
+  // History
+  const loadHistoryFirst = useCallback(() => videoUseCases.fetchHistory(), [])
+  const { items: historyVideos, loading: histLoading, reload: reloadHistory, pageSize: histPageSize, hasNext: histHasNext, sentinelRef: histSentinelRef } = usePaginatedList<Video>(
+    loadHistoryFirst,
+    loadVideosNext,
+  )
+
+  // Starred
+  const loadStarredFirst = useCallback(() => videoUseCases.fetchStarred(), [])
+  const { items: starredVideos, loading: starLoading, reload: reloadStarred, pageSize: starPageSize, hasNext: starHasNext, sentinelRef: starSentinelRef } = usePaginatedList<Video>(
+    loadStarredFirst,
+    loadVideosNext,
+  )
+
+  // Subscriptions (users)
+  const loadSubsFirst = useCallback(() => userUseCases.fetchSubscriptions(), [])
+  const loadUsersNext = useCallback((nextUrl: string) => userUseCases.fetchNext(nextUrl), [])
+  const { items: subsUsers, loading: subsLoading, reload: reloadSubs, pageSize: subsPageSize, hasNext: subsHasNext, sentinelRef: subsSentinelRef } = usePaginatedList<User>(
+    loadSubsFirst,
+    loadUsersNext,
+  )
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false)
 
   //
 
-  const totalViews = myVideos.reduce((sum, v) => sum + (v.views || 0), 0)
+  const totalViews = useMemo(() => myVideos.reduce((sum, v) => sum + (v.views || 0), 0), [myVideos])
 
+  const authInitRef = useRef(false)
   useEffect(() => {
-    if (!isAuthorized) return
-    // Fetch server data
-    setLoading(true)
-    ;(async () => {
-      try {
-        const [history, starred, subs] = await Promise.all([
-          videoUseCases.fetchHistory(),
-          videoUseCases.fetchStarred(),
-          userUseCases.fetchSubscriptions(),
-        ])
-        setHistoryVideos(history)
-        setStarredVideos(starred)
-        setSubsUsers(subs)
-      } catch (e) {
-        console.error("Failed to load profile data", e)
-      } finally {
-        setLoading(false)
-      }
-    })()
-  }, [isAuthorized])
+    if (!isAuthorized) {
+      authInitRef.current = false
+      return
+    }
+    if (authInitRef.current) return
+    authInitRef.current = true
+    reloadHistory()
+    reloadStarred()
+    reloadSubs()
+  }, [isAuthorized, reloadHistory, reloadStarred, reloadSubs])
 
+  const lastUserIdRef = useRef<string | null>(null)
   useEffect(() => {
     if (!isAuthorized) return
     if (!user?.id) return
-    ;(async () => {
-      try {
-        const mine = await videoUseCases.fetchByChannel(user.id)
-        setMyVideos(mine)
-      } catch (e) {
-        console.error("Failed to fetch my videos", e)
-      }
-    })()
-  }, [isAuthorized, user?.id])
+    const uid = String(user.id)
+    if (lastUserIdRef.current === uid) return
+    lastUserIdRef.current = uid
+    reloadMine()
+  }, [isAuthorized, user?.id, reloadMine])
 
   // Если не авторизован, не рендерим содержимое
   if (!isAuthorized) {
@@ -209,7 +222,7 @@ export function ProfilePage() {
                 </Button>
               </Link>
             </div>
-            {loading ? (
+            {myLoading ? (
               <div className="grid gap-3 sm:gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <VideoCardSkeleton key={`profile-videos-skel-${i}`} />
@@ -244,6 +257,16 @@ export function ProfilePage() {
                     </Link>
                   </div>
                 ))}
+                    {myHasNext &&
+                  Array.from({ length: Math.max(1, myPageSize) }).map((_, i) => (
+                    i === 0 ? (
+                      <div key={`profile-videos-tail-sentinel-wrap-${i}`} ref={mySentinelRef}>
+                        <VideoCardSkeleton />
+                      </div>
+                    ) : (
+                      <VideoCardSkeleton key={`profile-videos-tail-skel-${i}`} />
+                    )
+                  ))}
               </div>
             )}
           </TabsContent>
@@ -279,7 +302,8 @@ export function ProfilePage() {
                         } catch (e) {
                           console.error("Failed to clear history", e)
                         } finally {
-                          setHistoryVideos([])
+                          // Reload history list to reflect cleared state
+                          reloadHistory()
                         }
                       }}
                     >
@@ -289,7 +313,7 @@ export function ProfilePage() {
                 </AlertDialogContent>
               </AlertDialog>
             </div>
-            {loading ? (
+            {histLoading ? (
               <div className="grid gap-3 sm:gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <VideoCardSkeleton key={`profile-history-skel-${i}`} />
@@ -306,13 +330,23 @@ export function ProfilePage() {
                 {historyVideos.map((v) => (
                   <VideoCard key={v.id} video={v} />
                 ))}
+                {histHasNext &&
+                  Array.from({ length: Math.max(1, histPageSize) }).map((_, i) => (
+                    i === 0 ? (
+                      <div key={`profile-history-tail-sentinel-wrap-${i}`} ref={histSentinelRef}>
+                        <VideoCardSkeleton />
+                      </div>
+                    ) : (
+                      <VideoCardSkeleton key={`profile-history-tail-skel-${i}`} />
+                    )
+                  ))}
               </div>
             )}
           </TabsContent>
 
           <TabsContent value="starred" className="mt-0">
             <h2 className="text-lg font-semibold mb-4">Избранные видео</h2>
-            {loading ? (
+            {starLoading ? (
               <div className="grid gap-3 sm:gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <VideoCardSkeleton key={`profile-starred-skel-${i}`} />
@@ -331,13 +365,23 @@ export function ProfilePage() {
                 {starredVideos.map((v) => (
                   <VideoCard key={v.id} video={v} />
                 ))}
+                {starHasNext &&
+                  Array.from({ length: Math.max(1, starPageSize) }).map((_, i) => (
+                    i === 0 ? (
+                      <div key={`profile-starred-tail-sentinel-wrap-${i}`} ref={starSentinelRef}>
+                        <VideoCardSkeleton />
+                      </div>
+                    ) : (
+                      <VideoCardSkeleton key={`profile-starred-tail-skel-${i}`} />
+                    )
+                  ))}
               </div>
             )}
           </TabsContent>
 
           <TabsContent value="subscriptions" className="mt-0">
             <h2 className="text-lg font-semibold mb-4">Мои подписки</h2>
-            {loading ? (
+            {subsLoading ? (
               <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <ChannelCardSkeleton key={`profile-subs-skel-${i}`} />
@@ -362,6 +406,16 @@ export function ProfilePage() {
                 {subsUsers.map((s) => (
                   <ChannelCard key={s.id} channel={s} videos={[]} />
                 ))}
+                {subsHasNext &&
+                  Array.from({ length: Math.max(1, subsPageSize) }).map((_, i) => (
+                    i === 0 ? (
+                      <div key={`profile-subs-tail-sentinel-wrap-${i}`} ref={subsSentinelRef}>
+                        <ChannelCardSkeleton />
+                      </div>
+                    ) : (
+                      <ChannelCardSkeleton key={`profile-subs-tail-skel-${i}`} />
+                    )
+                  ))}
               </div>
             )}
           </TabsContent>

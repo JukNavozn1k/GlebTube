@@ -2,6 +2,7 @@ import { videoApi, type VideoApi } from "@/api/video";
 import type { Video } from "@/types/video";
 import type { UploadVideoPayload, UpdateVideoPayload } from "@/types/upload";
 import { UseCases } from "@/use-cases/use-cases";
+import type { Paginated, PaginationParams } from "@/types/pagination";
 
 export class VideoUseCases extends UseCases<Video> {
   private videoApi: VideoApi;
@@ -28,8 +29,8 @@ export class VideoUseCases extends UseCases<Video> {
   /**
    * Fetch watch history
    */
-  async fetchHistory() {
-    return this.videoApi.fetchHistory();
+  async fetchHistory(params?: PaginationParams): Promise<Paginated<Video>> {
+    return this.videoApi.fetchHistory(params);
   }
 
   /**
@@ -42,22 +43,25 @@ export class VideoUseCases extends UseCases<Video> {
   /**
    * Fetch starred videos
    */
-  async fetchStarred() {
-    return this.videoApi.fetchStarred();
+  async fetchStarred(params?: PaginationParams): Promise<Paginated<Video>> {
+    return this.videoApi.fetchStarred(params);
   }
 
   /**
    * Fetch videos by channel with optional starred filter
    */
-  async fetchByChannel(channel: number | string, opts?: { starred?: boolean }) {
+  async fetchByChannel(
+    channel: number | string,
+    opts?: { starred?: boolean } & PaginationParams
+  ): Promise<Paginated<Video>> {
     return this.videoApi.fetchByChannel(channel, opts);
   }
 
   /**
    * Search videos by text query
    */
-  async search(query: string) {
-    return this.videoApi.search(query);
+  async search(query: string, params?: PaginationParams): Promise<Paginated<Video>> {
+    return this.videoApi.search(query, params);
   }
 
   /**
@@ -70,8 +74,8 @@ export class VideoUseCases extends UseCases<Video> {
   /**
    * Fetch similar videos for a given id
    */
-  async fetchSimilar(id: string) {
-    return this.videoApi.fetchSimilar(id);
+  async fetchSimilar(id: string, params?: PaginationParams): Promise<Paginated<Video>> {
+    return this.videoApi.fetchSimilar(id, params);
   }
 
   /**
@@ -79,6 +83,11 @@ export class VideoUseCases extends UseCases<Video> {
    */
   hlsUrl(id: string) {
     return this.videoApi.hlsUrl(id);
+  }
+
+  // passthrough for next page fetching
+  async fetchNext(nextUrl: string): Promise<Paginated<Video>> {
+    return this.api.fetchNext(nextUrl)
   }
 }
 

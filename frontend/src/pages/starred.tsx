@@ -1,33 +1,24 @@
-import { useEffect, useState } from "react"
-import { type Video} from "@/types/video" 
+import { useRef } from "react"
+import { type Video } from "@/types/video"
 import { VideoCard } from "@/components/video-card"
 import { VideoCardSkeleton } from "@/components/video-card-skeleton"
 import { BottomNav } from "@/components/bottom-nav"
 import { Star } from "lucide-react"
 import { useProtectedRoute } from "@/hooks/use-protected-route"
 import { videoUseCases } from "@/use-cases/video"
+import { usePaginatedList } from "@/hooks/use-paginated-list"
 
 export function StarredPage() {
   const isAuthorized = useProtectedRoute("/starred")
-  const [videos, setVideos] = useState<Video[]>([])
-  const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    if (!isAuthorized) return
-    let cancelled = false
-    setLoading(true)
-    ;(async () => {
-      try {
-        const list = await videoUseCases.fetchStarred()
-        if (!cancelled) setVideos(list)
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [isAuthorized])
+  const { items: videos, loading, reload, pageSize, hasNext, sentinelRef } = usePaginatedList<Video>(
+    () => videoUseCases.fetchStarred(),
+    (next) => videoUseCases.fetchNext(next)
+  )
+  const didInitRef = useRef(false)
+  if (isAuthorized && !didInitRef.current) {
+    didInitRef.current = true
+    reload()
+  }
 
   if (!isAuthorized) {
     return null
@@ -40,7 +31,7 @@ export function StarredPage() {
 
         {loading ? (
           <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
+            {Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
               <VideoCardSkeleton key={`starred-skel-${i}`} />
             ))}
           </div>
@@ -55,6 +46,16 @@ export function StarredPage() {
             {videos.map((v) => (
               <VideoCard key={v.id} video={v} />
             ))}
+            {hasNext &&
+              Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
+                i === 0 ? (
+                  <div key={`starred-tail-sentinel-wrap-${i}`} ref={sentinelRef}>
+                    <VideoCardSkeleton />
+                  </div>
+                ) : (
+                  <VideoCardSkeleton key={`starred-tail-skel-${i}`} />
+                )
+              ))}
           </div>
         )}
       </main>

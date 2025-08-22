@@ -7,6 +7,8 @@ import { setAccessToken, setRefreshToken, getRefreshToken, clearAuth, getAccessT
 export class AuthUseCases {
   private authApi: AuthApi;
   private currentUser: UserProfile | null = null;
+  private initialized = false;
+  private initInFlight: Promise<void> | null = null;
 
   constructor(authApi: AuthApi) {
     this.authApi = authApi;
@@ -17,21 +19,34 @@ export class AuthUseCases {
    * If profile fetch fails, perform logout to clear tokens.
    */
   async initialize(): Promise<void> {
+    if (this.initialized) return;
+    if (this.initInFlight) return this.initInFlight;
+
     // If we have an access token already in memory, try to load the profile.
     // Otherwise, if we have a refresh token, try to refresh and then load profile.
-    try {
-      if (getAccessToken()) {
-        await this.loadUserProfile();
-        return;
-      }
+    this.initInFlight = (async () => {
+      try {
+        if (getAccessToken()) {
+          await this.loadUserProfile();
+          return;
+        }
 
-      const refresh = getRefreshToken();
-      if (refresh) {
-        await this.refreshTokens();
-        await this.loadUserProfile();
+        const refresh = getRefreshToken();
+        if (refresh) {
+          await this.refreshTokens();
+          await this.loadUserProfile();
+        }
+      } catch {
+        this.logout();
+      } finally {
+        this.initialized = true;
       }
-    } catch {
-      this.logout();
+    })();
+
+    try {
+      await this.initInFlight;
+    } finally {
+      this.initInFlight = null;
     }
   }
 

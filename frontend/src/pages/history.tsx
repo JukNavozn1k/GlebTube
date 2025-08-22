@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react"
+//
+import { useRef } from "react"
 import { type Video } from "@/types/video"
 import { VideoCard } from "@/components/video-card"
 import { VideoCardSkeleton } from "@/components/video-card-skeleton"
@@ -18,29 +19,20 @@ import {
 import { History } from "lucide-react"
 import { useProtectedRoute } from "@/hooks/use-protected-route"
 import { videoUseCases } from "@/use-cases/video"
+import { usePaginatedList } from "@/hooks/use-paginated-list"
 
 export function HistoryPage() {
   const isAuthorized = useProtectedRoute("/history")
-  const [videos, setVideos] = useState<Video[]>([])
-  const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    if (!isAuthorized) return
-    let cancelled = false
-    setLoading(true)
-    ;(async () => {
-      try {
-        const list = await videoUseCases.fetchHistory()
-        console.log(list)
-        if (!cancelled) setVideos(list)
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [isAuthorized])
+  const { items: videos, loading, reload, pageSize, hasNext, sentinelRef } = usePaginatedList<Video>(
+    () => videoUseCases.fetchHistory(),
+    (next) => videoUseCases.fetchNext(next)
+  )
+  const didInitRef = useRef(false)
+  if (isAuthorized && !didInitRef.current) {
+    // run once per mount/auth; safe against StrictMode re-render because ref persists within lifecyle
+    didInitRef.current = true
+    reload()
+  }
 
   if (!isAuthorized) {
     return null
@@ -70,7 +62,7 @@ export function HistoryPage() {
                   className="bg-blue-600 hover:bg-blue-700 text-white"
                   onClick={async () => {
                     await videoUseCases.clearHistory()
-                    setVideos([])
+                    reload()
                   }}
                 >
                   Очистить
@@ -82,7 +74,7 @@ export function HistoryPage() {
 
         {loading ? (
           <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
+            {Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
               <VideoCardSkeleton key={`history-skel-${i}`} />
             ))}
           </div>
@@ -97,6 +89,16 @@ export function HistoryPage() {
             {videos.map((v) => (
               <VideoCard key={v.id} video={v} />
             ))}
+            {hasNext &&
+              Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
+                i === 0 ? (
+                  <div key={`history-tail-sentinel-wrap-${i}`} ref={sentinelRef}>
+                    <VideoCardSkeleton />
+                  </div>
+                ) : (
+                  <VideoCardSkeleton key={`history-tail-skel-${i}`} />
+                )
+              ))}
           </div>
         )}
       </main>

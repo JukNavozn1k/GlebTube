@@ -2,6 +2,7 @@ import type { User, UserUpdateData } from "@/types/user"
 import { userApi, type UserApi } from "@/api/user"
 import { UseCases } from "@/use-cases/use-cases"
 import type { UpdateUserProfilePayload } from "@/types/upload"
+import type { Paginated, PaginationParams } from "@/types/pagination"
 
 export class UserUseCases extends UseCases<User> {
   private userApi: UserApi
@@ -23,8 +24,8 @@ export class UserUseCases extends UseCases<User> {
   /**
    * Fetch users that the current user is subscribed to. Optionally filter by username prefix.
    */
-  async fetchSubscriptions(username?: string): Promise<User[]> {
-    return this.userApi.listByFilter({ subscribed: true, username })
+  async fetchSubscriptions(username?: string, params?: PaginationParams): Promise<Paginated<User>> {
+    return this.userApi.listByFilter({ subscribed: true, username, ...(params || {}) })
   }
 
   /**
@@ -32,6 +33,10 @@ export class UserUseCases extends UseCases<User> {
    */
   async subscribe(channel_id: string | number): Promise<{ channel_id: number; subscribed: boolean }> {
     return this.userApi.subscribe(channel_id)
+  }
+
+  async fetchNext(nextUrl: string): Promise<Paginated<User>> {
+    return this.api.fetchNext(nextUrl)
   }
 }
 

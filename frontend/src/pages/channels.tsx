@@ -1,6 +1,6 @@
 import type React from "react"
 
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { BottomNav } from "@/components/bottom-nav"
 import { Input } from "@/components/ui/input"
 import { videos as builtins } from "@/lib/glebtube-data"
@@ -13,10 +13,12 @@ import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
 import type { User } from "@/types/user"
 import { userUseCases } from "@/use-cases/user"
+import { userApi } from "@/api/user"
+import { usePaginatedList } from "@/hooks/use-paginated-list"
+// page size is provided by usePaginatedList
 
 export function ChannelsPage() {
   const [uploads, setUploads] = useState<UploadedVideo[]>([])
-  const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -24,25 +26,29 @@ export function ChannelsPage() {
   const [q, setQ] = useState(qParam)
 
   useEffect(() => setUploads(getUploads()), [])
+  // Users pagination with optional search filter by username
+  const loadUsersFirst = useCallback(
+    () => userApi.listByFilter({ username: qParam || undefined }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [qParam],
+  )
+  const loadUsersNext = useCallback((nextUrl: string) => userUseCases.fetchNext(nextUrl), [])
+  const { items: users, count, loading: usersLoading, reload, pageSize, hasNext, sentinelRef } = usePaginatedList<User>(
+    loadUsersFirst,
+    loadUsersNext,
+  )
   useEffect(() => {
-    let cancelled = false
-    ;(async () => {
-      try {
-        setLoading(true)
-        const list = await userUseCases.fetchList()
-        if (!cancelled) setUsers(list)
-      } catch (e) {
-        if (!cancelled) setUsers([])
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [])
+    // reflect initial loading for page-level skeletons
+    setLoading(usersLoading)
+  }, [usersLoading])
+  const lastKeyRef = useRef<string | null>(null)
   useEffect(() => {
     setQ(qParam)
+    const key = qParam
+    if (lastKeyRef.current === key) return
+    lastKeyRef.current = key
+    reload()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [qParam])
 
   const all: Video[] = useMemo(() => [...uploads, ...builtins], [uploads])
@@ -95,7 +101,13 @@ export function ChannelsPage() {
         <div className="flex items-center justify-between">
           <h1 className="text-xl sm:text-2xl font-semibold">Каналы</h1>
           <div className="text-sm text-muted-foreground">
-            {grouped.length} {grouped.length === 1 ? "канал" : grouped.length < 5 ? "канала" : "каналов"}
+            {(typeof count === "number" ? count : grouped.length)}
+            {" "}
+            {(typeof count === "number" ? count : grouped.length) === 1
+              ? "канал"
+              : (typeof count === "number" ? count : grouped.length) < 5
+              ? "канала"
+              : "каналов"}
           </div>
         </div>
 
@@ -149,6 +161,16 @@ export function ChannelsPage() {
             {grouped.map((item) => (
               <ChannelCard key={item.channel.id} channel={item.channel} videos={item.videos} />
             ))}
+            {hasNext &&
+              Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
+                i === 0 ? (
+                  <div key={`channels-tail-sentinel-wrap-${i}`} ref={sentinelRef}>
+                    <ChannelCardSkeleton />
+                  </div>
+                ) : (
+                  <ChannelCardSkeleton key={`channels-tail-skel-${i}`} />
+                )
+              ))}
           </div>
         )}
       </main>

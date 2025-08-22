@@ -1,6 +1,7 @@
 import { commentApi, type CommentApi } from "@/api/comment";
 import type { Comment, CreateCommentPayload, ListCommentsParams, RateCommentResponse } from "@/types/comment";
 import { UseCases } from "@/use-cases/use-cases";
+import type { Paginated } from "@/types/pagination";
 
 export class CommentUseCases extends UseCases<Comment> {
   private apiImpl: CommentApi;
@@ -10,7 +11,14 @@ export class CommentUseCases extends UseCases<Comment> {
     this.apiImpl = api;
   }
 
-  async fetch(params?: ListCommentsParams) {
+  // Backward-compatible array response
+  async fetch(params?: ListCommentsParams): Promise<Comment[]> {
+    const page = await this.apiImpl.fetch(params);
+    return page.results;
+  }
+
+  // Full paginated variant
+  async fetchPaginated(params?: ListCommentsParams): Promise<Paginated<Comment>> {
     return this.apiImpl.fetch(params);
   }
 
@@ -26,8 +34,23 @@ export class CommentUseCases extends UseCases<Comment> {
     return this.apiImpl.rate(id);
   }
 
-  async fetchForVideo(video: string, opts?: { ordering?: ListCommentsParams["ordering"]; parent?: string }) {
-    return this.apiImpl.fetch({ video, ordering: opts?.ordering, parent: opts?.parent });
+  async fetchForVideo(
+    video: string,
+    opts?: { ordering?: ListCommentsParams["ordering"]; parent?: string; parent__isnull?: boolean }
+  ): Promise<Comment[]> {
+    const page = await this.apiImpl.fetch({ video, ...opts });
+    return page.results;
+  }
+
+  async fetchForVideoPaginated(
+    video: string,
+    opts?: { ordering?: ListCommentsParams["ordering"]; parent?: string; parent__isnull?: boolean }
+  ): Promise<Paginated<Comment>> {
+    return this.apiImpl.fetch({ video, ...opts });
+  }
+
+  async fetchNext(nextUrl: string): Promise<Paginated<Comment>> {
+    return this.api.fetchNext(nextUrl);
   }
 }
 

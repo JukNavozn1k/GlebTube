@@ -1,60 +1,33 @@
 import { cn } from "@/lib/utils"
 
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef } from "react"
 import { useSearchParams, useLocation } from "react-router-dom" // заменили на react-router-dom
 import { VideoCard } from "@/components/video-card"
 import { VideoCardSkeleton } from "@/components/video-card-skeleton"
 import { BottomNav } from "@/components/bottom-nav"
 import { videoUseCases } from "@/use-cases/video"
 import type { Video } from "@/types/video"
+import { usePaginatedList } from "@/hooks/use-paginated-list"
 
 export function HomePage() {
   const [searchParams] = useSearchParams() // в react-router-dom возвращается массив [params, setParams]
   const q = (searchParams.get("q") || "").toLowerCase().trim()
-  const [apiVideos, setApiVideos] = useState<Video[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const loadFirst = useCallback(() => (q ? videoUseCases.search(q) : videoUseCases.fetchListPaginated()), [q])
+  const loadNext = useCallback((next: string) => videoUseCases.fetchNext(next), [])
+  const { items: apiVideos, loading: isLoading, reload, pageSize, hasNext, sentinelRef } = usePaginatedList<Video>(loadFirst, loadNext)
 
   const location = useLocation()
 
+  // Explicitly load once on first mount and on q/path changes (StrictMode-safe)
+  const didKeyRef = useRef<string | null>(null)
   useEffect(() => {
-    // Prefer API videos only. If query is present, use server search.
-    let mounted = true
-    setIsLoading(true)
-    ;(async () => {
-      if (location.pathname !== "/" && location.pathname !== "") {
-        setIsLoading(false)
-        return
-      }
-      try {
-        const list = q ? await videoUseCases.search(q) : await videoUseCases.fetchList()
-        // Normalize to an array in case backend returns a wrapped object (e.g., { results: [...] })
-        const normalized = Array.isArray(list)
-          ? list
-          : (list as any)?.results && Array.isArray((list as any).results)
-            ? (list as any).results
-            : []
-        if (mounted) {
-          setApiVideos(normalized)
-          setIsLoading(false)
-        }
-      } catch (err) {
-        console.error("Failed to load videos from API:", err)
-        if (mounted) {
-          setApiVideos([])
-          setIsLoading(false)
-        }
-      }
-    })()
+    const key = `${location.pathname}|${q}`
+    if (didKeyRef.current === key) return
+    didKeyRef.current = key
+    if (location.pathname === "/" || location.pathname === "") reload()
+  }, [location.pathname, q, reload])
 
-    return () => {
-      mounted = false
-    }
-  }, [location.pathname, q])
-
-  const allVideos = useMemo<Video[]>(() => {
-  // Only use API videos. If API returned nothing, the list will be empty.
-  return apiVideos
-  }, [apiVideos])
+  const allVideos = useMemo<Video[]>(() => apiVideos, [apiVideos])
 
   // Server already filtered when q present. Ensure it's always an array.
   const filtered = useMemo<Video[]>(() => (Array.isArray(allVideos) ? allVideos : []), [allVideos])
@@ -75,7 +48,7 @@ export function HomePage() {
         <div className={cn("grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3", q ? "pt-0" : "pt-2")}>
           {isLoading ? (
             // Show skeleton cards while loading
-            Array.from({ length: 6 }).map((_, index) => (
+            Array.from({ length: Math.max(1, pageSize) }).map((_, index) => (
               <VideoCardSkeleton key={`skeleton-${index}`} />
             ))
           ) : (
@@ -84,6 +57,16 @@ export function HomePage() {
               <VideoCard key={v.id} video={v} />
             ))
           )}
+          {!isLoading && hasNext &&
+              Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
+                i === 0 ? (
+                  <div key={`home-tail-sentinel-wrap-${i}`} ref={sentinelRef}>
+                    <VideoCardSkeleton />
+                  </div>
+                ) : (
+                  <VideoCardSkeleton key={`home-tail-skel-${i}`} />
+                )
+              ))}
         </div>
       </main>
       <BottomNav />

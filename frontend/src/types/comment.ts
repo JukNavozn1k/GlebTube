@@ -9,6 +9,10 @@ export type Comment = {
   createdAt: string
   baseStars: number
   starred: boolean
+  // Кол-во ответов приходит от бэка (replyCount annotation)
+  replyCount?: number
+  // В некоторых местах может быть удобно иметь булевский флаг
+  // hasReply?: boolean
 }
 
 // Payload to create a comment
@@ -23,6 +27,10 @@ export type ListCommentsParams = {
   ordering?: "-baseStars" | "baseStars" | "-createdAt" | "createdAt"
   parent?: string
   video?: string
+  page?: number
+  page_size?: number
+  // Специальный фильтр DRF для выборки только корневых: parent__isnull=true
+  parent__isnull?: boolean
 }
 
 // Response for rating endpoint

@@ -3,6 +3,7 @@ import type { Video } from "@/types/video";
 import type { UploadVideoPayload, UpdateVideoPayload } from "@/types/upload";
 import { Api } from "@/api/api";
 import api from "@/api/client";
+import type { Paginated, PaginationParams } from "@/types/pagination";
 
 export class VideoApi extends Api<Video> {
   constructor(apiClient: AxiosInstance, prefix: string = "video") {
@@ -37,8 +38,8 @@ export class VideoApi extends Api<Video> {
   /**
    * Fetch watch history
    */
-  async fetchHistory(): Promise<Video[]> {
-    const res = await this.apiClient.get<Video[]>(`/${this.prefix}/history`);
+  async fetchHistory(params?: PaginationParams): Promise<Paginated<Video>> {
+    const res = await this.apiClient.get<Paginated<Video>>(`/${this.prefix}/history`, { params });
     return res.data;
   }
 
@@ -53,9 +54,9 @@ export class VideoApi extends Api<Video> {
    * Fetch starred videos
    * GET /video/?starred=true
    */
-  async fetchStarred(): Promise<Video[]> {
-    const res = await this.apiClient.get<Video[]>(`/${this.prefix}/`, {
-      params: { starred: true },
+  async fetchStarred(params?: PaginationParams): Promise<Paginated<Video>> {
+    const res = await this.apiClient.get<Paginated<Video>>(`/${this.prefix}/`, {
+      params: { ...(params || {}), starred: true },
     });
     return res.data;
   }
@@ -64,11 +65,14 @@ export class VideoApi extends Api<Video> {
    * Fetch videos by channel with optional starred filter
    * GET /video/?channel=<id>&starred=<true|false|''>
    */
-  async fetchByChannel(channel: number | string, opts?: { starred?: boolean }): Promise<Video[]> {
-    const starredParam = typeof opts?.starred === "boolean" ? opts.starred : "";
-    const res = await this.apiClient.get<Video[]>(`/${this.prefix}/`, {
-      params: { channel, starred: starredParam },
-    });
+  async fetchByChannel(
+    channel: number | string,
+    opts?: { starred?: boolean } & PaginationParams
+  ): Promise<Paginated<Video>> {
+    const { page, page_size, starred, ...rest } = opts || {};
+    const params: Record<string, any> = { channel, page, page_size, ...rest };
+    if (typeof starred === "boolean") params.starred = starred;
+    const res = await this.apiClient.get<Paginated<Video>>(`/${this.prefix}/`, { params });
     return res.data;
   }
 
@@ -76,9 +80,9 @@ export class VideoApi extends Api<Video> {
    * Search videos by query
    * GET /video/search/?q=<query>
    */
-  async search(query: string): Promise<Video[]> {
-    const res = await this.apiClient.get<Video[]>(`/${this.prefix}/search/`, {
-      params: { q: query },
+  async search(query: string, params?: PaginationParams): Promise<Paginated<Video>> {
+    const res = await this.apiClient.get<Paginated<Video>>(`/${this.prefix}/search/`, {
+      params: { q: query, ...(params || {}) },
     });
     return res.data;
   }
@@ -98,8 +102,8 @@ export class VideoApi extends Api<Video> {
    * Fetch similar videos for a given id
    * GET /video/{id}/similar
    */
-  async fetchSimilar(id: string): Promise<Video[]> {
-    const res = await this.apiClient.get<Video[]>(`/${this.prefix}/${id}/similar`);
+  async fetchSimilar(id: string, params?: PaginationParams): Promise<Paginated<Video>> {
+    const res = await this.apiClient.get<Paginated<Video>>(`/${this.prefix}/${id}/similar`, { params });
     return res.data;
   }
 

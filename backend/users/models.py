@@ -17,6 +17,12 @@ class User(AbstractUser):
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
+    def __str__(self) -> str:
+        full_name = f"{self.first_name} {self.last_name}".strip()
+        if full_name:
+            return f"{full_name} (@{self.username})"
+        return self.username or f"User#{self.pk}"
+
 
 class Subscription(models.Model):
       '''

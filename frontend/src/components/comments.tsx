@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -9,6 +10,9 @@ import { formatCommentTime } from "@/utils/format"
 import { useUser } from "@/hooks/use-user"
 import { useAuth } from "@/contexts/auth-context"
 import { commentUseCases } from "@/use-cases/comment"
+import { usePaginatedList } from "@/hooks/use-paginated-list"
+// page size is provided by usePaginatedList
+
 import {
   Star,
   ChevronDown,
@@ -41,7 +45,6 @@ type CommentsProps = {
 type SortOption = "newest" | "oldest" | "popular"
 
 export function Comments({ video }: CommentsProps) {
-  const [items, setItems] = useState<Comment[]>([])
   const [text, setText] = useState<string>("")
   const [replyTo, setReplyTo] = useState<string | null>(null)
   const [replyText, setReplyText] = useState<string>("")
@@ -52,27 +55,30 @@ export function Comments({ video }: CommentsProps) {
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null)
   const { user } = useUser()
   const { auth } = useAuth()
-  const [loading, setLoading] = useState(false)
 
+  // Pagination: load comments with ordering; infinite scroll via sentinel skeleton block
+  const ordering = sortBy === "popular" ? "-baseStars" : sortBy === "newest" ? "-createdAt" : "createdAt"
+  const loadFirst = useCallback(() => commentUseCases.fetchForVideoPaginated(video, { ordering, parent__isnull: true }), [video, ordering])
+  const loadNext = useCallback((nextUrl: string) => commentUseCases.fetchNext(nextUrl), [])
+  const { items: pagedItems, count, loading, reload, pageSize, hasNext, sentinelRef } = usePaginatedList<Comment>(loadFirst, loadNext)
+
+  // Reset UI state and reload when video or sort changes; guard against StrictMode duplicate for same key
+  const lastKeyRef = useRef<string | null>(null)
   useEffect(() => {
-    const ordering = sortBy === "popular" ? "-baseStars" : sortBy === "newest" ? "-createdAt" : "createdAt"
-    const load = async () => {
-      setLoading(true)
-      try {
-        const list = await commentUseCases.fetchForVideo(video, { ordering })
-        setItems(list)
-      } catch (e) {
-        console.error("Failed to load comments:", e)
-        setItems([])
-      } finally {
-        setLoading(false)
-      }
-    }
     setOpenReplies({})
     setEditingComment(null)
     setEditText("")
-    load()
-  }, [video, sortBy])
+    const key = `${video}|${ordering}`
+    if (lastKeyRef.current === key) return
+    lastKeyRef.current = key
+    reload()
+  }, [video, ordering, reload])
+
+  // Mirror paginated items into local items for edit/reply mapping logic
+  const [items, setItems] = useState<Comment[]>(pagedItems)
+  useEffect(() => {
+    setItems(pagedItems)
+  }, [pagedItems])
 
   // Create current user object
   const currentUser = useMemo(
@@ -103,28 +109,106 @@ export function Comments({ video }: CommentsProps) {
     }
   }, [items, sortBy])
 
-  const repliesByParent = useMemo(() => {
-    const map = new Map<string, Comment[]>()
-    for (const c of items) {
-      if (!c.parent) continue
-      if (!map.has(c.parent)) map.set(c.parent, [])
-      map.get(c.parent)!.push(c)
+  // Состояние ленивых реплаев по каждому parent
+  type RepliesState = {
+    items: Comment[]
+    next: string | null
+    loading: boolean
+  }
+  const [repliesMap, setRepliesMap] = useState<Record<string, RepliesState>>({})
+
+  // Локальный компонент-сентинел для догрузки реплаев с отображением скелетонов
+  function ThreadTailSentinel({ onVisible, active, pageSize }: { onVisible: () => void; active: boolean; pageSize: number }) {
+    const [el, setEl] = useState<HTMLDivElement | null>(null)
+    useEffect(() => {
+      if (!active || !el) return
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            onVisible()
+          }
+        }
+      }, { root: null, rootMargin: "200px", threshold: 0 })
+      io.observe(el)
+      return () => io.disconnect()
+    }, [el, active, onVisible])
+
+    return (
+      <div className="grid gap-3">
+        {Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
+          i === 0 ? (
+            <div key={`reply-tail-sentinel-${i}`} ref={setEl} className="flex items-start gap-3 animate-pulse">
+              <div className="h-7 w-7 rounded-full bg-slate-100 border border-blue-100" />
+              <div className="flex-1 grid gap-2 min-w-0">
+                <div className="h-3 bg-slate-100 rounded w-20" />
+                <div className="h-3 bg-slate-100 rounded w-10/12" />
+                <div className="h-3 bg-slate-100 rounded w-7/12" />
+              </div>
+            </div>
+          ) : (
+            <div key={`reply-tail-skel-${i}`} className="flex items-start gap-3 animate-pulse">
+              <div className="h-7 w-7 rounded-full bg-slate-100 border border-blue-100" />
+              <div className="flex-1 grid gap-2 min-w-0">
+                <div className="h-3 bg-slate-100 rounded w-20" />
+                <div className="h-3 bg-slate-100 rounded w-10/12" />
+                <div className="h-3 bg-slate-100 rounded w-7/12" />
+              </div>
+            </div>
+          )
+        ))}
+      </div>
+    )
+  }
+
+  // Загрузить первую страницу реплаев для parent
+  const loadRepliesFirst = useCallback(async (parentId: string) => {
+    setRepliesMap((s) => ({ ...s, [parentId]: { items: s[parentId]?.items || [], next: s[parentId]?.next ?? null, loading: true } }))
+    try {
+      const page = await commentUseCases.fetchForVideoPaginated(video, { ordering: "-createdAt", parent: parentId })
+      setRepliesMap((s) => ({
+        ...s,
+        [parentId]: {
+          items: page.results,
+          next: page.next || null,
+          loading: false,
+        },
+      }))
+    } catch (e) {
+      console.error("Failed to load replies:", e)
+      setRepliesMap((s) => ({ ...s, [parentId]: { items: s[parentId]?.items || [], next: s[parentId]?.next ?? null, loading: false } }))
     }
-    // Ответы всегда сортируем по дате (новые сначала)
-    for (const arr of map.values()) {
-      arr.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  }, [video])
+
+  // Догрузить следующую страницу реплаев
+  const loadRepliesNext = useCallback(async (parentId: string) => {
+    const state = repliesMap[parentId]
+    if (!state?.next || state.loading) return
+    setRepliesMap((s) => ({ ...s, [parentId]: { ...s[parentId], loading: true } }))
+    try {
+      const page = await commentUseCases.fetchNext(state.next)
+      setRepliesMap((s) => ({
+        ...s,
+        [parentId]: {
+          items: [...(s[parentId]?.items || []), ...page.results.filter((r) => r.parent === parentId)],
+          next: page.next || null,
+          loading: false,
+        },
+      }))
+    } catch (e) {
+      console.error("Failed to load more replies:", e)
+      setRepliesMap((s) => ({ ...s, [parentId]: { ...s[parentId], loading: false } }))
     }
-    return map
-  }, [items])
+  }, [repliesMap])
 
   function submitRoot() {
     const val = text.trim()
     if (!val) return
     ;(async () => {
       try {
-        const c = await commentUseCases.createComment({ video, text: val })
-        setItems((prev) => [c, ...prev])
+        await commentUseCases.createComment({ video, text: val })
         setText("")
+        // Reload first page to reflect server ordering and counts
+        reload()
       } catch (e) {
         console.error("Failed to create comment:", e)
       }
@@ -136,11 +220,26 @@ export function Comments({ video }: CommentsProps) {
     if (!val) return
     ;(async () => {
       try {
-        const c = await commentUseCases.createComment({ video, text: val, parent })
-        setItems((prev) => [c, ...prev])
+        const created = await commentUseCases.createComment({ video, text: val, parent })
         setReplyText("")
         setReplyTo(null)
+        // Открываем ветку
         setOpenReplies((s) => ({ ...s, [parent]: true }))
+        // Оптимистично добавляем реплай в ветку
+        setRepliesMap((s) => {
+          const prev = s[parent]
+          const items = prev?.items ? [created, ...prev.items] : [created]
+          return {
+            ...s,
+            [parent]: {
+              items,
+              next: prev?.next ?? null,
+              loading: false,
+            },
+          }
+        })
+        // Инкрементируем replyCount у родителя в списке корней
+        setItems((prev) => prev.map((c) => (c.id === parent ? { ...c, replyCount: (c.replyCount || 0) + 1 } : c)))
       } catch (e) {
         console.error("Failed to create reply:", e)
       }
@@ -162,10 +261,10 @@ export function Comments({ video }: CommentsProps) {
     if (!newText) return
     ;(async () => {
       try {
-        const updated = await commentUseCases.updateComment(commentId, newText)
-        setItems((prev) => prev.map((c) => (c.id === updated.id ? updated : c)))
+        await commentUseCases.updateComment(commentId, newText)
         setEditingComment(null)
         setEditText("")
+        reload()
       } catch (e) {
         console.error("Failed to update comment:", e)
       }
@@ -176,11 +275,7 @@ export function Comments({ video }: CommentsProps) {
     ;(async () => {
       try {
         await commentUseCases.remove(id)
-        // Re-fetch to also reflect backend cascading rules
-        const list = await commentUseCases.fetchForVideo(video, {
-          ordering: sortBy === "popular" ? "-baseStars" : sortBy === "newest" ? "-createdAt" : "createdAt",
-        })
-        setItems(list)
+        reload()
       } catch (e) {
         console.error("Failed to delete comment:", e)
       }
@@ -208,7 +303,7 @@ export function Comments({ video }: CommentsProps) {
     })()
   }
 
-  const count = items.filter((c) => !c.parent).length
+  const displayedCount = typeof count === "number" ? count : items.filter((c) => !c.parent).length
 
   const sortOptions = [
     { value: "newest" as const, label: "Сначала новые", icon: Clock },
@@ -221,7 +316,7 @@ export function Comments({ video }: CommentsProps) {
   return (
     <section className="grid gap-4 min-w-0">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-lg font-semibold">Комментарии ({count})</h3>
+        <h3 className="text-lg font-semibold">Комментарии ({displayedCount})</h3>
 
         {/* Сортировка - адаптивная для мобильных */}
         <DropdownMenu>
@@ -291,9 +386,9 @@ export function Comments({ video }: CommentsProps) {
 
       {/* List */}
       <div className="grid gap-4 min-w-0">
-        {loading && <div className="text-sm text-muted-foreground">Загрузка комментариев…</div>}
-        {!loading && roots.map((c) => {
-          const replies = repliesByParent.get(c.id) || []
+        {roots.map((c) => {
+          const rState = repliesMap[c.id]
+          const replies = rState?.items || []
           const meRoot = String((c.channel as any).id) === currentUserId
           const isOpen = openReplies[c.id] || false
           const isEditing = editingComment === c.id
@@ -402,19 +497,25 @@ export function Comments({ video }: CommentsProps) {
                         Ответить
                       </Button>
 
-                      {replies.length > 0 && (
+                      {(c.replyCount || 0) > 0 && (
                         <Button
                           variant="ghost"
                           size="sm"
                           className="h-8 px-2 text-blue-700 hover:bg-blue-50"
-                          onClick={() => setOpenReplies((s) => ({ ...s, [c.id]: !isOpen }))}
+                          onClick={async () => {
+                            const nextOpen = !isOpen
+                            setOpenReplies((s) => ({ ...s, [c.id]: nextOpen }))
+                            if (nextOpen && (!repliesMap[c.id] || (repliesMap[c.id].items.length === 0 && !repliesMap[c.id].loading))) {
+                              await loadRepliesFirst(c.id)
+                            }
+                          }}
                         >
                           {isOpen ? (
                             <ChevronDown className="h-4 w-4 mr-1" />
                           ) : (
                             <ChevronRight className="h-4 w-4 mr-1" />
                           )}
-                          {isOpen ? "Скрыть ответы" : `Показать ответы (${replies.length})`}
+                          {isOpen ? "Скрыть ответы" : `Показать ответы (${c.replyCount})`}
                         </Button>
                       )}
                     </div>
@@ -459,7 +560,7 @@ export function Comments({ video }: CommentsProps) {
                 )}
 
                 {/* Replies */}
-                {replies.length > 0 && isOpen && (
+                {(isOpen && (replies.length > 0 || rState?.loading || rState?.next)) && (
                   <div className="mt-2 pl-10 grid gap-3 min-w-0">
                     {replies.map((r) => {
                       const rMe = String((r.channel as any).id) === currentUserId
@@ -568,14 +669,61 @@ export function Comments({ video }: CommentsProps) {
                         </div>
                       )
                     })}
+                    {/* Скелетоны + автозапрос следующей страницы через сентинел */}
+                    {(rState?.loading || rState?.next) && (
+                      <ThreadTailSentinel
+                        onVisible={() => loadRepliesNext(c.id)}
+                        active={Boolean(rState?.next) && !Boolean(rState?.loading)}
+                        pageSize={pageSize}
+                      />
+                    )}
                   </div>
                 )}
               </div>
             </div>
           )
         })}
-        {roots.length === 0 && (
+        {roots.length === 0 && !loading && (
           <div className="text-sm text-muted-foreground">Пока нет комментариев. Будьте первым!</div>
+        )}
+        {loading && (
+          <div className="grid gap-4">
+            {Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
+              <div key={`comment-initial-skel-${i}`} className="flex items-start gap-3 animate-pulse">
+                <div className="h-9 w-9 rounded-full bg-slate-100 border border-blue-100" />
+                <div className="flex-1 grid gap-2 min-w-0">
+                  <div className="h-3 bg-slate-100 rounded w-24" />
+                  <div className="h-3 bg-slate-100 rounded w-11/12" />
+                  <div className="h-3 bg-slate-100 rounded w-8/12" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {!loading && hasNext && (
+          <div className="grid gap-4">
+            {Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
+              i === 0 ? (
+                <div key={`comment-tail-sentinel-wrap-${i}`} ref={sentinelRef} className="flex items-start gap-3 animate-pulse">
+                  <div className="h-9 w-9 rounded-full bg-slate-100 border border-blue-100" />
+                  <div className="flex-1 grid gap-2 min-w-0">
+                    <div className="h-3 bg-slate-100 rounded w-24" />
+                    <div className="h-3 bg-slate-100 rounded w-11/12" />
+                    <div className="h-3 bg-slate-100 rounded w-8/12" />
+                  </div>
+                </div>
+              ) : (
+                <div key={`comment-tail-skel-${i}`} className="flex items-start gap-3 animate-pulse">
+                  <div className="h-9 w-9 rounded-full bg-slate-100 border border-blue-100" />
+                  <div className="flex-1 grid gap-2 min-w-0">
+                    <div className="h-3 bg-slate-100 rounded w-24" />
+                    <div className="h-3 bg-slate-100 rounded w-11/12" />
+                    <div className="h-3 bg-slate-100 rounded w-8/12" />
+                  </div>
+                </div>
+              )
+            ))}
+          </div>
         )}
       </div>
 
