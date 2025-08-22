@@ -5,7 +5,7 @@ from django.utils import timezone
 import numpy as np
 from profiles.models import WatchHistory
 from sklearn.cluster import DBSCAN
-from auths.models import User
+from users.models import User
 import logging
 
 @shared_task

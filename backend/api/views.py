@@ -15,7 +15,7 @@ import unicodedata
 from django.core.cache import cache
 from django.conf import settings
 
-from auths.models import User
+from users.models import User
 from profiles.models import WatchHistory, Subscription
 from videos.models import Video, CommentVideo, UserVideoRelation, UserCommentRelation
 

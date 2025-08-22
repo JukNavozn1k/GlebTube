@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 from django.db import models
 
-from auths.models import User
+from users.models import User
 from videos.models import Video
 
 from django.core.exceptions import ValidationError

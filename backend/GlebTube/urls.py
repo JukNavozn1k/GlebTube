@@ -11,7 +11,7 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls,name='admin_panel_url'),
     
-    # path('',include('auths.urls')),
+    # path('',include('users.urls')),
     # path('',include('profiles.urls')),
     # path('',include('videos.urls')),
     # path('',include('watch.urls')),

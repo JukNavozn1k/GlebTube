@@ -3,7 +3,7 @@ from django_filters import rest_framework as filters
 from django.db.models import Exists, OuterRef, Value, BooleanField
 from profiles.models import Subscription
 from videos.models import UserVideoRelation, UserCommentRelation, Video,CommentVideo
-from auths.models import User
+from users.models import User
 
 class UserFilter(filters.FilterSet):
     subscribed = filters.BooleanFilter(method='filter_subscribed')

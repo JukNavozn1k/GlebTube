@@ -3,7 +3,7 @@ from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.utils import timezone
 
-from auths.models import User
+from users.models import User
 
 from django.core.exceptions import ValidationError
 from django.db.models import JSONField
