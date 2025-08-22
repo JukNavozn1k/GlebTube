@@ -41,18 +41,18 @@ export function ProfilePage() {
     count: 0, next: null, previous: null, results: [] as Video[],
   })), [user?.id])
   const loadVideosNext = useCallback((nextUrl: string) => videoUseCases.fetchNext(nextUrl), [])
-  const { items: myVideos, loading: myLoading, loadingMore: myLoadingMore, reload: reloadMine, pageSize: myPageSize } = usePaginatedList<Video>(loadMineFirst, loadVideosNext)
+  const { items: myVideos, loading: myLoading, reload: reloadMine, pageSize: myPageSize, hasNext: myHasNext, sentinelRef: mySentinelRef } = usePaginatedList<Video>(loadMineFirst, loadVideosNext)
 
   // History
   const loadHistoryFirst = useCallback(() => videoUseCases.fetchHistory(), [])
-  const { items: historyVideos, loading: histLoading, loadingMore: histLoadingMore, reload: reloadHistory, pageSize: histPageSize } = usePaginatedList<Video>(
+  const { items: historyVideos, loading: histLoading, reload: reloadHistory, pageSize: histPageSize, hasNext: histHasNext, sentinelRef: histSentinelRef } = usePaginatedList<Video>(
     loadHistoryFirst,
     loadVideosNext,
   )
 
   // Starred
   const loadStarredFirst = useCallback(() => videoUseCases.fetchStarred(), [])
-  const { items: starredVideos, loading: starLoading, loadingMore: starLoadingMore, reload: reloadStarred, pageSize: starPageSize } = usePaginatedList<Video>(
+  const { items: starredVideos, loading: starLoading, reload: reloadStarred, pageSize: starPageSize, hasNext: starHasNext, sentinelRef: starSentinelRef } = usePaginatedList<Video>(
     loadStarredFirst,
     loadVideosNext,
   )
@@ -60,7 +60,7 @@ export function ProfilePage() {
   // Subscriptions (users)
   const loadSubsFirst = useCallback(() => userUseCases.fetchSubscriptions(), [])
   const loadUsersNext = useCallback((nextUrl: string) => userUseCases.fetchNext(nextUrl), [])
-  const { items: subsUsers, loading: subsLoading, loadingMore: subsLoadingMore, reload: reloadSubs, pageSize: subsPageSize } = usePaginatedList<User>(
+  const { items: subsUsers, loading: subsLoading, reload: reloadSubs, pageSize: subsPageSize, hasNext: subsHasNext, sentinelRef: subsSentinelRef } = usePaginatedList<User>(
     loadSubsFirst,
     loadUsersNext,
   )
@@ -257,9 +257,15 @@ export function ProfilePage() {
                     </Link>
                   </div>
                 ))}
-                {myLoadingMore &&
+                    {myHasNext &&
                   Array.from({ length: Math.max(1, myPageSize) }).map((_, i) => (
-                    <VideoCardSkeleton key={`profile-videos-tail-skel-${i}`} />
+                    i === 0 ? (
+                      <div key={`profile-videos-tail-sentinel-wrap-${i}`} ref={mySentinelRef}>
+                        <VideoCardSkeleton />
+                      </div>
+                    ) : (
+                      <VideoCardSkeleton key={`profile-videos-tail-skel-${i}`} />
+                    )
                   ))}
               </div>
             )}
@@ -324,9 +330,15 @@ export function ProfilePage() {
                 {historyVideos.map((v) => (
                   <VideoCard key={v.id} video={v} />
                 ))}
-                {histLoadingMore &&
+                {histHasNext &&
                   Array.from({ length: Math.max(1, histPageSize) }).map((_, i) => (
-                    <VideoCardSkeleton key={`profile-history-tail-skel-${i}`} />
+                    i === 0 ? (
+                      <div key={`profile-history-tail-sentinel-wrap-${i}`} ref={histSentinelRef}>
+                        <VideoCardSkeleton />
+                      </div>
+                    ) : (
+                      <VideoCardSkeleton key={`profile-history-tail-skel-${i}`} />
+                    )
                   ))}
               </div>
             )}
@@ -353,9 +365,15 @@ export function ProfilePage() {
                 {starredVideos.map((v) => (
                   <VideoCard key={v.id} video={v} />
                 ))}
-                {starLoadingMore &&
+                {starHasNext &&
                   Array.from({ length: Math.max(1, starPageSize) }).map((_, i) => (
-                    <VideoCardSkeleton key={`profile-starred-tail-skel-${i}`} />
+                    i === 0 ? (
+                      <div key={`profile-starred-tail-sentinel-wrap-${i}`} ref={starSentinelRef}>
+                        <VideoCardSkeleton />
+                      </div>
+                    ) : (
+                      <VideoCardSkeleton key={`profile-starred-tail-skel-${i}`} />
+                    )
                   ))}
               </div>
             )}
@@ -388,9 +406,15 @@ export function ProfilePage() {
                 {subsUsers.map((s) => (
                   <ChannelCard key={s.id} channel={s} videos={[]} />
                 ))}
-                {subsLoadingMore &&
+                {subsHasNext &&
                   Array.from({ length: Math.max(1, subsPageSize) }).map((_, i) => (
-                    <ChannelCardSkeleton key={`profile-subs-tail-skel-${i}`} />
+                    i === 0 ? (
+                      <div key={`profile-subs-tail-sentinel-wrap-${i}`} ref={subsSentinelRef}>
+                        <ChannelCardSkeleton />
+                      </div>
+                    ) : (
+                      <ChannelCardSkeleton key={`profile-subs-tail-skel-${i}`} />
+                    )
                   ))}
               </div>
             )}

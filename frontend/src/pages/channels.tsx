@@ -33,7 +33,7 @@ export function ChannelsPage() {
     [qParam],
   )
   const loadUsersNext = useCallback((nextUrl: string) => userUseCases.fetchNext(nextUrl), [])
-  const { items: users, count, loading: usersLoading, loadingMore, reload, pageSize } = usePaginatedList<User>(
+  const { items: users, count, loading: usersLoading, reload, pageSize, hasNext, sentinelRef } = usePaginatedList<User>(
     loadUsersFirst,
     loadUsersNext,
   )
@@ -161,9 +161,15 @@ export function ChannelsPage() {
             {grouped.map((item) => (
               <ChannelCard key={item.channel.id} channel={item.channel} videos={item.videos} />
             ))}
-            {loadingMore &&
+            {hasNext &&
               Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
-                <ChannelCardSkeleton key={`channels-tail-skel-${i}`} />
+                i === 0 ? (
+                  <div key={`channels-tail-sentinel-wrap-${i}`} ref={sentinelRef}>
+                    <ChannelCardSkeleton />
+                  </div>
+                ) : (
+                  <ChannelCardSkeleton key={`channels-tail-skel-${i}`} />
+                )
               ))}
           </div>
         )}

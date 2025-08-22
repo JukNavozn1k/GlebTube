@@ -23,7 +23,7 @@ import { usePaginatedList } from "@/hooks/use-paginated-list"
 
 export function HistoryPage() {
   const isAuthorized = useProtectedRoute("/history")
-  const { items: videos, loading, reload, pageSize } = usePaginatedList<Video>(
+  const { items: videos, loading, reload, pageSize, hasNext, sentinelRef } = usePaginatedList<Video>(
     () => videoUseCases.fetchHistory(),
     (next) => videoUseCases.fetchNext(next)
   )
@@ -89,6 +89,16 @@ export function HistoryPage() {
             {videos.map((v) => (
               <VideoCard key={v.id} video={v} />
             ))}
+            {hasNext &&
+              Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
+                i === 0 ? (
+                  <div key={`history-tail-sentinel-wrap-${i}`} ref={sentinelRef}>
+                    <VideoCardSkeleton />
+                  </div>
+                ) : (
+                  <VideoCardSkeleton key={`history-tail-skel-${i}`} />
+                )
+              ))}
           </div>
         )}
       </main>

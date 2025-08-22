@@ -14,17 +14,16 @@ export function HomePage() {
   const q = (searchParams.get("q") || "").toLowerCase().trim()
   const loadFirst = useCallback(() => (q ? videoUseCases.search(q) : videoUseCases.fetchListPaginated()), [q])
   const loadNext = useCallback((next: string) => videoUseCases.fetchNext(next), [])
-  const { items: apiVideos, loading: isLoading, reload } = usePaginatedList<Video>(loadFirst, loadNext)
+  const { items: apiVideos, loading: isLoading, reload, pageSize, hasNext, sentinelRef } = usePaginatedList<Video>(loadFirst, loadNext)
 
   const location = useLocation()
 
-  // Avoid double initial load: hook already loads on mount. Only reload when q/path change after mount.
-  const didMountRef = useRef(false)
+  // Explicitly load once on first mount and on q/path changes (StrictMode-safe)
+  const didKeyRef = useRef<string | null>(null)
   useEffect(() => {
-    if (!didMountRef.current) {
-      didMountRef.current = true
-      return
-    }
+    const key = `${location.pathname}|${q}`
+    if (didKeyRef.current === key) return
+    didKeyRef.current = key
     if (location.pathname === "/" || location.pathname === "") reload()
   }, [location.pathname, q, reload])
 
@@ -49,7 +48,7 @@ export function HomePage() {
         <div className={cn("grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3", q ? "pt-0" : "pt-2")}>
           {isLoading ? (
             // Show skeleton cards while loading
-            Array.from({ length: 6 }).map((_, index) => (
+            Array.from({ length: Math.max(1, pageSize) }).map((_, index) => (
               <VideoCardSkeleton key={`skeleton-${index}`} />
             ))
           ) : (
@@ -58,6 +57,16 @@ export function HomePage() {
               <VideoCard key={v.id} video={v} />
             ))
           )}
+          {!isLoading && hasNext &&
+              Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
+                i === 0 ? (
+                  <div key={`home-tail-sentinel-wrap-${i}`} ref={sentinelRef}>
+                    <VideoCardSkeleton />
+                  </div>
+                ) : (
+                  <VideoCardSkeleton key={`home-tail-skel-${i}`} />
+                )
+              ))}
         </div>
       </main>
       <BottomNav />

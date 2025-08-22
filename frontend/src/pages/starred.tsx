@@ -10,7 +10,7 @@ import { usePaginatedList } from "@/hooks/use-paginated-list"
 
 export function StarredPage() {
   const isAuthorized = useProtectedRoute("/starred")
-  const { items: videos, loading, reload, pageSize } = usePaginatedList<Video>(
+  const { items: videos, loading, reload, pageSize, hasNext, sentinelRef } = usePaginatedList<Video>(
     () => videoUseCases.fetchStarred(),
     (next) => videoUseCases.fetchNext(next)
   )
@@ -46,6 +46,16 @@ export function StarredPage() {
             {videos.map((v) => (
               <VideoCard key={v.id} video={v} />
             ))}
+            {hasNext &&
+              Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
+                i === 0 ? (
+                  <div key={`starred-tail-sentinel-wrap-${i}`} ref={sentinelRef}>
+                    <VideoCardSkeleton />
+                  </div>
+                ) : (
+                  <VideoCardSkeleton key={`starred-tail-skel-${i}`} />
+                )
+              ))}
           </div>
         )}
       </main>

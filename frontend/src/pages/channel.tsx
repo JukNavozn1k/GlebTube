@@ -4,6 +4,7 @@ import { formatViews } from "@/utils/format"
 import { isSubscribed } from "@/utils/storage"
 import { Button } from "@/components/ui/button"
 import { VideoCard } from "@/components/video-card"
+import { VideoCardSkeleton } from "@/components/video-card-skeleton"
 import { BottomNav } from "@/components/bottom-nav"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -62,7 +63,7 @@ export function ChannelPage() {
   const channelId = useMemo(() => nameFromSlug(slug || ""), [slug])
   const loadFirst = useCallback(() => videoUseCases.fetchByChannel(channelId), [channelId])
   const loadNext = useCallback((nextUrl: string) => videoUseCases.fetchNext(nextUrl), [])
-  const { items: videos, loading: listLoading, reload } = usePaginatedList<Video>(loadFirst, loadNext)
+  const { items: videos, loading: listLoading, reload, pageSize, hasNext, sentinelRef } = usePaginatedList<Video>(loadFirst, loadNext)
 
   // Reload videos when channel changes
   useEffect(() => {
@@ -184,6 +185,13 @@ export function ChannelPage() {
                 {sortedVideos.map((v) => (
                   <VideoCard key={v.id} video={v} showChannelAvatar={false} />
                 ))}
+                {hasNext && (
+                  <div ref={sentinelRef} className="contents">
+                    {Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
+                      <VideoCardSkeleton key={`channel-tail-skel-${i}`} />
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </TabsContent>

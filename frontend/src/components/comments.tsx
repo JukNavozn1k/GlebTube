@@ -56,11 +56,11 @@ export function Comments({ video }: CommentsProps) {
   const { user } = useUser()
   const { auth } = useAuth()
 
-  // Pagination: load comments with ordering, infinite scroll on window scroll
+  // Pagination: load comments with ordering; infinite scroll via sentinel skeleton block
   const ordering = sortBy === "popular" ? "-baseStars" : sortBy === "newest" ? "-createdAt" : "createdAt"
   const loadFirst = useCallback(() => commentUseCases.fetchForVideoPaginated(video, { ordering }), [video, ordering])
   const loadNext = useCallback((nextUrl: string) => commentUseCases.fetchNext(nextUrl), [])
-  const { items: pagedItems, count, loading, loadingMore, reload, pageSize } = usePaginatedList<Comment>(loadFirst, loadNext)
+  const { items: pagedItems, count, loading, reload, pageSize, hasNext, sentinelRef } = usePaginatedList<Comment>(loadFirst, loadNext)
 
   // Reset UI state and reload when video or sort changes; guard against StrictMode duplicate for same key
   const lastKeyRef = useRef<string | null>(null)
@@ -579,10 +579,10 @@ export function Comments({ video }: CommentsProps) {
         {roots.length === 0 && !loading && (
           <div className="text-sm text-muted-foreground">Пока нет комментариев. Будьте первым!</div>
         )}
-        {(loading || loadingMore) && (
+        {loading && (
           <div className="grid gap-4">
             {Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
-              <div key={`comment-tail-skel-${i}`} className="flex items-start gap-3 animate-pulse">
+              <div key={`comment-initial-skel-${i}`} className="flex items-start gap-3 animate-pulse">
                 <div className="h-9 w-9 rounded-full bg-slate-100 border border-blue-100" />
                 <div className="flex-1 grid gap-2 min-w-0">
                   <div className="h-3 bg-slate-100 rounded w-24" />
@@ -590,6 +590,31 @@ export function Comments({ video }: CommentsProps) {
                   <div className="h-3 bg-slate-100 rounded w-8/12" />
                 </div>
               </div>
+            ))}
+          </div>
+        )}
+        {!loading && hasNext && (
+          <div className="grid gap-4">
+            {Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
+              i === 0 ? (
+                <div key={`comment-tail-sentinel-wrap-${i}`} ref={sentinelRef} className="flex items-start gap-3 animate-pulse">
+                  <div className="h-9 w-9 rounded-full bg-slate-100 border border-blue-100" />
+                  <div className="flex-1 grid gap-2 min-w-0">
+                    <div className="h-3 bg-slate-100 rounded w-24" />
+                    <div className="h-3 bg-slate-100 rounded w-11/12" />
+                    <div className="h-3 bg-slate-100 rounded w-8/12" />
+                  </div>
+                </div>
+              ) : (
+                <div key={`comment-tail-skel-${i}`} className="flex items-start gap-3 animate-pulse">
+                  <div className="h-9 w-9 rounded-full bg-slate-100 border border-blue-100" />
+                  <div className="flex-1 grid gap-2 min-w-0">
+                    <div className="h-3 bg-slate-100 rounded w-24" />
+                    <div className="h-3 bg-slate-100 rounded w-11/12" />
+                    <div className="h-3 bg-slate-100 rounded w-8/12" />
+                  </div>
+                </div>
+              )
             ))}
           </div>
         )}

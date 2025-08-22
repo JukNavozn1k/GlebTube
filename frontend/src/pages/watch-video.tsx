@@ -46,7 +46,7 @@ export function WatchPage() {
   // Paginated recommendations (similar videos)
   const loadSimilarFirst = useCallback(() => videoUseCases.fetchSimilar(id), [id])
   const loadSimilarNext = useCallback((nextUrl: string) => videoUseCases.fetchNext(nextUrl), [])
-  const { items: recommended, loadingMore: recLoadingMore, reload: reloadRecommended, pageSize: recPageSize } = usePaginatedList<Video>(
+  const { items: recommended, reload: reloadRecommended, pageSize: recPageSize, hasNext: recHasNext, sentinelRef: recSentinelRef } = usePaginatedList<Video>(
     loadSimilarFirst,
     loadSimilarNext,
   )
@@ -224,16 +224,27 @@ export function WatchPage() {
                 </Link>
               )
             })}
-            {recLoadingMore &&
+            {recHasNext &&
               Array.from({ length: Math.max(1, recPageSize) }).map((_, i) => (
-                <div key={`rec-tail-skel-${i}`} className="flex gap-3 min-w-0 animate-pulse">
-                  <div className="aspect-video w-40 min-w-40 rounded-md bg-blue-50" />
-                  <div className="flex-1 min-w-0 grid gap-2">
-                    <div className="h-3 bg-slate-100 rounded w-11/12" />
-                    <div className="h-3 bg-slate-100 rounded w-8/12" />
-                    <div className="h-3 bg-slate-100 rounded w-6/12" />
+                i === 0 ? (
+                  <div key={`rec-tail-sentinel-wrap-${i}`} ref={recSentinelRef} className="flex gap-3 min-w-0 animate-pulse">
+                    <div className="aspect-video w-40 min-w-40 rounded-md bg-blue-50" />
+                    <div className="flex-1 min-w-0 grid gap-2">
+                      <div className="h-3 bg-slate-100 rounded w-11/12" />
+                      <div className="h-3 bg-slate-100 rounded w-8/12" />
+                      <div className="h-3 bg-slate-100 rounded w-6/12" />
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div key={`rec-tail-skel-${i}`} className="flex gap-3 min-w-0 animate-pulse">
+                    <div className="aspect-video w-40 min-w-40 rounded-md bg-blue-50" />
+                    <div className="flex-1 min-w-0 grid gap-2">
+                      <div className="h-3 bg-slate-100 rounded w-11/12" />
+                      <div className="h-3 bg-slate-100 rounded w-8/12" />
+                      <div className="h-3 bg-slate-100 rounded w-6/12" />
+                    </div>
+                  </div>
+                )
               ))}
           </div>
         </aside>

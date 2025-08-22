@@ -92,26 +92,40 @@ export function usePaginatedList<T extends { id?: string | number }>(
 
   // Note: No auto-load on mount. Callers must call reload() on mount or when inputs change.
 
-  // listen scroll: when near bottom, load next
+  // IntersectionObserver sentinel: when visible, trigger loadMore
+  const [sentinelEl, setSentinelEl] = useState<HTMLDivElement | null>(null)
+  const sentinelRef = useCallback((node: HTMLDivElement | null) => {
+    setSentinelEl(node)
+  }, [])
   useEffect(() => {
-    let lastCall = 0
-    function onScroll() {
-      const now = Date.now()
-      if (now - lastCall < 150) return
-      lastCall = now
-      if (!nextUrl) return
-      const threshold = 200 // px from bottom
-      const scrolledToBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - threshold
-      if (scrolledToBottom) {
-        loadMore()
-      }
-    }
-    window.addEventListener("scroll", onScroll)
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [nextUrl, loadMore])
+    if (!sentinelEl) return
+    if (!nextUrl) return
+    const el = sentinelEl
+    let ticking = false
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0]
+        if (!entry.isIntersecting) return
+        if (ticking) return
+        if (loadingMoreRef.current) return
+        ticking = true
+        // small microtask delay to batch
+        Promise.resolve().then(() => {
+          // Debug: comment out in production if noisy
+          try { console.debug?.("IO trigger loadMore", { nextUrl }) } catch {}
+          loadMore()
+          ticking = false
+        })
+      },
+      { root: null, rootMargin: "400px 0px", threshold: 0 }
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [sentinelEl, nextUrl, loadMore])
 
+  const hasNext = !!nextUrl
   return useMemo(
-    () => ({ items, next: nextUrl, count, loading, loadingMore, reload: load, loadMore, pageSize }),
-    [items, nextUrl, count, loading, loadingMore, load, loadMore, pageSize]
+    () => ({ items, next: nextUrl, count, loading, loadingMore, reload: load, loadMore, pageSize, hasNext, sentinelRef }),
+    [items, nextUrl, count, loading, loadingMore, load, loadMore, pageSize, hasNext]
   )
 }

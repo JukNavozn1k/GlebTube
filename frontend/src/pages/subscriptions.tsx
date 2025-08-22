@@ -13,7 +13,7 @@ import { usePaginatedList } from "@/hooks/use-paginated-list"
 export function SubscriptionsPage() {
   const isAuthorized = useProtectedRoute("/subscriptions")
   const [uploads, setUploads] = useState<Video[]>([])
-  const { items: subscribedUsers, loading, reload, pageSize } = usePaginatedList<User>(
+  const { items: subscribedUsers, loading, reload, pageSize, hasNext, sentinelRef } = usePaginatedList<User>(
     () => userUseCases.fetchSubscriptions(),
     (next) => userUseCases.fetchNext(next)
   )
@@ -60,6 +60,16 @@ export function SubscriptionsPage() {
             {channels.map((ch) => (
               <ChannelCard key={ch.channel.id} channel={ch.channel} videos={ch.videos} />
             ))}
+            {hasNext &&
+              Array.from({ length: Math.max(1, pageSize) }).map((_, i) => (
+                i === 0 ? (
+                  <div key={`subs-tail-sentinel-wrap-${i}`} ref={sentinelRef}>
+                    <ChannelCardSkeleton />
+                  </div>
+                ) : (
+                  <ChannelCardSkeleton key={`subs-tail-skel-${i}`} />
+                )
+              ))}
           </div>
         )}
       </main>
