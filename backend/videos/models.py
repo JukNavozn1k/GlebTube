@@ -3,7 +3,7 @@ from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.utils import timezone
 
-from auths.models import User
+from users.models import User
 
 from django.core.exceptions import ValidationError
 from django.db.models import JSONField
@@ -136,3 +136,21 @@ class UserCommentRelation(models.Model):
 
         unique_together = ['comment', 'user']
     
+
+class WatchHistory(models.Model):
+      '''
+          Allows you to record your watch history.
+      '''
+      viewer = models.ForeignKey(User,null=True,on_delete=models.CASCADE,verbose_name='Зритель',related_name='watch_history')
+      video = models.ForeignKey('Video',null=True,on_delete=models.CASCADE,verbose_name='Видео')
+      watch_time = models.DateTimeField(
+        verbose_name='Время просмотра',
+        auto_now_add=True
+      )
+      def __str__(self):
+            return f"{self.viewer} смотрел '{self.video.title}' в {self.watch_time.strftime('%Y-%m-%d %H:%M')}"
+      class Meta:
+        verbose_name = 'Просмотр'
+        verbose_name_plural = 'История просмотров'
+        unique_together = ('viewer', 'video')
+        db_table = 'users_watchhistory'

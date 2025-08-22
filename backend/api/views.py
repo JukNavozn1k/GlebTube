@@ -15,12 +15,13 @@ import unicodedata
 from django.core.cache import cache
 from django.conf import settings
 
-from auths.models import User
-from profiles.models import WatchHistory, Subscription
+from users.models import User
+from videos.models import WatchHistory
+from users.models import Subscription
 from videos.models import Video, CommentVideo, UserVideoRelation, UserCommentRelation
 
 from . import serializers, permissions
-from watch import tasks
+from videos import tasks
 
 from ml.search import semantic_search_videos,semantic_search_videos_by_embedding
 
@@ -99,7 +100,7 @@ class CommentView(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(channel=self.request.user)
 
-    @action(methods=['post'], detail=True)
+    @action(methods=['post'], detail=True, permission_classes=[IsAuthenticated])
     def rate(self, request, pk):
         rate_obj, _ = UserCommentRelation.objects.get_or_create(
             comment_id=pk, user=request.user
@@ -266,7 +267,7 @@ class VideoView(ModelViewSet):
 
         return queryset
 
-    @action(methods=['post'], detail=True)
+    @action(methods=['post'], detail=True, permission_classes=[IsAuthenticated])
     def rate(self, request, pk):
         rate_obj, _ = UserVideoRelation.objects.get_or_create(video_id=pk, user=request.user)
         rate_obj.grade = 0 if rate_obj.grade == 1 else 1

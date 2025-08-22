@@ -25,11 +25,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
-    'social_django',
-    'auths',
-    'profiles',
+    'users',
     'videos',
-    'watch',
 ]
 
 MIDDLEWARE = [
@@ -47,8 +44,7 @@ ROOT_URLCONF = 'GlebTube.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates/', 'GlebTube/auths/templates','GlebTube/profiles/templates',
-                 'GlebTube/videos/templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -82,7 +78,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-AUTH_USER_MODEL = 'auths.User'
+AUTH_USER_MODEL = 'users.User'
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = os.getenv('TIME_ZONE', 'UTC')
@@ -100,15 +96,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTHENTICATION_BACKENDS = (
-    'social_core.backends.github.GithubOAuth2',
-    'django.contrib.auth.backends.ModelBackend',
-)
-
-SOCIAL_AUTH_GITHUB_KEY = os.getenv('GITHUB_KEY', '')
-SOCIAL_AUTH_GITHUB_SECRET = os.getenv('GITHUB_SECRET', '')
-
-SOCIAL_AUTH_JSONFIELD_ENABLED = True
 
 if DEBUG:
     INTERNAL_IPS = ["127.0.0.1"]

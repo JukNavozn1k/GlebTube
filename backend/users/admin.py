@@ -1,7 +1,7 @@
 import json
 from django.contrib import admin
 from django.utils.html import format_html, mark_safe
-from .models import User
+from .models import User, Subscription
 
 
 @admin.register(User)
@@ -19,7 +19,7 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ("username", "email")
     list_filter = ("is_staff", "is_superuser", "is_active")
 
-    readonly_fields = ("user_embeddings_pretty", "avatar_preview")
+    readonly_fields = ("user_embeddings", "user_embeddings_pretty", "avatar_preview")
 
     fieldsets = (
         (None, {"fields": ("username", "password")}),
@@ -62,3 +62,13 @@ class UserAdmin(admin.ModelAdmin):
         except Exception:
             return str(obj.user_embeddings)
     user_embeddings_pretty.short_description = "Кластеры эмбеддингов"
+
+
+@admin.register(Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = ("id", "subscriber", "channel", "active")
+    list_select_related = ("subscriber", "channel")
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related("subscriber", "channel")

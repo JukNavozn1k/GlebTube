@@ -7,34 +7,11 @@ from django.conf.urls.static import static
 from .settings import DEBUG
 
 from . import views
-from django.views.generic import TemplateView
 
 urlpatterns = [
-    path('',views.home),
     path('admin/', admin.site.urls,name='admin_panel_url'),
-    
-    # path('',include('auths.urls')),
-    # path('',include('profiles.urls')),
-    # path('',include('videos.urls')),
-    # path('',include('watch.urls')),
-    
-    # path('', include('social_django.urls', namespace='social')),
-    # path('accounts/profile/', views.home),
-    
-    path('serve_hls_playlist/<int:video_id>/', views.serve_hls_playlist, name='serve_hls_playlist'),
-    path('serve_hls_segment/<int:video_id>/<str:segment_name>/',views.serve_hls_segment, name='serve_hls_segment'),
-    
     path('api/', include('api.urls')),
 
-    path(
-        "manifest.json",
-        TemplateView.as_view(
-            template_name="manifest.json",
-            content_type="application/json"
-        ),
-        name="manifest"
-    ),
-    
 ] 
 
 if DEBUG:
