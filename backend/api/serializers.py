@@ -23,6 +23,8 @@ class CommentSerializer(serializers.ModelSerializer):
     channel = UserSerializer(read_only=True)
     baseStars = serializers.IntegerField(default=0,read_only=True)
     starred = serializers.BooleanField(default=False,read_only=True)
+    # Expose annotated reply count (queryset must annotate reply_count)
+    replyCount = serializers.IntegerField(source='reply_count', read_only=True, default=0)
     
     class Meta:
         model = video_models.CommentVideo

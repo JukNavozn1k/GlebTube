@@ -1,4 +1,5 @@
-from django.db.models import OuterRef, Exists, Value, BooleanField, Prefetch
+from django.db.models import OuterRef, Exists, Value, BooleanField, Prefetch, Count, Subquery, IntegerField
+from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse, HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -115,6 +116,18 @@ class CommentView(ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         user = self.request.user
+
+        # Annotate reply_count using a Subquery for robustness
+        replies_count_sq = (
+            CommentVideo.objects
+            .filter(parent_id=OuterRef('pk'))
+            .values('parent_id')
+            .annotate(c=Count('*'))
+            .values('c')[:1]
+        )
+        queryset = queryset.annotate(
+            reply_count=Coalesce(Subquery(replies_count_sq, output_field=IntegerField()), Value(0))
+        )
 
         if user.is_authenticated:
             # starred для комментария
