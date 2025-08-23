@@ -46,7 +46,7 @@ export function WatchPage() {
   // Paginated recommendations (similar videos)
   const loadSimilarFirst = useCallback(() => videoUseCases.fetchSimilar(id), [id])
   const loadSimilarNext = useCallback((nextUrl: string) => videoUseCases.fetchNext(nextUrl), [])
-  const { items: recommended, reload: reloadRecommended, pageSize: recPageSize, hasNext: recHasNext, sentinelRef: recSentinelRef } = usePaginatedList<Video>(
+  const { items: recommended, loading: recLoading, reload: reloadRecommended, pageSize: recPageSize, hasNext: recHasNext, sentinelRef: recSentinelRef } = usePaginatedList<Video>(
     loadSimilarFirst,
     loadSimilarNext,
   )
@@ -191,6 +191,20 @@ export function WatchPage() {
         <aside className="grid gap-4 self-start min-w-0">
           <div className="text-sm font-semibold">Рекомендованные</div>
           <div className="grid gap-3">
+            {recommended.length === 0 && recLoading && (
+              <>
+                {Array.from({ length: recPageSize }).map((_, i) => (
+                  <div key={`rec-initial-skel-${i}`} className="flex gap-3 min-w-0 animate-pulse">
+                    <div className="aspect-video w-40 min-w-40 rounded-md bg-blue-50" />
+                    <div className="flex-1 min-w-0 grid gap-2">
+                      <div className="h-3 bg-slate-100 rounded w-11/12" />
+                      <div className="h-3 bg-slate-100 rounded w-8/12" />
+                      <div className="h-3 bg-slate-100 rounded w-6/12" />
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
             {recommended.filter((rv) => rv.id !== id).map((v) => {
               if (!v.channel) return null
 
@@ -223,7 +237,7 @@ export function WatchPage() {
               )
             })}
             {recHasNext &&
-              Array.from({ length: Math.max(1, recPageSize) }).map((_, i) => (
+              Array.from({ length: recPageSize }).map((_, i) => (
                 i === 0 ? (
                   <div key={`rec-tail-sentinel-wrap-${i}`} ref={recSentinelRef} className="flex gap-3 min-w-0 animate-pulse">
                     <div className="aspect-video w-40 min-w-40 rounded-md bg-blue-50" />
