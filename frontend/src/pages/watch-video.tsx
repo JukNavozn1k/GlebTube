@@ -52,29 +52,27 @@ export function WatchPage() {
   )
 
   useEffect(() => {
-    const didRef = (WatchPage as any)._didRef || { current: new Map<string, boolean>() }
-    ;(WatchPage as any)._didRef = didRef
-    const loadVideo = async () => {
+    let alive = true
+    const run = async () => {
       setIsLoading(true)
       try {
         const v = await videoUseCases.fetchById(id)
+        if (!alive) return
         setVideo(v)
         if (v?.channel) setSub(!!v.channel.subscribed)
+        // After details are loaded for this id, reload recommendations
+        await reloadRecommended()
       } catch (error) {
         console.error("Failed to load video:", error)
+        if (!alive) return
         setVideo(null)
       } finally {
+        if (!alive) return
         setIsLoading(false)
       }
     }
-    loadVideo()
-    // reset and load recommendations for new id; guard StrictMode duplicate for same id
-    const key = String(id)
-    const seen = didRef.current.get(key)
-    if (!seen) {
-      didRef.current.set(key, true)
-      reloadRecommended()
-    }
+    run()
+    return () => { alive = false }
   }, [id, reloadRecommended])
 
   useEffect(() => {

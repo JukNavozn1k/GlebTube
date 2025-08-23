@@ -103,7 +103,7 @@ export class VideoApi extends Api<Video> {
    * GET /video/{id}/similar
    */
   async fetchSimilar(id: string, params?: PaginationParams): Promise<Paginated<Video>> {
-    const res = await this.apiClient.get<Paginated<Video>>(`/${this.prefix}/${id}/similar`, { params });
+    const res = await this.apiClient.get<Paginated<Video>>(`/${this.prefix}/${id}/similar/`, { params });
     return res.data;
   }
 

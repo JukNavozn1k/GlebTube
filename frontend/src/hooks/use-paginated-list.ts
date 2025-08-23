@@ -24,15 +24,6 @@ export function usePaginatedList<T extends { id?: string | number }>(
   const inFlightNextUrlRef = useRef<string | null>(null)
   // Guard against fetching the same nextUrl again even after completion (backend returning same URL or rapid triggers)
   const lastLoadedNextUrlRef = useRef<string | null>(null)
-  // Keep stable refs to the loader functions to avoid effect dependency thrash
-  const loadFirstRef = useRef(loadFirst)
-  const loadNextRef = useRef(loadNext)
-  useEffect(() => {
-    loadFirstRef.current = loadFirst
-  }, [loadFirst])
-  useEffect(() => {
-    loadNextRef.current = loadNext
-  }, [loadNext])
 
   // no external reset; reload() resets state before fetching
 
@@ -45,7 +36,7 @@ export function usePaginatedList<T extends { id?: string | number }>(
     inFlightNextUrlRef.current = null
     lastLoadedNextUrlRef.current = null
     try {
-      const page = await loadFirstRef.current()
+      const page = await loadFirst()
       setItems(page.results)
       setNextUrl(page.next)
       setCount(page.count)
@@ -54,7 +45,7 @@ export function usePaginatedList<T extends { id?: string | number }>(
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [loadFirst])
 
   const loadMore = useCallback(async () => {
     if (!nextUrl || loadingMoreRef.current) return
@@ -64,7 +55,7 @@ export function usePaginatedList<T extends { id?: string | number }>(
     inFlightNextUrlRef.current = nextUrl
     setLoadingMore(true)
     try {
-      const page = await loadNextRef.current(nextUrl)
+      const page = await loadNext(nextUrl)
       setItems((prev) => {
         const seen = new Set(prev.map((it) => String(keyFn(it))))
         const merged: T[] = [...prev]
@@ -88,7 +79,7 @@ export function usePaginatedList<T extends { id?: string | number }>(
       // Clear in-flight marker to allow subsequent nextUrl fetches
       inFlightNextUrlRef.current = null
     }
-  }, [nextUrl])
+  }, [nextUrl, loadNext, keyFn])
 
   // Note: No auto-load on mount. Callers must call reload() on mount or when inputs change.
 
