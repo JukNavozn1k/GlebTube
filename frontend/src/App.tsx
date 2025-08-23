@@ -7,6 +7,7 @@ import { EditVideoPage } from "@/pages/edit-video"
 import { ProfilePage } from "@/pages/profile"
 import { ProfileSettingsPage } from "@/pages/profile-settings"
 import { SubscriptionsPage } from "@/pages/subscriptions"
+import { VideoEditorPage } from "@/pages/video-editor"
 
 import { ClientLayout } from "@/ClientLayout"
 import { AuthPage } from "@/pages/auth"
@@ -32,6 +33,8 @@ function App() {
           <Route path="/profile/settings" element={<ProfileSettingsPage />} />
           <Route path="/subscriptions" element={<SubscriptionsPage />} />
         </Route>
+        {/* Standalone video editor without layout */}
+        <Route path="/editor" element={<VideoEditorPage />} />
       </Routes>
     </BrowserRouter>
   )
